@@ -1,0 +1,323 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{e2da6772-132b-4ad7-9fd8-eb7b62988d10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\소스">
+      <UniqueIdentifier>{62947338-02a8-4a7f-b6af-9f18bae8632a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\헤더">
+      <UniqueIdentifier>{e96d0d9f-9c44-4bbe-9203-e54dc76d37e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{f6636431-f6ad-49a8-b474-0285a497b024}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\소스">
+      <UniqueIdentifier>{67730e9d-591d-45c7-a540-1dd1850d4373}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\헤더">
+      <UniqueIdentifier>{3c118c08-8d71-416f-b1be-2cea245f443a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{dacb2fb1-3cfb-4178-b55f-4be7738af6ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model\소스">
+      <UniqueIdentifier>{8a74928d-1e64-49cf-9f1e-03961ec92db0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model\헤더">
+      <UniqueIdentifier>{9061ba9e-ea7a-4c24-a58c-e81c90f9c8bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\hlsl">
+      <UniqueIdentifier>{c0d0d565-9c56-4782-a1fb-d570f2bd59b7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DBase.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameFramework.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dUtil.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MathHelper.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="UploadBuffer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Shader\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="CTerrainShader.h">
+      <Filter>Shader\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Network.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelStructure.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="SkinModel.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Objects\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Objects\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="CAnimationObject.h">
+      <Filter>Objects\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelManager.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationShader.h">
+      <Filter>Shader\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="Zombie.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CStaticObjectShader.h">
+      <Filter>Shader\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMap.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowShader.h">
+      <Filter>Shader\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="CLight.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TexturePool.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationBlend.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationPool.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>Model\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationInfo.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="D3DBase.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader12.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GameFramework.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="OldModelLoader.h">
+      <Filter>Model\헤더</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="MathHelper.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dUtil.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Shader\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="CTerrainShader.cpp">
+      <Filter>Shader\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Network.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinModel.cpp">
+      <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Objects\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Objects\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="CAnimationObject.cpp">
+      <Filter>Objects\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelManager.cpp">
+      <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationShader.cpp">
+      <Filter>Shader\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="Zombie.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CStaticObjectShader.cpp">
+      <Filter>Shader\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMap.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowShader.cpp">
+      <Filter>Shader\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="CLight.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="OldModelLoader2.cpp">
+      <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="Configuration.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationBlend.cpp">
+      <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationPool.cpp">
+      <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="StateMachine.cpp">
+      <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="TexturePool.cpp">
+      <Filter>Model\헤더</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationInfo.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="D3DBase.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="D3DBase.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Animation.hlsl">
+      <Filter>Shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders.hlsl">
+      <Filter>Shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="PlayerShader.hlsl">
+      <Filter>Shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="common.hlsl">
+      <Filter>Shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowMapShader.hlsl">
+      <Filter>Shader\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="Lighting.hlsl">
+      <Filter>Shader\hlsl</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="debug.hlsl">
+      <Filter>Shader\hlsl</Filter>
+    </None>
+    <None Include="Header.hlsli">
+      <Filter>Shader\hlsl</Filter>
+    </None>
+  </ItemGroup>
+</Project>

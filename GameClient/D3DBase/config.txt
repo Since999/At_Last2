@@ -1,0 +1,13 @@
+test_sol_no_texture.fbx
+demo_soldier_512.tga
+test_sol_no_texture.fbx
+demo_soldier_512.tga
+test_sol_no_texture.fbx
+demo_soldier_512.tga
+
+
+P1_sol_idle.fbx
+P1_sol_back_walk.fbx
+P1_sol_side_walk.fbx
+P1_sol_walk.fbx
+P1_sol_walk.fbx
