@@ -334,3 +334,9 @@ class DebugMesh : public CMesh
 public:
 	DebugMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::vector<DebugVertex>& v);
 };
+
+class C2DMesh : public CMesh
+{
+public:
+	C2DMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+};

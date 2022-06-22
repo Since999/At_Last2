@@ -119,3 +119,42 @@ DebugMesh::DebugMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	m_d3dVertexBufferView.StrideInBytes = m_nStride;
 	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
 }
+
+C2DMesh::C2DMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) 
+{
+	CTexturedVertex vertices[6];
+	XMFLOAT3 normal = { 0.0, 0.0, 1.0 };
+	for (int i = 0; i < 6; ++i) {
+		vertices[i].Normal = normal;
+	}
+	vertices[0].m_xmf3Position = { -1.0, -1.0, 0.0 };
+	vertices[0].m_xmf2TexCoord = { -1.0, -1.0 };
+	
+	vertices[1].m_xmf3Position = { -1.0, 1.0, 0.0 };
+	vertices[1].m_xmf2TexCoord = { -1.0, 1.0 };
+
+	vertices[2].m_xmf3Position = { 1.0, 1.0, 0.0 };
+	vertices[2].m_xmf2TexCoord = { 1.0, 1.0 };
+
+	vertices[3].m_xmf3Position = { 1.0, 1.0, 0.0 };
+	vertices[3].m_xmf2TexCoord = { 1.0, 1.0 };
+
+	vertices[4].m_xmf3Position = { 1.0, -1.0, 0.0 };
+	vertices[4].m_xmf2TexCoord = { 1.0, -1.0 };
+
+	vertices[5].m_xmf3Position = { -1.0, -1.0, 0.0 };
+	vertices[5].m_xmf2TexCoord = { -1.0, -1.0 };
+
+
+
+	m_nVertices = (UINT)6;
+	m_nStride = sizeof(CTexturedVertex);
+	m_nOffset = 0;
+	m_nSlot = 0;
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	m_pd3dVertexBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, &(vertices[0]), m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
+
+	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
+	m_d3dVertexBufferView.StrideInBytes = m_nStride;
+	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+}

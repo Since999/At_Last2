@@ -171,6 +171,12 @@
     <ClInclude Include="AnimationInfo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="2DObject.h">
+      <Filter>Objects\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="2DShader.h">
+      <Filter>Shader\헤더</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3DBase.cpp">
@@ -277,6 +283,12 @@
     </ClCompile>
     <ClCompile Include="AnimationInfo.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="2DObject.cpp">
+      <Filter>Objects\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="2DShader.cpp">
+      <Filter>Shader\소스</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

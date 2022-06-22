@@ -165,6 +165,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="2DObject.h" />
+    <ClInclude Include="2DShader.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimationBlend.h" />
     <ClInclude Include="AnimationInfo.h" />
@@ -208,6 +210,8 @@
     <ClInclude Include="Zombie.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="2DObject.cpp" />
+    <ClCompile Include="2DShader.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationBlend.cpp" />
     <ClCompile Include="AnimationInfo.cpp" />
@@ -416,7 +420,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="debug.hlsl" />
+    <None Include="debug.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="Header.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
