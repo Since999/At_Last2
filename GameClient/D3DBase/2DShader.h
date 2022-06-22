@@ -26,6 +26,7 @@ public:
 	virtual void AddObject();
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual D3D12_BLEND_DESC CreateBlendState();
 };
 
 //ROOT_PARAMATER_INDEX::GAMEOBJECT

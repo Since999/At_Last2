@@ -128,10 +128,10 @@ C2DMesh::C2DMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 		vertices[i].Normal = normal;
 	}
 	vertices[0].m_xmf3Position = { -1.0, -1.0, 0.0 };
-	vertices[0].m_xmf2TexCoord = { -1.0, -1.0 };
+	vertices[0].m_xmf2TexCoord = { 0.0, 0.0 };
 	
 	vertices[1].m_xmf3Position = { -1.0, 1.0, 0.0 };
-	vertices[1].m_xmf2TexCoord = { -1.0, 1.0 };
+	vertices[1].m_xmf2TexCoord = { 0.0, 1.0 };
 
 	vertices[2].m_xmf3Position = { 1.0, 1.0, 0.0 };
 	vertices[2].m_xmf2TexCoord = { 1.0, 1.0 };
@@ -140,10 +140,10 @@ C2DMesh::C2DMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	vertices[3].m_xmf2TexCoord = { 1.0, 1.0 };
 
 	vertices[4].m_xmf3Position = { 1.0, -1.0, 0.0 };
-	vertices[4].m_xmf2TexCoord = { 1.0, -1.0 };
+	vertices[4].m_xmf2TexCoord = { 1.0, 0.0 };
 
 	vertices[5].m_xmf3Position = { -1.0, -1.0, 0.0 };
-	vertices[5].m_xmf2TexCoord = { -1.0, -1.0 };
+	vertices[5].m_xmf2TexCoord = { 0.0, 0.0 };
 
 
 
