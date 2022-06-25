@@ -11,7 +11,7 @@ HINSTANCE						ghAppInstance;
 TCHAR							szTitle[MAX_LOADSTRING];
 TCHAR							szWindowClass[MAX_LOADSTRING];
 
-CGameFramework					gGameFramework;
+CGameFramework*					gGameFramework;
 
 ATOM MyRegisterClass(HINSTANCE hInstance);
 BOOL InitInstance(HINSTANCE, int);
@@ -68,7 +68,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 				}
 				else
 				{
-					gGameFramework.FrameAdvance();
+					gGameFramework->FrameAdvance();
 				}
 			}
 			return 0;
@@ -86,7 +86,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 			th.join();
 		}
 #endif
-		gGameFramework.OnDestroy();
+		gGameFramework->OnDestroy();
 
 		WSACleanup();
 
@@ -125,8 +125,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	HWND hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hInstance, NULL);
 
 	if (!hMainWnd) return(FALSE);
-
-	gGameFramework.OnCreate(hInstance, hMainWnd);
+	gGameFramework = CGameFramework::GetInstance();
+	gGameFramework->OnCreate(hInstance, hMainWnd);
 
 	::ShowWindow(hMainWnd, nCmdShow);
 	::UpdateWindow(hMainWnd);
@@ -153,7 +153,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 	case WM_KEYDOWN:
 	case WM_KEYUP:
-		gGameFramework.OnProcessingWindowMessage(hWnd, message, wParam, lParam);
+		gGameFramework->OnProcessingWindowMessage(hWnd, message, wParam, lParam);
 		break;
 	case WM_COMMAND:
 		wmId = LOWORD(wParam);

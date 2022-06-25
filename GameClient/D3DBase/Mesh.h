@@ -338,5 +338,9 @@ public:
 class C2DMesh : public CMesh
 {
 public:
+	static C2DMesh* GetInstance();
+private:
+	static C2DMesh* singleton;
+public:
 	C2DMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 };

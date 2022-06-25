@@ -120,6 +120,16 @@ DebugMesh::DebugMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
 }
 
+C2DMesh* C2DMesh::singleton = NULL;
+
+C2DMesh* C2DMesh::GetInstance()
+{
+	if (singleton) return singleton;
+	singleton = new C2DMesh(DEVICEMANAGER.pd3dDevice, DEVICEMANAGER.pd3dCommandList);
+	return singleton;
+}
+ 
+
 C2DMesh::C2DMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) 
 {
 	CTexturedVertex vertices[6];
@@ -145,7 +155,12 @@ C2DMesh::C2DMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	vertices[5].m_xmf3Position = { -1.0, -1.0, 0.0 };
 	vertices[5].m_xmf2TexCoord = { 0.0, 0.0 };
 
-
+	for (int i = 0; i < 6; ++i) {
+		//vertices[i].m_xmf3Position.z = vertices[i].m_xmf3Position.y;
+		////vertices[i].m_xmf3Position.y = 0;
+		//vertices[i].m_xmf3Position.y = vertices[i].m_xmf3Position.x;
+		//vertices[i].m_xmf3Position.x = 0.f;
+	}
 
 	m_nVertices = (UINT)6;
 	m_nStride = sizeof(CTexturedVertex);

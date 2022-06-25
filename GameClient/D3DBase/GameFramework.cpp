@@ -15,6 +15,15 @@ float bottom = -500.0f;
 #define PRINT_RATE 10.0f
 float renderTime = 0.0f;
 
+CGameFramework* CGameFramework::singleton;
+
+CGameFramework* CGameFramework::GetInstance() 
+{
+	if (singleton) return singleton;
+	
+	singleton = new CGameFramework();
+	return singleton;
+}
 
 CGameFramework::CGameFramework()
 {
@@ -477,7 +486,7 @@ void CGameFramework::OnDestroy()
 	if (m_pd3dDevice) m_pd3dDevice->Release();
 	if (m_pdxgiFactory) m_pdxgiFactory->Release();
 }
-
+#include "2DShader.h"
 void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -486,6 +495,7 @@ void CGameFramework::BuildObjects()
 
 	m_pScene = new CScene();
 	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	ui_system = new UISystem(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
 
 
 	m_pScene->m_pPlayer = m_pPlayer = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10, 
@@ -791,8 +801,6 @@ void CGameFramework::FrameAdvance()
 
 void CGameFramework::ShadowMapRender()
 {
-	
-	
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ShadowMap->Resource(),
 		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 
@@ -859,6 +867,10 @@ void CGameFramework::Render()
 #ifdef SHADOW_TEXTURE_RENDER
 	dd.Render(m_pd3dCommandList);
 #endif
+
+	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+
+	ui_system->Render(m_pd3dCommandList, NULL);
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
