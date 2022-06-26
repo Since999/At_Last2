@@ -111,14 +111,15 @@ void CCamera::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 	UINT ncbElementBytes = ((sizeof(VS_CB_CAMERA_INFO) + 255) & ~255); //256ÀÇ ¹è¼ö
 	m_pd3dcbCamera = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
 
-	m_pd3dcbCamera->Map(0, NULL, (void**)&m_pcbMappedCamera);
+	//m_pd3dcbCamera->Map(0, NULL, (void**)&m_pcbMappedCamera);
 }
 
 void CCamera::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pd3dcbCamera->Map(0, NULL, (void**)&m_pcbMappedCamera);
 	XMStoreFloat4x4(&m_pcbMappedCamera->m_xmf4x4View, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
 	XMStoreFloat4x4(&m_pcbMappedCamera->m_xmf4x4Projection, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Projection)));
-
+	m_pd3dcbCamera->Unmap(0, NULL);
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbCamera->GetGPUVirtualAddress();
 	pd3dCommandList->SetGraphicsRootConstantBufferView(1, d3dGpuVirtualAddress);
 }
@@ -127,7 +128,7 @@ void CCamera::ReleaseShaderVariables()
 {
 	if (m_pd3dcbCamera)
 	{
-		m_pd3dcbCamera->Unmap(0, NULL);
+		//m_pd3dcbCamera->Unmap(0, NULL);
 		m_pd3dcbCamera->Release();
 	}
 }
@@ -291,7 +292,7 @@ void CThirdPersonCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
 
 CTopViewCamera::CTopViewCamera(CCamera* pCamera) {
 	m_nMode = THIRD_PERSON_CAMERA;
-	dir = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.1f));
+	dir = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.01f));
 	distance = 2600.0f;
 }
 
@@ -322,4 +323,22 @@ void CTopViewCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
 	m_xmf3Right = XMFLOAT3(mtxLookAt._11, mtxLookAt._21, mtxLookAt._31);
 	m_xmf3Up = XMFLOAT3(mtxLookAt._12, mtxLookAt._22, mtxLookAt._32);
 	m_xmf3Look = XMFLOAT3(mtxLookAt._13, mtxLookAt._23, mtxLookAt._33);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//UICamera
+
+UICamera::UICamera()
+{
+	GenerateProjectionMatrix(0, 0, 0, 0);
+	SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
+	SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+	
+}
+
+void UICamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle)
+{
+	//auto tmp = 
+	//auto tmp = XMMatrixIdentity();
+	XMStoreFloat4x4(&m_xmf4x4Projection, XMMatrixOrthographicLH(UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT, 0.0f, 1000.0f));
 }

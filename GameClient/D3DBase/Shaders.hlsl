@@ -23,3 +23,23 @@ float4 PSTextured(VS_TEXTURED_OUTPUT input) : SV_TARGET
 
 	return(result);
 }
+
+
+VS_TEXTURED_OUTPUT VSParticle(VS_TEXTURED_INPUT input)
+{
+	VS_TEXTURED_OUTPUT output;
+	//float4 rotation = float4(m_xmf4x4View._13, m_xmf4x4View._23, m_xmf4x4View._33, 1.0f);
+	//float4 toCamera = mul(float4(input.position, 1.0f), );
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = input.uv;
+	return(output);
+}
+
+float4 PSParticle(VS_TEXTURED_OUTPUT input) : SV_TARGET
+{
+	float4 cColor = gtxtTexture.Sample(gSamplerState, input.uv);
+
+	float4 result = cColor;
+
+	return(result);
+}

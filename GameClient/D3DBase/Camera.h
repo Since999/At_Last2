@@ -60,7 +60,7 @@ public:
 	void GenerateViewMatrix(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3LookAt, XMFLOAT3 xmf3Up);
 	void RegenerateViewMatrix();
 
-	void GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle);
+	virtual void GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle);
 
 	void SetViewport(int xTopLeft, int yTopLeft, int nWidth, int nHeight, float fMinZ = 0.0f, float fMaxZ = 1.0f);
 	void SetScissorRect(LONG xLeft, LONG yTop, LONG xRight, LONG yBottom);
@@ -77,9 +77,21 @@ public:
 	void SetLookAtPosition(XMFLOAT3 xmf3LookAtWorld) { m_xmf3LookAtWorld = xmf3LookAtWorld; }
 	XMFLOAT3& GetLookAtPosition() { return(m_xmf3LookAtWorld); }
 
-	XMFLOAT3& GetRightVector() { return(m_xmf3Right); }
-	XMFLOAT3& GetUpVector() { return(m_xmf3Up); }
-	XMFLOAT3& GetLookVector() { return(m_xmf3Look); }
+	XMFLOAT3& GetRightVector() { 
+		m_xmf3Right.x = m_xmf4x4View._11;
+		m_xmf3Right.y = m_xmf4x4View._21;
+		m_xmf3Right.z = m_xmf4x4View._31;
+		return(m_xmf3Right); }
+	XMFLOAT3& GetUpVector() { 
+		m_xmf3Up.x = m_xmf4x4View._12;
+		m_xmf3Up.y = m_xmf4x4View._22;
+		m_xmf3Up.z = m_xmf4x4View._32;
+		return(m_xmf3Up); }
+	XMFLOAT3& GetLookVector() { 
+		m_xmf3Look.x = m_xmf4x4View._13;
+		m_xmf3Look.y = m_xmf4x4View._23;
+		m_xmf3Look.z = m_xmf4x4View._33;
+		return(m_xmf3Look); }
 
 	float& GetPitch() { return(m_fPitch); }
 	float& GetRoll() { return(m_fRoll); }
@@ -149,4 +161,13 @@ public:
 		if (distance < 100.0f)
 			distance = 100.0f;
 	}
+};
+
+#define UI_SCREEN_WIDTH 1980
+#define UI_SCREEN_HEIGHT 1080
+
+class UICamera : public CCamera {
+public:
+	UICamera();
+	void GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle);
 };

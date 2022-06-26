@@ -171,6 +171,18 @@
     <ClInclude Include="AnimationInfo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="2DObject.h">
+      <Filter>Objects\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="2DShader.h">
+      <Filter>Shader\헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="Markup.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLReader.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3DBase.cpp">
@@ -272,11 +284,23 @@
     <ClCompile Include="StateMachine.cpp">
       <Filter>Model\소스</Filter>
     </ClCompile>
-    <ClCompile Include="TexturePool.cpp">
-      <Filter>Model\헤더</Filter>
-    </ClCompile>
     <ClCompile Include="AnimationInfo.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="2DObject.cpp">
+      <Filter>Objects\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="2DShader.cpp">
+      <Filter>Shader\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="Markup.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLReader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TexturePool.cpp">
+      <Filter>Model\소스</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -319,5 +343,10 @@
     <None Include="Header.hlsli">
       <Filter>Shader\hlsl</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Resources\UI\TestUI.xml">
+      <Filter>리소스 파일</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

@@ -131,8 +131,9 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
 protected:
-	CGameObject** m_ppObjects = 0;
-	int								m_nObjects = 0;
+	std::list<CGameObject*> object_list;
+	//CGameObject** m_ppObjects = 0;
+	int								max_object = 0;
 
 	ID3D12Resource* m_pd3dcbGameObjects = NULL;
 	CB_GAMEOBJECT_INFO* m_pcbMappedGameObjects = NULL;

@@ -9,11 +9,16 @@
 
 class ShadowMap;
 class CSunLight;
+class UISystem;
 
 class CGameFramework
 {
-public:
+private:
+	static CGameFramework* singleton;
 	CGameFramework();
+	
+public:
+	static CGameFramework* GetInstance();
 	~CGameFramework();
 
 	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
@@ -49,6 +54,7 @@ public:
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
+	CCamera* GetCamera() const { return m_pCamera; }
 private:
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd;
@@ -109,5 +115,7 @@ private:
 	POINT						m_ptOldCursorPos;
 
 	_TCHAR						m_pszFrameRate[50];
+
+	UISystem* ui_system;
 };
 

@@ -467,6 +467,12 @@ void CGameObject::Scale(float size)
 	m_xmf4x4World = Matrix4x4::Multiply(mtxScale, m_xmf4x4World);
 }
 
+void CGameObject::Scale(float x, float y, float z)
+{
+	XMMATRIX mtxScale = XMMatrixScaling(x, y, z);
+	m_xmf4x4World = Matrix4x4::Multiply(mtxScale, m_xmf4x4World);
+}
+
 //----------------------------------------------------------------------------
 
 void CStaticObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12DescriptorHeap* desc_heap, CCamera* pCamera)
