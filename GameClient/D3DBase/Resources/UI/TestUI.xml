@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UI
-  width ="1"
-  height ="1"
-  x ="0"
-  y ="0"
-  image="Resources/UI/test.png"/>
+  width ="100"
+  height ="100"
+  x ="100"
+  y ="100"
+  image="Resources/UI/UV_Grid.jpg"/>

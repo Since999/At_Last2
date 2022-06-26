@@ -111,14 +111,15 @@ void CCamera::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 	UINT ncbElementBytes = ((sizeof(VS_CB_CAMERA_INFO) + 255) & ~255); //256ÀÇ ¹è¼ö
 	m_pd3dcbCamera = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
 
-	m_pd3dcbCamera->Map(0, NULL, (void**)&m_pcbMappedCamera);
+	//m_pd3dcbCamera->Map(0, NULL, (void**)&m_pcbMappedCamera);
 }
 
 void CCamera::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pd3dcbCamera->Map(0, NULL, (void**)&m_pcbMappedCamera);
 	XMStoreFloat4x4(&m_pcbMappedCamera->m_xmf4x4View, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4View)));
 	XMStoreFloat4x4(&m_pcbMappedCamera->m_xmf4x4Projection, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Projection)));
-
+	m_pd3dcbCamera->Unmap(0, NULL);
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbCamera->GetGPUVirtualAddress();
 	pd3dCommandList->SetGraphicsRootConstantBufferView(1, d3dGpuVirtualAddress);
 }
@@ -127,7 +128,7 @@ void CCamera::ReleaseShaderVariables()
 {
 	if (m_pd3dcbCamera)
 	{
-		m_pd3dcbCamera->Unmap(0, NULL);
+		//m_pd3dcbCamera->Unmap(0, NULL);
 		m_pd3dcbCamera->Release();
 	}
 }
@@ -337,6 +338,7 @@ UICamera::UICamera()
 
 void UICamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle)
 {
-	auto tmp = XMMatrixOrthographicLH(UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT, 0.0f, 1000.0f);
-	XMStoreFloat4x4(&m_xmf4x4Projection, tmp);
+	//auto tmp = 
+	//auto tmp = XMMatrixIdentity();
+	XMStoreFloat4x4(&m_xmf4x4Projection, XMMatrixOrthographicLH(UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT, 0.0f, 1000.0f));
 }

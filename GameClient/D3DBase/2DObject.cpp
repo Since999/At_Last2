@@ -7,7 +7,7 @@ CMesh* C2DObject::mesh = NULL;
 C2DObject::C2DObject()
 {
 	if (!mesh) mesh = C2DMesh::GetInstance();
-	Scale(1000.0f);
+	//Scale(1000.0f);
 }
 
 void C2DObject::Animate(float fTimeElapsed)
