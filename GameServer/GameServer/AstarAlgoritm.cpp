@@ -218,10 +218,7 @@ stack<AS_Node*> AStarAI::AstartSearch(int s_x, int s_y, int e_x, int e_y)
 	while (cur != nullptr)
 	{
 		closed_stack.push(cur);
-		if (cur->Get_Parent() == nullptr)
-		{
-			cur = cur->Get_Parent();
-		}
+		cur = cur->Get_Parent();
 	}
 
 	return closed_stack;
