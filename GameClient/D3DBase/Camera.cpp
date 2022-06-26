@@ -333,7 +333,10 @@ UICamera::UICamera()
 	GenerateProjectionMatrix(0, 0, 0, 0);
 	SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 	SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-	
+	XMFLOAT3 pos = { UI_SCREEN_WIDTH / 2.0f,UI_SCREEN_HEIGHT / 2.0f, 0.0f };
+	XMFLOAT3 look = pos;
+	look.z += 1.f;
+	GenerateViewMatrix(pos, look, {0.0f, 1.0f, 0.0f});
 }
 
 void UICamera::GenerateProjectionMatrix(float fNearPlaneDistance, float fFarPlaneDistance, float fAspectRatio, float fFOVAngle)
