@@ -1,1 +1,2 @@
 0-30 idle / 31-111 walk / 112-179 attack / 180-241 attacked / 241-320 death
+0-30 idle / 31-152 walk / 156-269 attack / 270-330 attacked / 331-475 death
