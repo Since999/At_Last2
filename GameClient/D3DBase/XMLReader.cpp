@@ -14,6 +14,8 @@ bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
     float x;
     float y;
     wstring image_file_name;
+    xml.FindElem(L"UISystem");
+    xml.IntoElem();
     while (xml.FindElem(L"UI")) {
         width = _wtoi(xml.GetAttrib(L"width"));
         height = _wtoi(xml.GetAttrib(L"height"));

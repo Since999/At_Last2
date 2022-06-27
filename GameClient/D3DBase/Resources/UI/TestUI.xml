@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<UISystem>
+  
+
 <UI
   width ="100"
   height ="100"
   x ="100"
   y ="100"
   image="Resources/UI/UV_Grid.jpg"/>
+
+  <UI
+    width ="100"
+    height ="100"
+    x ="1000"
+    y ="1000"
+    image="Resources/UI/UV_Grid.jpg"/>
+
+</UISystem>
