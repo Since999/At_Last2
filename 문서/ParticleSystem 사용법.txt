@@ -1,0 +1,30 @@
+D3DBase\Resources\Particle\내에 xml파일로 저장
+
+<?xml version="1.0" encoding="utf-8"?>
+<ParticleSystem>
+  <Particle
+  name ="lightning"	// 코드 내에서 사용할 이름
+  width ="300"		// 크기
+  height ="600"
+  duration="0.3">		// 파티클 지속시간
+    <Image
+      image ="Resources/Particle/Lightning/Lightning.png"/>
+    <Image
+      image ="Resources/Particle/Lightning/Lightning2.png"/>
+    <Image
+      image ="Resources/Particle/Lightning/Lightning3.png"/>
+    <Image
+      image ="Resources/Particle/Lightning/Lightning4.png"/>
+    <Image
+      image ="Resources/Particle/Lightning/Lightning5.png"/>
+  </Particle>
+</ParticleSystem>
+
+
+위 양식대로 <Particle> </Particle>로 만들면 됩니다.
+
+코드 내에서는 
+ParticleSystem::GetInstance()->AddParticle(	{위치}	,  {파티클 이름} ); 을 부르면 위치에 파티클이 나옵니다.
+
+참고
+
