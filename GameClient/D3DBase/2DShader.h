@@ -1,9 +1,11 @@
 #pragma once
 #include "Shader.h"
+#include "2DObject.h"
 #include <map>
 #include <string>
 #define MAX_PARTICLE 300
 #define MAX_PARTICLE_TYPE 50
+
 
 class C2DShader :
     public CObjectsShader
@@ -28,7 +30,6 @@ public:
 	//virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual CTexture* GetTexture(const wstring& tex_file_name);
 	virtual void AddTexture(ID3D12Device* device, CTexture* tex);
-	virtual void AddObject();
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual D3D12_BLEND_DESC CreateBlendState();
@@ -62,9 +63,19 @@ private:
 };
 
 class ParticleSystem : public C2DShader {
+private:
+	static ParticleSystem* singleton;
 public:
-	ParticleSystem();
-	~ParticleSystem(){}
+	static ParticleSystem* GetInstance();
+	static ParticleSystem* InitInstance(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig);
+private:
+	map<wstring, CParticleBuilder> particle_pool;
+public:
+	ParticleSystem(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig);
+	~ParticleSystem();
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	void AddParticle(const XMFLOAT3& position, const wstring& name);
+private:
+	void LoadParticle(const wstring& name);
 };

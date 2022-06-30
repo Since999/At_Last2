@@ -441,6 +441,7 @@
     <None Include="Header.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="Resources\Particle\sample.xml" />
     <Xml Include="Resources\UI\TestUI.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

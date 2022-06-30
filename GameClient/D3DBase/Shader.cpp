@@ -393,6 +393,7 @@ void CObjectsShader::AnimateObjects(float fTimeElapsed)
 	for (CGameObject* object : object_list) {
 		object->Animate(fTimeElapsed);
 	}
+	RemoveObjects();
 }
 
 void CObjectsShader::ReleaseUploadBuffers()
@@ -402,6 +403,32 @@ void CObjectsShader::ReleaseUploadBuffers()
 	}
 }
 
+void CObjectsShader::AddObject(CGameObject* object)
+{
+	object_list.push_back(object);
+}
+
+void CObjectsShader::RemoveObject(CGameObject* object)
+{
+	remove_list.push_back(object);
+}
+
+void CObjectsShader::RemoveObjects()
+{
+	for (const auto& object : remove_list) {
+		auto found = find(object_list.begin(), object_list.end(), object);
+		if (found == object_list.end()) {
+#ifdef _DEBUG
+			cout << "warning(CObjectShader::RemoveObject): object not found" << endl;
+#endif
+			return;
+		}
+		delete (*found);
+		object_list.erase(found);
+	}
+	remove_list.clear();
+}
+
 void CObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	CTexturedShader::Render(pd3dCommandList, pCamera);
@@ -409,42 +436,6 @@ void CObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 		object->Render(pd3dCommandList, pCamera);
 	}
 }
-
-void CAlterShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256ÀÇ ¹è¼ö
-	m_pd3dcbGameObjects = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes * nObjects, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
-
-	m_pd3dcbGameObjects->Map(0, NULL, (void**)&m_pcbMappedGameObjects);
-}
-
-void CAlterShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, int index, const XMFLOAT4X4& info)
-{
-	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
-	CB_GAMEOBJECT_INFO* pbMappedcbGameObject = (CB_GAMEOBJECT_INFO*)((UINT8*)m_pcbMappedGameObjects + (index * ncbElementBytes));
-	XMStoreFloat4x4(&pbMappedcbGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&info)));
-}
-
-void CAlterShader::ReleaseShaderVariables()
-{
-	if (m_pd3dcbGameObjects)
-	{
-		m_pd3dcbGameObjects->Unmap(0, NULL);
-		m_pd3dcbGameObjects->Release();
-	}
-
-	CTexturedShader::ReleaseShaderVariables();
-}
-
-int CAlterShader::AddObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	if (cur_object + 1 < nObjects) return cur_object++;
-	ReleaseShaderVariables();
-	nObjects = nObjects * 2;
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	return cur_object++;
-}
-
 
 ShadowMapDebugShader::ShadowMapDebugShader()
 {

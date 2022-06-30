@@ -69,7 +69,10 @@ C2DShader::C2DShader(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, I
 
 C2DShader::~C2DShader()
 {
-
+	for (auto& [name, texture] : texture_map) {
+		if(texture) delete texture;
+	}
+	texture_map.clear();
 }
 #include "Configuration.h"
 void C2DShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
@@ -95,11 +98,6 @@ CTexture* C2DShader::GetTexture(const wstring& tex_file_name)
 void C2DShader::AddTexture(ID3D12Device* device, CTexture* tex)
 {
 	CreateShaderResourceViews(device, tex, 0, (UINT)ROOT_PARAMATER_INDEX::TEXTURE);
-}
-
-void C2DShader::AddObject()
-{
-
 }
 
 void C2DShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -140,7 +138,7 @@ void C2DShaderSample::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	object->SetMaterial(Material);
 	object->SetPosition(50500.0f, CConfiguration::bottom + 200.0f, 14000.0f);
 	object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * 0));
-	object_list.push_back(object);
+	AddObject(object);
 }
 
 void C2DShaderSample::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -193,7 +191,7 @@ void UISystem::AddUI(float width, float height, float x, float y, const wstring&
 	material->SetTexture(texture);
 	CGameObject* object = new CUIObject(width, height, x, y, material);
 	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
-	object_list.push_back(object);
+	AddObject(object);
 }
 
 void UISystem::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -210,6 +208,29 @@ void UISystem::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCame
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Particle
+
+ParticleSystem* ParticleSystem::singleton;
+
+ParticleSystem* ParticleSystem::InitInstance(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig)
+{
+	if (singleton) return singleton;
+	singleton = new ParticleSystem(device, cmdlist, root_sig);
+	return singleton;
+}
+ParticleSystem* ParticleSystem::GetInstance()
+{
+	return singleton;
+}
+
+ParticleSystem::ParticleSystem(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig)
+{
+	CreateShader(device, root_sig);
+	BuildObjects(device, cmdlist);
+}
+
+ParticleSystem::~ParticleSystem()
+{
+}
 
 void ParticleSystem::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
@@ -231,4 +252,30 @@ void ParticleSystem::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 void ParticleSystem::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
 	C2DShader::BuildObjects(pd3dDevice, pd3dCommandList);
+	wstring particles[] = { L"sample" };
+	for (const auto& name : particles) {
+		LoadParticle(name);
+	}	
+}
+
+void ParticleSystem::AddParticle(const XMFLOAT3& position, const wstring& name)
+{
+	auto found = particle_pool.find(name);
+	if (found == particle_pool.end()) {
+#ifdef _DEBUG
+		cout << "warning(ParticleSystem::AddParticle): no such particle (" << name.c_str() << ")" << endl;
+#endif
+		return;
+	}
+	AddObject((*found).second.Build(position));
+}
+
+
+void ParticleSystem::LoadParticle(const wstring& name)
+{
+	wstring file_name = name;
+	file_name.insert(0, L"Resources/Particle/");
+	file_name.insert(file_name.size(), L".xml");
+	auto builder = CXMLReader::LoadParticle(file_name, this);
+	particle_pool.emplace(name, builder);
 }

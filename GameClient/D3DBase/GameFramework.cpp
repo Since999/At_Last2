@@ -496,7 +496,7 @@ void CGameFramework::BuildObjects()
 	m_pScene = new CScene();
 	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	ui_system = new UISystem(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
-
+	particle_system = ParticleSystem::InitInstance(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
 
 	m_pScene->m_pPlayer = m_pPlayer = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10, 
 		CConfiguration::player_models[0], CConfiguration::player_textures[0].c_str());
@@ -707,6 +707,9 @@ void CGameFramework::AnimateObjects()
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 
 	sun_light->Update(XMFLOAT3(), m_GameTimer.GetTimeElapsed());
+
+	particle_system->AnimateObjects(m_GameTimer.GetTimeElapsed());
+	ui_system->AnimateObjects(m_GameTimer.GetTimeElapsed());
 }
 
 void CGameFramework::UpdateShaderVariables()
@@ -863,6 +866,8 @@ void CGameFramework::Render()
 	m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
 	m_pPlayer2->Render(m_pd3dCommandList, m_pCamera);
 	m_pPlayer3->Render(m_pd3dCommandList, m_pCamera);
+
+	particle_system->Render(m_pd3dCommandList, m_pCamera);
 
 #ifdef SHADOW_TEXTURE_RENDER
 	dd.Render(m_pd3dCommandList);

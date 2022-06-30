@@ -43,6 +43,12 @@
     <Filter Include="Shader\hlsl">
       <UniqueIdentifier>{c0d0d565-9c56-4782-a1fb-d570f2bd59b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="리소스 파일\UI">
+      <UniqueIdentifier>{1a2ff67a-54a1-4c33-9aaa-70c6793a18d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="리소스 파일\Particle">
+      <UniqueIdentifier>{5625b4e6-a12c-4f2f-804a-22c3dea3818f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -345,8 +351,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="Resources\Particle\sample.xml">
+      <Filter>리소스 파일\Particle</Filter>
+    </Xml>
     <Xml Include="Resources\UI\TestUI.xml">
-      <Filter>리소스 파일</Filter>
+      <Filter>리소스 파일\UI</Filter>
     </Xml>
   </ItemGroup>
 </Project>

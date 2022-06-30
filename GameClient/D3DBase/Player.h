@@ -125,6 +125,9 @@ class CMainGamePlayer : public CPlayer
 {
 private:
 	Client* server_player_info;
+//TEST
+	float particle_test_time = 0.f;
+//TEST
 public:
 	CMainGamePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext=NULL, int nMeshes=1,string mesh="", const wchar_t* texture=L"" );
 	virtual ~CMainGamePlayer();
