@@ -103,6 +103,23 @@ void Socket::do_recv(int _prev_size)
 	}
 }
 
+void Socket::do_recv()
+{
+	DWORD recv_flag = 0;
+	ZeroMemory(&_recv_over._wsa_over, sizeof(_recv_over._wsa_over));
+	
+	_recv_over._wsa_buf.buf = (char*)_recv_over._ring_net_buf.GetReadPtr();
+	_recv_over._wsa_buf.len = _recv_over._ring_net_buf.DirectEnqueueSize();
+
+	int ret = WSARecv(s_socket, &_recv_over._wsa_buf, 1, 0, &recv_flag, &_recv_over._wsa_over, NULL);
+	if (SOCKET_ERROR == ret) {
+		int error_num = WSAGetLastError();
+		if (ERROR_IO_PENDING != error_num) {
+			throw Exception("Recv Fail");
+		}
+	}
+}
+
 void Socket::do_send(int num_bytes, void* mess)
 {
 	ex_over = new Exp_Over(IOType::SEND, num_bytes, mess);
@@ -111,6 +128,26 @@ void Socket::do_send(int num_bytes, void* mess)
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num)
 			throw Exception("Send Fail");
+	}
+}
+
+void Socket::do_send(int num_bytes)
+{
+	//ex_over = new Exp_Over(IOType::SEND, num_bytes);
+	_send_over._wsa_buf.buf = (char*)_send_over._ring_send_buf.GetReadPtr();
+	_send_over._wsa_buf.len = num_bytes;
+	ZeroMemory(&_send_over._wsa_over, sizeof(_send_over._wsa_over));
+	//int ret = _send_over._ring_send_buf.Dequeue((unsigned char*)_send_over._wsa_buf.buf, num_bytes);
+	//if (ret == 0)
+	//{
+	//	throw Exception("send_ring_buffer -> dequeue_fail");
+	//}
+	_send_over._IOType = IOType::SEND;
+	int ret = WSASend(s_socket, &_send_over._wsa_buf, 1, 0, 0, &_send_over._wsa_over, NULL);
+	if (SOCKET_ERROR == ret) {
+		int error_num = WSAGetLastError();
+		if (ERROR_IO_PENDING != error_num)
+			throw Exception("Ring Send Fail");
 	}
 }
 

@@ -1224,13 +1224,10 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	}
 	case (int)MsgType::CS_PLAYER_MOVE:
 	{
-		//cl.state_lock.lock();
 		if (cl._state != ClientState::INGAME)
 		{
-			//cl.state_lock.unlock();
 			break;
 		}
-		//cl.state_lock.unlock();
 
 		cs_move_packet* packet = reinterpret_cast<cs_move_packet*>(p);
 
@@ -2503,8 +2500,8 @@ void Server::Work()
 				cl._id = new_id;
 				cl.prev_size = 0;
 				cl._recv_over._IOType = IOType::RECV;
-				cl._recv_over._wsa_buf.buf = reinterpret_cast<char*>(cl._recv_over._net_buf);
-				cl._recv_over._wsa_buf.len = sizeof(cl._recv_over._net_buf);
+				cl._recv_over._wsa_buf.buf = reinterpret_cast<char*>(cl._recv_over._ring_net_buf.GetReadPtr());
+				cl._recv_over._wsa_buf.len = sizeof(cl._recv_over._ring_net_buf.GetFreeSize());
 				ZeroMemory(&cl._recv_over._wsa_over, sizeof(cl._recv_over._wsa_over));
 				cl.m_socket.s_socket = c_socket;
 
@@ -2523,8 +2520,18 @@ void Server::Work()
 				continue;
 			}
 			Client& cl = g_clients[c_id];
+			cl.m_socket._recv_over._ring_net_buf.MoveRear(num_byte);
+			unsigned char* packet_start = cl.m_socket._recv_over._ring_net_buf.GetReadPtr();
+			int remain_data = cl.m_socket._recv_over._ring_net_buf.GetUseSize();
+			cl.m_socket._recv_over._ring_net_buf.Dequeue(packet_start, num_byte);
+			/*
 			int remain_data = num_byte + cl.prev_size;
-			unsigned char* packet_start = exp_over->_net_buf;
+			packet_start = exp_over->_net_buf;
+			*/
+
+			if (packet_start == nullptr)
+				break;
+
 			int packet_size = ((int)packet_start[1] * 256 ) + (int)packet_start[0];
 
 			while (packet_size <= remain_data)
@@ -2538,11 +2545,11 @@ void Server::Work()
 					break;
 			}
 
-			if (remain_data > 0)
-			{
-				cl.prev_size = remain_data;
-				memcpy(&exp_over->_net_buf, packet_start, remain_data);
-			}
+			//if (remain_data > 0)
+			//{
+			//	cl.prev_size = remain_data;
+			//	memcpy(&exp_over->_net_buf, packet_start, remain_data);
+			//}
 			cl.do_recv();
 		}
 			break;
@@ -2551,8 +2558,9 @@ void Server::Work()
 			if (num_byte != exp_over->_wsa_buf.len) {
 				Disconnect(c_id);
 			}
-			delete exp_over;
-			exp_over = nullptr;
+
+			//delete exp_over;
+			exp_over->_ring_send_buf.MoveFront(num_byte);
 		}
 			break;
 		case IOType::NPC_SPAWN:
@@ -3255,7 +3263,7 @@ void Server::Update()
 {
 	srand(time(NULL));
 
-	Exp_Over p_over;
+	Exp_Over p_over; 
 	_socket.Accept_Ex(p_over);
 
 	Initialize();

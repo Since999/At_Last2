@@ -31,7 +31,7 @@ void Client::move(float time_elapsed)
 		speed = clamp( speed - acceleration * time_elapsed, 0.0f, max_speed);
 		return;
 	}*/
-	speed = clamp(speed - (acceleration / 2) * time_elapsed, 0.0f, max_speed);
+	speed = clamp(speed - (acceleration/ 2) * time_elapsed, 0.0f, max_speed);
 	if(is_input) speed = clamp(speed + acceleration * time_elapsed, 0.0f, max_speed);
 	
 	if(is_input){

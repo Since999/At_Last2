@@ -65,6 +65,7 @@ public:
 	~Client();
 
 	void do_send(int num_bytes, void* mess);
+	void do_send(int num_bytes);
 	void do_recv();
 };
 

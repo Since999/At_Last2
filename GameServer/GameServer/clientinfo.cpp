@@ -17,12 +17,23 @@ Client::~Client()
 
 void Client::do_recv()
 {
-	m_socket.do_recv(prev_size);
+	//m_socket.do_recv(prev_size);
+	m_socket.do_recv();
 }
 
 void Client::do_send(int num_bytes, void* mess)
 {
-	m_socket.do_send(num_bytes, mess);
+	int ret = m_socket._send_over._ring_send_buf.Enqueue((const unsigned char*)mess, num_bytes);
+	if (ret == 0)
+	{
+		throw Exception("send_ring_buffer -> enqueue_fail");
+	}
+	m_socket.do_send(num_bytes);
+}
+
+void Client::do_send(int num_bytes)
+{
+	m_socket.do_send(num_bytes);
 }
 
 Player::Player()

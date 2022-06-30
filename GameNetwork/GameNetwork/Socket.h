@@ -11,6 +11,7 @@ public :
 	HANDLE h_iocp;
 	Exp_Over _recv_over;
 	Exp_Over* ex_over;
+	Exp_Over _send_over;
 
 public:
 	Socket();
@@ -28,5 +29,7 @@ public:
 	HANDLE& ReturnHandle();
 
 	void do_send(int num_bytes, void* mess);
+	void do_send(int num_bytes);
 	void do_recv(int _prev_size);
+	void do_recv();
 };

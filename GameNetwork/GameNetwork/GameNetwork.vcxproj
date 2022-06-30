@@ -148,10 +148,12 @@
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Expover.h" />
     <ClInclude Include="protocol.h" />
+    <ClInclude Include="Ringbuffer.h" />
     <ClInclude Include="Socket.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="Ringbuffer.cpp" />
     <ClCompile Include="Socket.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
