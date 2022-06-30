@@ -76,6 +76,7 @@ public:
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	void AddParticle(const XMFLOAT3& position, const wstring& name);
+	void AddBuilder(const wstring& name, float duration, const XMFLOAT2& size, vector<CMaterial*>* materials);
 private:
 	void LoadParticle(const wstring& name);
 };

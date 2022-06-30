@@ -29,33 +29,39 @@ bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
     return true;
 }
 
-
-CParticleBuilder CXMLReader::LoadParticle(const wstring& file_name, ParticleSystem* sys)
+void CXMLReader::LoadParticle(const wstring& file_name, ParticleSystem* sys)
 {
     CMarkup xml;
     CString strFileName = file_name.c_str();
     if (!xml.Load(strFileName))
     {
-        return CParticleBuilder(0, {0, 0}, NULL);
+        return;
     }
-    float width;
-    float height;
-    float duration;
-    vector<CMaterial*>* materials = new vector<CMaterial*>;
-    wstring image_file_name;
-    xml.FindElem(L"Particle");
-    width = _wtof(xml.GetAttrib(L"width"));
-    height = _wtof(xml.GetAttrib(L"height"));
-    duration = _wtof(xml.GetAttrib(L"duration"));
+    xml.FindElem(L"ParticleSystem");
     xml.IntoElem();
-    while (xml.FindElem(L"Image")) {
-        image_file_name = std::wstring(xml.GetAttrib(L"image").operator LPCWSTR());
-        CTexture* texture = sys->GetTexture(image_file_name);
-        CMaterial* mat = new CMaterial();
-        mat->SetTexture(texture);
-        materials->push_back(mat);
+    while (xml.FindElem(L"Particle")) {
+        float width;
+        float height;
+        float duration;
+        wstring name;
+        vector<CMaterial*>* materials = new vector<CMaterial*>;
+        wstring image_file_name;
+        xml.FindElem(L"Particle");
+        name = wstring{ xml.GetAttrib(L"name") };
+        width = _wtof(xml.GetAttrib(L"width"));
+        height = _wtof(xml.GetAttrib(L"height"));
+        duration = _wtof(xml.GetAttrib(L"duration"));
+        xml.IntoElem();
+        while (xml.FindElem(L"Image")) {
+            image_file_name = std::wstring(xml.GetAttrib(L"image").operator LPCWSTR());
+            CTexture* texture = sys->GetTexture(image_file_name);
+            CMaterial* mat = new CMaterial();
+            mat->SetTexture(texture);
+            materials->push_back(mat);
+        }
+        xml.OutOfElem();
+        materials->shrink_to_fit();
+        sys->AddBuilder(name, duration, { width, height }, materials);
     }
-    materials->shrink_to_fit();
-    CParticleBuilder builder{ duration, { width, height }, materials };
-    return builder;
+    return;
 }

@@ -276,6 +276,11 @@ void ParticleSystem::LoadParticle(const wstring& name)
 	wstring file_name = name;
 	file_name.insert(0, L"Resources/Particle/");
 	file_name.insert(file_name.size(), L".xml");
-	auto builder = CXMLReader::LoadParticle(file_name, this);
-	particle_pool.emplace(name, builder);
+	CXMLReader::LoadParticle(file_name, this);
+}
+
+
+void ParticleSystem::AddBuilder(const wstring& name, float duration, const XMFLOAT2& size, vector<CMaterial*>* materials)
+{
+	particle_pool.emplace(name, CParticleBuilder( duration, size, materials));
 }

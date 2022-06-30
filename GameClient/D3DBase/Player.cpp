@@ -450,7 +450,7 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 		pos.x += (((float)rand() / (float)RAND_MAX) - 0.5f) * 1000;
 		pos.y += (((float)rand() / (float)RAND_MAX) - 0.5f) * 10000;
 		pos.z += (((float)rand() / (float)RAND_MAX) - 0.5f) * 1000;
-		ParticleSystem::GetInstance()->AddParticle(pos, L"sample");
+		ParticleSystem::GetInstance()->AddParticle(pos, L"lightning");
 	}
 	//TEST
 }
