@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ParticleSystem>
+  <Particle
+  name ="lightning"
+  width ="300"
+  height ="600"
+  duration="0.3">
+    <Image
+      image ="Resources/Particle/Lightning/Lightning.png"/>
+    <Image
+      image ="Resources/Particle/Lightning/Lightning2.png"/>
+    <Image
+      image ="Resources/Particle/Lightning/Lightning3.png"/>
+    <Image
+      image ="Resources/Particle/Lightning/Lightning4.png"/>
+    <Image
+      image ="Resources/Particle/Lightning/Lightning5.png"/>
+  </Particle>
+</ParticleSystem>

@@ -10,6 +10,7 @@
 class ShadowMap;
 class CSunLight;
 class UISystem;
+class ParticleSystem;
 
 class CGameFramework
 {
@@ -116,6 +117,7 @@ private:
 
 	_TCHAR						m_pszFrameRate[50];
 
-	UISystem* ui_system;
+	UISystem* ui_system = NULL;
+	ParticleSystem* particle_system = NULL;
 };
 

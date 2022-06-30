@@ -128,34 +128,22 @@ public:
 
 	virtual void ReleaseUploadBuffers();
 
+	virtual void AddObject(CGameObject* object);
+	virtual void RemoveObject(CGameObject* object);
+
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
 protected:
+	virtual void RemoveObjects();
+protected:
 	std::list<CGameObject*> object_list;
+	vector<CGameObject*> remove_list;
+
 	//CGameObject** m_ppObjects = 0;
 	int								max_object = 0;
 
 	ID3D12Resource* m_pd3dcbGameObjects = NULL;
 	CB_GAMEOBJECT_INFO* m_pcbMappedGameObjects = NULL;
-};
-
-class CAlterShader : public CTexturedShader
-{
-public:
-	CAlterShader();
-	~CAlterShader();
-	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, int index, const XMFLOAT4X4& info);
-	virtual void ReleaseShaderVariables();
-	virtual int AddObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-protected:
-
-	int nObjects = 50;
-	int cur_object = 0;
-	ID3D12Resource* m_pd3dcbGameObjects = NULL;
-	CB_GAMEOBJECT_INFO* m_pcbMappedGameObjects = NULL;
-
-
 };
 
 class ShadowMapDebugShader : public CShader

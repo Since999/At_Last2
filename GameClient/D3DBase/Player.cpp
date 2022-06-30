@@ -376,7 +376,7 @@ CCamera* CMainGamePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 
 	return(m_pCamera);
 }
-
+#include "2DShader.h"
 void CMainGamePlayer::Update(float fTimeElapsed)
 {
 	//UpdateBoneTransforms(fTimeElapsed);
@@ -441,4 +441,16 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 	}
 
 	pre_location = curr_location;
+	//TEST
+	float t = 0.3f;
+	particle_test_time += fTimeElapsed;
+	if (particle_test_time > t) {
+		particle_test_time -= t;
+		XMFLOAT3 pos = GetPosition();
+		pos.x += (((float)rand() / (float)RAND_MAX) - 0.5f) * 1000;
+		pos.y += (((float)rand() / (float)RAND_MAX) - 0.5f) * 10000;
+		pos.z += (((float)rand() / (float)RAND_MAX) - 0.5f) * 1000;
+		ParticleSystem::GetInstance()->AddParticle(pos, L"lightning");
+	}
+	//TEST
 }

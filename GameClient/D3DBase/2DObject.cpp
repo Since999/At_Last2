@@ -1,13 +1,14 @@
 #include "2DObject.h"
 #include "Shader.h"
 #include "GameFramework.h"
+#include "2DShader.h"
 
 CMesh* C2DObject::mesh = NULL;
 
 C2DObject::C2DObject()
 {
 	if (!mesh) mesh = C2DMesh::GetInstance();
-	//Scale(1000.0f);
+	size = { 1000.f, 1000.f };
 }
 
 void C2DObject::Animate(float fTimeElapsed)
@@ -24,7 +25,7 @@ void C2DObject::Animate(float fTimeElapsed)
 	m_xmf4x4World._31 = look.x; m_xmf4x4World._32 = look.y; m_xmf4x4World._33 = look.z;
 	
 	//Rotate(fTimeElapsed * 10.0f, fTimeElapsed * 5.0f, fTimeElapsed * 2.0f);
-	Scale(1000.0f);
+	Scale(size.x, size.y, 1.0f);
 }
 
 void C2DObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -91,4 +92,62 @@ CUIObject::CUIObject(float width, float height, float x, float y, CMaterial* mat
 
 void CUIObject::Animate(float fTimeElapsed)
 {
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//	CParticleObject
+CParticleObject::CParticleObject(float duration, const XMFLOAT2& size, 
+	const XMFLOAT3& position, vector<CMaterial*>* materials)
+	: duration(duration), materials(materials)
+{
+	this->size = size;
+	SetPosition(position);
+}
+
+
+void CParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, 
+	const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera)
+{
+	OnPrepareRender();
+	float factor = cur_time / duration;	// 0~1
+	int index = (int)(materials->size() * factor);
+	if (index >= materials->size()) {
+#ifdef _DEBUG
+		cout << "warning(particle render): index over size " << endl;
+#endif
+		return;
+	}
+	CMaterial* mat = (*materials)[index];
+	if (mat)
+	{
+		if (mat->m_pShader)
+		{
+			mat->m_pShader->Render(pd3dCommandList, pCamera);
+			mat->m_pShader->UpdateShaderVariables(pd3dCommandList);
+		}
+	}
+
+	if (mat && mat->m_pTexture) {
+		mat->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, 0);
+	}
+
+	pd3dCommandList->SetGraphicsRootDescriptorTable(2, desc_handle);
+
+	if (mesh) mesh->Render(pd3dCommandList);
+#ifdef _DEBUG
+	else {
+		cout << "Error(2DObject): no mesh" << endl;
+	}
+#endif
+}
+
+void CParticleObject::Animate(float fTimeElapsed)
+{
+	cur_time += fTimeElapsed;
+	if (cur_time >= duration) {
+		ParticleSystem::GetInstance()->RemoveObject(this);
+		//ªË¡¶ remove this
+		return;
+	}
+	C2DObject::Animate(fTimeElapsed);
 }
