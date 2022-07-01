@@ -262,7 +262,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		game_start = true;
 		Send_request_packet(MsgType::CS_GAME_START);
 
-		AddTimer(my_id, EVENT_TYPE::PLAYER_MOVE, 100);
+		AddTimer(my_id, EVENT_TYPE::PLAYER_MOVE, 1000);
 		break;
 	}
 	case (int)MsgType::SC_GAME_START_FAIL:
@@ -1188,6 +1188,8 @@ void volatile Network::ProcessData(Exp_Over& exp_over, int& size)
 
 	while (packet_size <= remain_data)
 	{
+		cout << packet_size << "\n";
+
 		ProcessPacket(packet_start);
 		remain_data -= packet_size;
 		packet_start += packet_size;

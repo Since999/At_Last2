@@ -23,6 +23,8 @@ void Client::do_recv()
 
 void Client::do_send(int num_bytes, void* mess)
 {
+	if (num_bytes == 0) return;
+
 	int ret = m_socket._send_over._ring_send_buf.Enqueue((const unsigned char*)mess, num_bytes);
 	if (ret == 0)
 	{

@@ -155,7 +155,7 @@ void Server::Send_select_packet(int c_id, int s_id)
 	packet.speed = g_clients[c_id].player->speed;
 	g_clients[s_id].do_send(sizeof(packet), &packet);
 }
-
+ 
 void Server::Send_player_move_packet(int c_id, int s_id, float x, float z, float t_x, float t_z, float speed)
 {
 	sc_player_move_packet packet;
@@ -903,6 +903,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		
 		for (auto& other : g_clients)
 		{
+			this_thread::sleep_for(1ms);
 			if (other._id == client_id)
 				continue;
 
@@ -925,6 +926,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		// 자기 자신에게 다른 플레이어들의 아이디, 네임 받아오기
 		for (auto& other : g_clients)
 		{
+			this_thread::sleep_for(1ms);
 			if (other._id == client_id)
 				continue;
 
@@ -1657,7 +1659,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	}
 	default:
 	{
-		cout << "잘못왔음 \n";
+		cout << (int)packet_type << "잘못왔음 \n";
 		break;
 	}
 	}
@@ -2499,10 +2501,10 @@ void Server::Work()
 
 				cl._id = new_id;
 				cl.prev_size = 0;
-				cl._recv_over._IOType = IOType::RECV;
-				cl._recv_over._wsa_buf.buf = reinterpret_cast<char*>(cl._recv_over._ring_net_buf.GetReadPtr());
-				cl._recv_over._wsa_buf.len = sizeof(cl._recv_over._ring_net_buf.GetFreeSize());
-				ZeroMemory(&cl._recv_over._wsa_over, sizeof(cl._recv_over._wsa_over));
+				cl.m_socket._recv_over._IOType = IOType::RECV;
+				cl.m_socket._recv_over._wsa_buf.buf = reinterpret_cast<char*>(cl.m_socket._recv_over._ring_net_buf.GetReadPtr());
+				cl.m_socket._recv_over._wsa_buf.len = sizeof(cl.m_socket._recv_over._ring_net_buf.GetFreeSize());
+				ZeroMemory(&cl.m_socket._recv_over._wsa_over, sizeof(cl.m_socket._recv_over._wsa_over));
 				cl.m_socket.s_socket = c_socket;
 
 				_socket.OnlyCreatePort(c_socket, new_id);
@@ -2560,7 +2562,8 @@ void Server::Work()
 			}
 
 			//delete exp_over;
-			exp_over->_ring_send_buf.MoveFront(num_byte);
+			Client& cl = g_clients[c_id];
+			cl.m_socket._send_over._ring_send_buf.MoveFront(num_byte);
 		}
 			break;
 		case IOType::NPC_SPAWN:
