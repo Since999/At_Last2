@@ -852,6 +852,21 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 		npc.zombie->hp = hp;
 }
 
+void Server::CommanderSpecialSkill(Client& cl)
+{
+
+}
+
+void Server::EngineerSpecialSkill(Client& cl)
+{
+
+}
+
+void Server::MercenarySpecialSkill(Client& cl)
+{
+
+}
+
 void Server::ProcessPacket(int client_id, unsigned char* p)
 {
 	unsigned char packet_type = p[2];
@@ -1564,13 +1579,24 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	}
 	case (int)MsgType::CS_PLAYER_SPECIAL:
 	{
-		//cl.state_lock.lock();
 		if (cl._state != ClientState::INGAME)
 		{
-			//cl.state_lock.unlock();
 			break;
 		}
-		//cl.state_lock.unlock();
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			CommanderSpecialSkill(cl);
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			EngineerSpecialSkill(cl);
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			MercenarySpecialSkill(cl);
+		}
+
 		cl.idle_time = chrono::system_clock::now();
 		break;
 	}

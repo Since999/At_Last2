@@ -594,7 +594,7 @@ void CGameFramework::ProcessInput()
 	if (!bProcessedByScene)
 	{
 		DWORD dwDirection = 0;
-		
+
 		if ((pKeysBuffer['W'] & 0xF0)) dwDirection |= DIR_FORWARD;
 		if ((pKeysBuffer['S'] & 0xF0)) dwDirection |= DIR_BACKWARD;
 		if ((pKeysBuffer['A'] & 0xF0)) dwDirection |= DIR_LEFT;
@@ -618,6 +618,12 @@ void CGameFramework::ProcessInput()
 		if ((pKeysBuffer['R'] & 0xF0) && network.key_down_state == false) {
 			network.key_down_state = true;
 			network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
+		}
+
+		if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false)
+		{
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_PLAYER_SPECIAL);
 		}
 
 #endif

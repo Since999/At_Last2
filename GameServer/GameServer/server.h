@@ -116,6 +116,9 @@ public:
 	static void ChangeZombieStateToSpawn(int spawn_id);
 	static bool MapCheck(MapType map_type);
 	static void PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float p_z);
+	static void CommanderSpecialSkill(Client& cl);
+	static void EngineerSpecialSkill(Client& cl);
+	static void MercenarySpecialSkill(Client& cl);
 	static void DieZombie(Zombie* zombie) { delete zombie; zombie = nullptr; };
 	static float Distance(float s_x, float s_z, float e_x, float e_z);
 	static void SearchZombieAstar(int col, int row, Client& cl, NPC& npc);
