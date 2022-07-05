@@ -55,7 +55,11 @@ public:
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
+	CScene* GetCurruntScene() const { return m_pScene; }
+
 	CCamera* GetCamera() const { return m_pCamera; }
+
+	CPlayer* GetPlayer() const { return client_player; }
 private:
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd;

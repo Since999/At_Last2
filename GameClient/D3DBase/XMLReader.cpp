@@ -46,7 +46,6 @@ void CXMLReader::LoadParticle(const wstring& file_name, ParticleSystem* sys)
         wstring name;
         vector<CMaterial*>* materials = new vector<CMaterial*>;
         wstring image_file_name;
-        xml.FindElem(L"Particle");
         name = wstring{ xml.GetAttrib(L"name") };
         width = _wtof(xml.GetAttrib(L"width"));
         height = _wtof(xml.GetAttrib(L"height"));

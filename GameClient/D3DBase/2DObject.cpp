@@ -151,3 +151,37 @@ void CParticleObject::Animate(float fTimeElapsed)
 	}
 	C2DObject::Animate(fTimeElapsed);
 }
+
+CTrail::CTrail(float duration, const XMFLOAT2& size, const XMFLOAT3& position, vector<CMaterial*>* materials)
+	:CParticleObject(duration, size, position, materials)
+{
+	index = rand() % materials->size();
+}
+
+void CTrail::Render(ID3D12GraphicsCommandList* pd3dCommandList,
+	const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera)
+{
+	OnPrepareRender();
+	CMaterial* mat = (*materials)[index];
+	if (mat)
+	{
+		if (mat->m_pShader)
+		{
+			mat->m_pShader->Render(pd3dCommandList, pCamera);
+			mat->m_pShader->UpdateShaderVariables(pd3dCommandList);
+		}
+	}
+
+	if (mat && mat->m_pTexture) {
+		mat->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, 0);
+	}
+
+	pd3dCommandList->SetGraphicsRootDescriptorTable(2, desc_handle);
+
+	if (mesh) mesh->Render(pd3dCommandList);
+#ifdef _DEBUG
+	else {
+		cout << "Error(2DObject): no mesh" << endl;
+	}
+#endif
+}

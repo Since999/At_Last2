@@ -22,7 +22,7 @@ public:
 };
 
 class CParticleObject : public C2DObject {
-private:
+protected:
     float duration;
     float cur_time = 0.0f;
     vector<CMaterial*>* materials;
@@ -33,6 +33,14 @@ public:
     virtual void Animate(float fTimeElapsed);
 };
 
+class CTrail : public CParticleObject {
+private:
+    unsigned int index;
+public:
+    CTrail(float duration, const XMFLOAT2& size, const XMFLOAT3& position, vector<CMaterial*>* materials);
+    virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera = NULL);
+};
+
 class CParticleBuilder {
 private:
     float duration;
@@ -41,10 +49,13 @@ private:
 
 public:
     CParticleBuilder(float duration, const XMFLOAT2& size, vector<CMaterial*>* materials) :
-        duration(duration), size(size), materials(materials){}
+        duration(duration), size(size), materials(materials) {}
     ~CParticleBuilder() {
     }
     CParticleObject* Build(const XMFLOAT3& position) {
         return new CParticleObject(duration, size, position, materials);
+    }
+    CParticleObject* BuildAsTrail(const XMFLOAT3& position) {
+        return new CTrail(duration, size, position, materials);
     }
 };

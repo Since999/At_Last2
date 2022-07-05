@@ -8,6 +8,7 @@
 #include "CLight.h"
 #include "Object.h"
 #include "Configuration.h"
+#include "Bullet.h"
 
 DebugObject dd;
 
@@ -601,13 +602,14 @@ void CGameFramework::ProcessInput()
 		if ((pKeysBuffer['D'] & 0xF0)) dwDirection |= DIR_RIGHT;
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-
+#ifdef _DEBUG
 		if (pKeysBuffer[VK_OEM_PLUS] & 0xF0 || pKeysBuffer[VK_ADD] & 0xF0) {
 			if (m_pCamera) m_pCamera->AddDistance(50.0f);
 		}
 		if (pKeysBuffer[VK_OEM_MINUS] & 0xF0 || pKeysBuffer[VK_SUBTRACT] & 0xF0) {
 			if (m_pCamera) m_pCamera->AddDistance(-50.0f);
 		}
+#endif
 #ifdef ENABLE_NETWORK
 		if ((pKeysBuffer['E'] & 0xF0) && network.key_down_state == false) {
 			network.key_down_state = true;
@@ -658,6 +660,13 @@ void CGameFramework::ProcessInput()
 			cursor_direction = XMVector2Normalize(cursor_direction);
 			network.g_client[network.my_id].mx = cursor_direction.m128_f32[0];
 			network.g_client[network.my_id].mz = cursor_direction.m128_f32[1];
+			if (GetCapture() == m_hWnd)
+			{
+				((CMainGamePlayer*)client_player)->StartFire();
+			}
+			else {
+				((CMainGamePlayer*)client_player)->StopFire();
+			}
 		}
 
 #ifdef ENABLE_NETWORK
