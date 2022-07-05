@@ -17,7 +17,7 @@ public:
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera = NULL) {}
     virtual void ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL) {}
 
-    CBullet(const XMFLOAT3& position, const XMFLOAT3& direction, float speed = 20000);
+    CBullet(const XMFLOAT3& position, const XMFLOAT3& direction, float speed = 50000);
     virtual void Animate(float fTimeElapsed);
 
    

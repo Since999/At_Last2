@@ -26,10 +26,10 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 {
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	m_nShaders = 1;
+	m_nShaders = 4;
 	m_ppShaders = new CShader * [m_nShaders];
 
-	/*CTerrainShader* pObjectShader = new CTerrainShader();
+	CTerrainShader* pObjectShader = new CTerrainShader();
 	pObjectShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	pObjectShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
 	m_ppShaders[0] = pObjectShader;
@@ -40,10 +40,10 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	CStaticObjectShader* static_shader = new CStaticObjectShader();
 	static_shader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
 	static_shader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
-	m_ppShaders[2] = static_shader;*/
+	m_ppShaders[2] = static_shader;
 
 	C2DShader* particle_shader = new C2DShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
-	m_ppShaders[0] = particle_shader;
+	m_ppShaders[3] = particle_shader;
 
 
 	/*for(int i = 0; i< ROAD_ZOMBIE_NUM + FIRST_CHECK_POINT_ZOMBIE_NUM; ++i)

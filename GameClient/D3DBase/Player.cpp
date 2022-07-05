@@ -476,7 +476,8 @@ void CMainGamePlayer::Fire()
 {
 	XMFLOAT3 dir = XMFLOAT3(-server_player_info->mx, 0.0f, server_player_info->mz);
 	dir = Vector3::Normalize(dir);
+	XMFLOAT3 pos = Vector3::Add(Vector3::Add(GetPosition(), Vector3::ScalarProduct(dir, 100.f, false)), XMFLOAT3(0.0f, 700.0f, 0.0f));
 	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(
-		new CBullet(Vector3::Add(GetPosition(), Vector3::ScalarProduct(dir, 100.f, false)), dir));
+		new CBullet(pos, dir));
 		//new CBullet(GetPosition(), dir));
 }
