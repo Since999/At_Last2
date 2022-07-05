@@ -95,6 +95,8 @@ public:
 	static void Send_player_reload_packet(int c_id, int s_id, int bullet);
 	static void Send_player_rotate_packet(int c_id, int s_id, float m_x, float m_z);
 	static void Send_player_idle_packet(int c_id, int s_id);
+	static void Send_commander_skill_packet(int c_id, int s_id);
+	static void Send_commander_skill_check_packet(int c_id, int s_id);
 	static void Send_viewlist_put_packet(int c_id, int z_id, MapType m_type, float z_x, float z_z, MsgType msg, ZombieType z_type);
 	static void Send_viewlist_remove_packet(int c_id, int z_id, MapType m_type);
 	static void Send_search_packet(int c_id, int x, int z, ObjectType _type);
@@ -116,8 +118,11 @@ public:
 	static void ChangeZombieStateToSpawn(int spawn_id);
 	static bool MapCheck(MapType map_type);
 	static void PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float p_z);
+	static void ResurrectionPlayer(Client& cl);
 	static void CommanderSpecialSkill(Client& cl);
 	static void EngineerSpecialSkill(Client& cl);
+	static bool EngineerSpecialSkillMapCheck(int x, int z, DIR dir);
+	static bool EngineerSpecialSkillZombieCheck(NPC& npc);
 	static void MercenarySpecialSkill(Client& cl);
 	static void DieZombie(Zombie* zombie) { delete zombie; zombie = nullptr; };
 	static float Distance(float s_x, float s_z, float e_x, float e_z);

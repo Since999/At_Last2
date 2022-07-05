@@ -626,6 +626,18 @@ void CGameFramework::ProcessInput()
 			network.Send_request_packet(MsgType::CS_PLAYER_SPECIAL);
 		}
 
+		if ((pKeysBuffer['C'] & 0xF0) && network.g_client[network.my_id].special_skill_key == true)
+		{
+			network.g_client[network.my_id].special_skill_key = false;
+			network.Send_commander_special_req_packet(network.g_client[network.my_id].special_id);
+		}
+
+		if ((pKeysBuffer['V'] & 0xF0) && network.g_client[network.my_id].special_skill_key == true)
+		{
+			network.g_client[network.my_id].special_skill_key = false;
+			network.Send_commander_special_req_packet(network.g_client[network.my_id].special_id);
+		}
+
 #endif
 
 		float cxDelta = 0.0f, cyDelta = 0.0f;

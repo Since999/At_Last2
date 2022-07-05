@@ -9,6 +9,8 @@ Client::Client()
 	t_z = 0;
 	_dir = Direction::NONE;
 	rotate_speed = MathHelper::Pi *2;
+	special_skill_key = false;
+	special_id = -1;
 }
 
 Client::~Client()

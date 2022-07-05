@@ -147,8 +147,6 @@ void Server::Send_select_packet(int c_id, int s_id)
 	packet.playertype = g_clients[c_id]._type;
 	packet.hp = g_clients[c_id].player->hp;
 	packet.maxhp = g_clients[c_id].player->maxhp;
-	packet.shp = g_clients[c_id].player->shp;
-	packet.maxshp = g_clients[c_id].player->maxshp;
 	packet.x = g_clients[c_id].player->x;
 	packet.z = g_clients[c_id].player->z;
 	packet.bullet = g_clients[c_id].player->bullet;
@@ -852,18 +850,250 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 		npc.zombie->hp = hp;
 }
 
+void Server::Send_commander_skill_packet(int c_id, int s_id)
+{
+	sc_commander_special_packet packet;
+	packet.bullet = g_clients[s_id].player->bullet;
+	packet.hp = g_clients[s_id].player->hp;
+	packet.id = s_id;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_COMMANDER_SPECIAL;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void Server::ResurrectionPlayer(Client& cl)
+{
+	cl._state = ClientState::INGAME;
+	int max_hp = cl.player->maxhp;
+	cl.player->hp = max_hp;
+	cl.player->bullet = 30;
+
+	for (auto& s_cl : g_clients)
+	{
+		if (s_cl._state == ClientState::INGAME) continue;
+
+		Send_commander_skill_packet(s_cl._id, cl._id);
+	}
+}
+
+void Server::Send_commander_skill_check_packet(int c_id, int s_id)
+{
+	sc_player_co_special_check_packet packet;
+	packet.id = s_id;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_COMMANDER_SPECIAL_CHECK;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
 void Server::CommanderSpecialSkill(Client& cl)
+{
+	if (cl.player->special_skill == 0)
+	{
+		Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
+		return;
+	}
+
+	for (auto& other : g_clients)
+	{
+		if (other._id == cl._id)
+		{
+			continue;
+		}
+
+		if (other._state != ClientState::DEAD)
+		{
+			continue;
+		}
+
+		if (Distance(cl.player->x, cl.player->z, other.player->x, other.player->z) <= 2.0f)
+		{
+			Send_commander_skill_check_packet(cl._id, other._id);
+		}
+
+	}
+}
+
+bool Server::EngineerSpecialSkillMapCheck(int x, int z, DIR dir)
+{
+	if (dir == DIR::HEIGHT)
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			if (map.map[z][x - 2 + i] != (char)MazeWall::ROAD)
+			{
+				return false;
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			if (map.map[z - 2 + i][x] != (char)MazeWall::ROAD)
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+bool Server::EngineerSpecialSkillZombieCheck(NPC& npc)
 {
 
 }
 
 void Server::EngineerSpecialSkill(Client& cl)
 {
+	if (cl.player->special_skill == 0)
+	{
+		Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
+		return;
+	}
+
+	bool check = true;
+	int t_x = 0, t_z = 0;
+
+	if (cl.player->special_dir == DIR::HEIGHT)
+	{
+		if (cl.player->dir == Direction::UP)
+		{
+			t_x = cl.player->x;
+			t_z = cl.player->z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::UP_RIGHT)
+		{
+			t_x = cl.player->x + 1;
+			t_z = cl.player->z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::RIGHT)
+		{
+			t_x = cl.player->x + 1;
+			t_z = cl.player->z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::DOWN_RIGHT)
+		{
+			t_x = cl.player->x + 1;
+			t_z = cl.player->z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::DOWN)
+		{
+			t_x = cl.player->x;
+			t_z = cl.player->z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::DOWN_LEFT)
+		{
+			t_x = cl.player->x - 1;
+			t_z = cl.player->z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::LEFT)
+		{
+			t_x = cl.player->x - 1;
+			t_z = cl.player->z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::UP_LEFT)
+		{
+			t_x = cl.player->x - 1;
+			t_z = cl.player->z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+	}
+	else
+	{
+		if (cl.player->dir == Direction::UP)
+		{
+			t_x = cl.player->x;
+			t_z = cl.player->z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::UP_RIGHT)
+		{
+			t_x = cl.player->x + 1;
+			t_z = cl.player->z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::RIGHT)
+		{
+			t_x = cl.player->x + 1;
+			t_z = cl.player->z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::DOWN_RIGHT)
+		{
+			t_x = cl.player->x + 1;
+			t_z = cl.player->z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::DOWN)
+		{
+			t_x = cl.player->x;
+			t_z = cl.player->z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::DOWN_LEFT)
+		{
+			t_x = cl.player->x - 1;
+			t_z = cl.player->z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::LEFT)
+		{
+			t_x = cl.player->x - 1;
+			t_z = cl.player->z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::UP_LEFT)
+		{
+			t_x = cl.player->x - 1;
+			t_z = cl.player->z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+	}
+
+	if (map_type == MapType::CHECK_POINT_ONE)
+	{
+
+	}
+	else if (map_type == MapType::CHECK_POINT_TWO)
+	{
+
+	}
+	else if (map_type == MapType::CHECK_POINT_FINAL)
+	{
+
+	}
+	else
+	{
+
+	}
+
+	if (check)
+	{
+
+	}
+	else
+	{
+		Send_fail_packet(cl._id, MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL);
+	}
 
 }
 
 void Server::MercenarySpecialSkill(Client& cl)
 {
+	if (cl.player->special_skill == 0)
+	{
+		Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
+		return;
+	}
+
 
 }
 
@@ -1264,6 +1494,47 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		cl.player->z = packet->z;
 		cl.move_lock.unlock();
 
+		if (0.75f < packet->t_x && packet->t_x <= 1.0f)
+		{
+			cl.player->dir = Direction::RIGHT;
+		}
+		else if (0.25f < packet->t_x && packet->t_x <= 0.75f)
+		{
+			if (packet->t_z > 0.0f)
+			{
+				cl.player->dir = Direction::UP_RIGHT;
+			}
+			else
+			{
+				cl.player->dir = Direction::DOWN_RIGHT;
+			}
+		}
+		else if (-0.25f < packet->t_x && packet->t_x <= 0.25f)
+		{
+			if (packet->t_z > 0.0f)
+			{
+				cl.player->dir = Direction::UP;
+			}
+			else
+			{
+				cl.player->dir = Direction::DOWN;
+			}
+		}
+		else if (-0.75f < packet->t_x && packet->t_x <= -0.25f)
+		{
+			if (packet->t_z > 0.0f)
+			{
+				cl.player->dir = Direction::UP_LEFT;
+			}
+			else
+			{
+				cl.player->dir = Direction::DOWN_LEFT;
+			}
+		}
+		else
+		{
+			cl.player->dir = Direction::LEFT;
+		}
 
 		// 미리 주변 뷰리스트 확인
 		unordered_set<int> near_zombie_list;
@@ -1598,6 +1869,65 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		}
 
 		cl.idle_time = chrono::system_clock::now();
+		break;
+	}
+	case (int)MsgType::CS_SPECIAL_SKILL_CHANGE:
+	{
+		cs_special_req_packet* packet = reinterpret_cast<cs_special_req_packet*>(p);
+
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			for (auto& other : g_clients)
+			{
+				if (other._id == cl._id) continue;
+				if (other._state != ClientState::DEAD) continue;
+				if (other._id == packet->id) continue;
+
+				if (Distance(cl.player->x, cl.player->z, other.player->x, other.player->z) <= 2.0f)
+				{
+					Send_commander_skill_check_packet(cl._id, other._id);
+				}
+			}
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+
+		}
+
+
+		break;
+	}
+	case (int)MsgType::CS_SPECIAL_SKILL_REQUEST:
+	{
+		cs_special_req_packet* packet = reinterpret_cast<cs_special_req_packet*>(p);
+
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			ResurrectionPlayer(g_clients[packet->id]);
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			
+		}
+
 		break;
 	}
 	case (int)MsgType::CS_BARRICADE_REQUEST:

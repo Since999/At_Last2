@@ -141,6 +141,24 @@ void Network::Send_rotate_packet(float m_x, float m_z)
 	_socket.do_send(sizeof(packet), &packet);
 }
 
+void Network::Send_commander_special_req_packet(int c_id)
+{
+	cs_special_req_packet packet;
+	packet.size = sizeof(packet);
+	packet.id = c_id;
+	packet.type = MsgType::CS_SPECIAL_SKILL_REQUEST;
+	_socket.do_send(sizeof(packet), &packet);
+}
+
+void Network::Send_commander_special_change_packet(int c_id)
+{
+	cs_special_req_packet packet;
+	packet.size = sizeof(packet);
+	packet.id = c_id;
+	packet.type = MsgType::CS_SPECIAL_SKILL_CHANGE;
+	_socket.do_send(sizeof(packet), &packet);
+}
+
 void Network::ProcessPacket(unsigned char* ptr)
 {
 	int packet_type = (int)ptr[2];
@@ -380,8 +398,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		g_client[id]._type = packet->playertype;
 		g_client[id].hp = packet->hp;
 		g_client[id].maxhp = packet->maxhp;
-		g_client[id].shp = packet->shp;
-		g_client[id].maxshp = packet->maxshp;
 		g_client[id].x = packet->x;
 		g_client[id].z = packet->z;
 		g_client[id].bullet = packet->bullet;
@@ -406,6 +422,61 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_PLAYER_SPECIAL:
 	{
+		break;
+	}
+	case (int)MsgType::SC_COMMANDER_SPECIAL:
+	{
+		sc_commander_special_packet* packet = reinterpret_cast<sc_commander_special_packet*>(ptr);
+
+		if (packet->id == my_id)
+		{
+			cout << "부활하였습니다 \n";
+		}
+		else
+		{
+			if (g_client[packet->id]._type == PlayerType::ENGINEER)
+			{
+				cout << "엔지니어가 부활하였습니다. \n";
+			}
+			else
+			{
+				cout << "용병이 부활하였습니다. \n";
+			}
+		}
+
+		g_client[packet->id].hp = packet->hp;
+		g_client[packet->id].bullet = packet->bullet;
+
+		break;
+	}
+	case (int)MsgType::SC_COMMANDER_SPECIAL_CHECK:
+	{
+		sc_player_co_special_check_packet* packet = reinterpret_cast<sc_player_co_special_check_packet*>(ptr);
+
+		if (g_client[packet->id]._type == PlayerType::ENGINEER)
+		{
+			cout << "엔지니어를 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
+		}
+		else
+		{
+			cout << "용병을 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
+		}
+
+		g_client[my_id].special_skill_key = true;
+		g_client[my_id].special_id = packet->id;
+
+		break;
+	}
+	case (int)MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL:
+	{
+		cout << "해당 지역에 지을 수 없습니다. \n";
+
+		break;
+	}
+	case (int)MsgType::SC_PLAYER_SPECIAL_NUM_ZERO:
+	{
+		cout << "스페셜 스킬 사용 횟수가 없어 사용하지 못했습니다. \n";
+
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_DEAD:

@@ -6,14 +6,16 @@ class Player
 {
 public:
 	atomic_short hp, maxhp;			// юс╫ц short
-	char shp, maxshp;
 	char attack;
 	char interaction;
+	char special_skill;
 	atomic_char bullet;
 	float x, z;
 	float m_x, m_z;
 	float speed;
-	
+	DIR special_dir;
+	Direction dir;
+
 public:
 	Player();
 	virtual ~Player();

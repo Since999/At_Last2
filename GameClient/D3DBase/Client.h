@@ -10,8 +10,7 @@ public:
 	int _id;
 	char Name[MAX_NAME_SIZE];
 	PlayerType _type;
-	atomic_int hp, shp;
-	int maxhp, maxshp;
+	atomic_int hp, maxhp;
 	float speed;
 	float max_speed;
 	float acceleration = 30.0f;
@@ -26,6 +25,9 @@ public:
 	float mx, mz;		// 마우스 클릭 위치
 	atomic <ClientState> _state;
 	atomic <ClientAnimationState> _animation;
+
+	atomic_bool special_skill_key;
+	atomic_int	special_id;
 
 	chrono::system_clock::time_point move_time;
 

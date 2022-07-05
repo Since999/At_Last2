@@ -100,6 +100,8 @@ enum class MsgType : char							// 서버에서 보내는 메세지 형식
 	CS_PLAYER_INTERATION,						// 플레이어 상호작용
 	CS_PLAYER_SPECIAL,								// 플레이어 특수 능력 사용
 	CS_PLAYER_RELOAD_REQUEST,				// 플레이어 재장전 신호
+	CS_SPECIAL_SKILL_CHANGE,					// 스페셜 스킬 변경 요청
+	CS_SPECIAL_SKILL_REQUEST,					// 스페셜 스킬 사용 요청
 	CS_SERVER_REQUEST,							// 서버 응답 요청
 	SC_LOGIN_OK,										// 서버 -> 클라 로그인 승인 신호
 	SC_LOGIN_OTHER,									// 다른 플레이어 로그인시
@@ -120,6 +122,14 @@ enum class MsgType : char							// 서버에서 보내는 메세지 형식
 	SC_PLAYER_INTERATION,						// 플레이어 상호작용
 	SC_PLAYER_NOT_ENGINEER,					// 플레이어가 엔지니어가 아니기에 사용할 수 없을 때
 	SC_PLAYER_SPECIAL,								// 플레이어 특수 능력 사용
+	SC_COMMANDER_SPECIAL,						// 플레이어(커맨더) 특수 능력 사용
+	SC_COMMANDER_SPECIAL_CHECK,			// 플레이어(커맨더) 특수 능력 사용 여부 체크
+	SC_ENGINEER_SPECIAL,							// 플레이어(엔지니어) 특수 능력 사용
+	SC_ENGINEER_SPECIAL_CHECK,				// 플레이어(엔지니어) 특수 능력 사용 체크
+	SC_ENGINEER_SPECIAL_BUILD_FAIL,		// 플레이어(엔지니어) 특수 능력 빌드 실패
+	SC_MERCENARY_SPECIAL,						// 플레이어(용병) 특수 능력 사용
+	SC_MERCENARY_SPECIAL_CHECK,			// 플레이어(용병) 특수 능력 사용 체크
+	SC_PLAYER_SPECIAL_NUM_ZERO,			// 플레이어 특수 능력 사용량 제로 이면
 	SC_PLAYER_DEAD,									// 플레이어 사망
 	SC_PLAYER_SEARCH,								// 플레이어 주변 사물 접근 확인
 	SC_PLAYER_BULLET_INFO,						// 플레이어 총알 개수 변동량 전송
@@ -325,6 +335,13 @@ struct cs_request_packet									// 클라이언트에서 게임이 시작했는지 확인하고자 
 	MsgType type;										// 메시지 타입 CS_GAME_START_REQUEST
 };
 
+struct cs_special_req_packet						// 클라이언트에서 커맨더가 누굴 살릴지 요청하는 패킷
+{
+	unsigned short size;
+	MsgType type;										// 메시지 타입 CS_SPECAIL_SKILL_REQUEST
+	int id;														// 커맨더 살릴 ID
+};
+
 struct sc_login_ok_packet							// 서버에서 클라이언트에게 로그인이 되었다고 전송
 {
 	unsigned short size;
@@ -356,7 +373,6 @@ struct sc_player_select_packet						// 서버에서 클라이언트에게 캐릭터 선택을 알�
 	char id;													// 플레이어 id
 	float x, z;												// 플레이어 위치
 	short hp, maxhp;
-	char shp, maxshp;									// 플레이어HP, MAXHP, SHP, MAXSHP 
 	char bullet;												// 플레이어 총알 보유 개수
 	float speed;											// 플레이어 이동 속도
 };
@@ -452,8 +468,23 @@ struct sc_player_special_packet					// 서버에서 클라이언트에게 특수능력 사용 했�
 	unsigned short size;
 	MsgType type;										// 메시지 타입 PLAYER_SPECIAL
 	char id;													// 해당 클라만 알고있으면 됨
-	char shp;												// 해당 클라의 SHP
 	bool success;											// 발동 했는지 안했는지
+};
+
+struct sc_player_co_special_check_packet			// 커맨더 특수능력 사용 여부 체크하는 패킷
+{
+	unsigned short size;
+	MsgType type;										// SPECIAL_CHECK
+	char id;													// 누구에게 할 건지?
+};
+
+struct sc_commander_special_packet			// 서버에서 커맨더가 특수능력 사용했다고 알려주는 패킷
+{
+	unsigned short size;
+	MsgType type;										// 메시지 타입 COMMANDER_SPECIAL
+	char id;													// 살려낸 ID
+	short hp;												// 해당 ID 의 체력
+	char bullet;												// 해당 ID 의 총알 수
 };
 
 struct sc_player_attack_packet						// 서버에서 클라이언트에게 누가 공격하고 있는지 알려주기
