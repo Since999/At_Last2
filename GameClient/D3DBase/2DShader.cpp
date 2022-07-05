@@ -244,7 +244,7 @@ void ParticleSystem::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	object_list.sort([cameraPos](CGameObject* a, CGameObject* b) {
 		float adis = Vector3::Length(Vector3::Subtract(a->GetPosition(), cameraPos));
 		float bdis = Vector3::Length(Vector3::Subtract(b->GetPosition(), cameraPos));
-		return adis > bdis;
+		return adis < bdis;
 	});
 	C2DShader::Render(pd3dCommandList, pCamera);
 }
@@ -270,6 +270,17 @@ void ParticleSystem::AddParticle(const XMFLOAT3& position, const wstring& name)
 	AddObject((*found).second.Build(position));
 }
 
+void ParticleSystem::AddTrail(const XMFLOAT3& position, const wstring& name)
+{
+	auto found = particle_pool.find(name);
+	if (found == particle_pool.end()) {
+#ifdef _DEBUG
+		cout << "warning(ParticleSystem::AddParticle): no such particle (" << name.c_str() << ")" << endl;
+#endif
+		return;
+	}
+	AddObject((*found).second.BuildAsTrail(position));
+}
 
 void ParticleSystem::LoadParticle(const wstring& name)
 {

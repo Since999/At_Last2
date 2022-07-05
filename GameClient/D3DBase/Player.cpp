@@ -8,6 +8,8 @@
 
 #include "ShadowShader.h"
 #include "StateMachine.h"
+#include "GameFramework.h"
+#include "Bullet.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CPlayer
 
@@ -452,5 +454,29 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 		pos.z += (((float)rand() / (float)RAND_MAX) - 0.5f) * 1000;
 		ParticleSystem::GetInstance()->AddParticle(pos, L"lightning");
 	}
+	fire_time -= fTimeElapsed;
 	//TEST
+}
+
+void CMainGamePlayer::StartFire()
+{
+	if (fire_time < 0.f) {
+		Fire();
+		fire_time = fire_rate;
+	}
+}
+
+void CMainGamePlayer::StopFire()
+{
+	/*is_firing = false;
+	fire_time = 0.f;*/
+}
+
+void CMainGamePlayer::Fire()
+{
+	XMFLOAT3 dir = XMFLOAT3(-server_player_info->mx, 0.0f, server_player_info->mz);
+	dir = Vector3::Normalize(dir);
+	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(
+		new CBullet(Vector3::Add(GetPosition(), Vector3::ScalarProduct(dir, 100.f, false)), dir));
+		//new CBullet(GetPosition(), dir));
 }

@@ -16,4 +16,21 @@
     <Image
       image ="Resources/Particle/Lightning/Lightning5.png"/>
   </Particle>
+  <Particle
+   name ="smoke"
+   width ="30"
+   height ="30"
+   duration="1.0">
+    <Image
+      image ="Resources/Particle/Smoke/Smoke.png"/>
+    <Image
+      image ="Resources/Particle/Smoke/Smoke2.png"/>
+    <Image
+      image ="Resources/Particle/Smoke/Smoke3.png"/>
+    <Image
+      image ="Resources/Particle/Smoke/Smoke4.png"/>
+    <Image
+      image ="Resources/Particle/Smoke/Smoke5.png"/>
+
+    </Particle>
 </ParticleSystem>

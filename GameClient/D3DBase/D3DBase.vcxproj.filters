@@ -189,6 +189,9 @@
     <ClInclude Include="XMLReader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>Objects\헤더</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3DBase.cpp">
@@ -307,6 +310,9 @@
     </ClCompile>
     <ClCompile Include="TexturePool.cpp">
       <Filter>Model\소스</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Objects\소스</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -35,13 +35,18 @@ public:
 
 	void ReleaseUploadBuffers();
 
+	virtual void AddObject(CGameObject* object);
+	virtual void RemoveObject(CGameObject* object);
+
 	CPlayer* m_pPlayer = NULL;
 	CPlayer* m_pPlayer2 = NULL;
 	CPlayer* m_pPlayer3 = NULL;
-
-	std::vector<CGameObject*> objects;
+private:
+	std::vector<CGameObject*> remove_list;
+	std::list<CGameObject*> object_list;
 
 protected:
+	void RemoveObjects();
 	CShader** m_ppShaders = NULL;
 	int							m_nShaders = 0;
 

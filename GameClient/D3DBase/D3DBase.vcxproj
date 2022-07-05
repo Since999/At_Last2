@@ -180,6 +180,7 @@
     <ClInclude Include="AnimationInfo.h" />
     <ClInclude Include="AnimationPool.h" />
     <ClInclude Include="AnimationShader.h" />
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CAnimationObject.h" />
     <ClInclude Include="Client.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="AnimationInfo.cpp" />
     <ClCompile Include="AnimationPool.cpp" />
     <ClCompile Include="AnimationShader.cpp" />
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Camera.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
