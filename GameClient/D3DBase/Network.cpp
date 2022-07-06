@@ -230,28 +230,28 @@ void Network::ProcessPacket(unsigned char* ptr)
 		int i = 0;
 		for (auto& bar : one_barricade)
 		{
-			bar = Change_Client_Pos(packet->one_base[i]);
+			//bar = Change_Client_Pos(packet->one_base[i]);
 			map[packet->one_base[i].z][packet->one_base[i++].x] = (char)MazeWall::BARRICADE;
 		}
 
 		i = 0;
 		for (auto& bar : two_barricade)
 		{
-			bar = Change_Client_Pos(packet->two_base[i]);
+			//bar = Change_Client_Pos(packet->two_base[i]);
 			map[packet->two_base[i].z][packet->two_base[i++].x] = (char)MazeWall::BARRICADE;
 		}
 
 		i = 0;
 		for (auto& bar : three_barricade)
 		{
-			bar = Change_Client_Pos(packet->three_base[i]);
+			//bar = Change_Client_Pos(packet->three_base[i]);
 			map[packet->three_base[i].z][packet->three_base[i++].x] = (char)MazeWall::BARRICADE;
 		}
 
 		i = 0;
 		for (auto& bar : three_barricade2)
 		{
-			bar = Change_Client_Pos(packet->three_base2[i]);
+			//bar = Change_Client_Pos(packet->three_base2[i]);
 			map[packet->three_base2[i].z][packet->three_base2[i++].x] = (char)MazeWall::BARRICADE;
 		}
 
@@ -464,6 +464,14 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 		g_client[my_id].special_skill_key = true;
 		g_client[my_id].special_id = packet->id;
+
+		break;
+	}
+	case (int)MsgType::SC_ENGINEER_SPECIAL:
+	{
+		sc_engineer_barrigate_build_packet* packet = reinterpret_cast<sc_engineer_barrigate_build_packet*>(ptr);
+		
+		map[packet->z][packet->x] = (char)MazeWall::BARRICADE;
 
 		break;
 	}

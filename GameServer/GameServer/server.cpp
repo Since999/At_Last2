@@ -25,11 +25,6 @@ mutex Server::num_lock;
 mutex Server::spawn_lock;
 mutex Server::map_lock;
 
-//chrono::system_clock::time_point Server::start_time;
-//chrono::system_clock::time_point Server::end_time;
-//chrono::system_clock::time_point Server::zombie_start_time;
-//chrono::system_clock::time_point Server::zombie_end_time;
-
 chrono::milliseconds Server::sec;
 float Server::s_speed;
 float Server::z_speed;
@@ -37,6 +32,7 @@ float Server::z_speed;
 bool Server::zombie_send;
 int Server::door_num;
 bool Server::game_start;
+
 Server::Server()
 {
 	wcout.imbue(locale("korean"));
@@ -931,9 +927,33 @@ bool Server::EngineerSpecialSkillMapCheck(int x, int z, DIR dir)
 	return true;
 }
 
-bool Server::EngineerSpecialSkillZombieCheck(NPC& npc)
+void Server::EngineerBuildBarricade(int bx, int bz, DIR dir)
 {
+	if (dir == DIR::HEIGHT)
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			map.map[bz - 2 + i][bx] = (char)MazeWall::BARRICADE;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			map.map[bz][bx - 2 + i] = (char)MazeWall::BARRICADE;
+		}
+	}
+}
 
+void Server::Send_engineer_skill_packet(int c_id, int t_x, int t_z)
+{
+	sc_engineer_barrigate_build_packet packet;
+	packet.dir = g_clients[c_id].player->special_dir;
+	packet.x = t_x;
+	packet.z = t_z;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_ENGINEER_SPECIAL;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
 void Server::EngineerSpecialSkill(Client& cl)
@@ -944,8 +964,14 @@ void Server::EngineerSpecialSkill(Client& cl)
 		return;
 	}
 
-	bool check = true;
+	bool check = true;	// true : 지을수 있음, false : 지을 수 없음
 	int t_x = 0, t_z = 0;
+
+	if (map_type != MapType::CHECK_POINT_ONE || map_type != MapType::CHECK_POINT_TWO || map_type != MapType::CHECK_POINT_FINAL)
+	{
+		Send_fail_packet(cl._id, MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL);
+		return;
+	}
 
 	if (cl.player->special_dir == DIR::HEIGHT)
 	{
@@ -1052,24 +1078,126 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 	if (map_type == MapType::CHECK_POINT_ONE)
 	{
+		for (auto& npc : b_zombie1)
+		{
+			if (npc._state != ZombieState::SPAWN) continue;
 
+			int root_x = (int)npc.zombie->GetX();
+			int root_z = (int)npc.zombie->GetZ();
+
+			float result_root_x = npc.zombie->GetX() - root_x;
+			float result_root_z = npc.zombie->GetZ() - root_z;
+
+			if (result_root_x > 0.5f)
+				root_x += 1;
+			if (result_root_z > 0.5f)
+				root_z += 1;
+
+			if (cl.player->special_dir == DIR::HEIGHT)
+			{
+				if (t_x == root_x)
+				{
+					if (t_z - 2 <= root_z && root_z <= t_z + 2)
+					{
+						check = false;
+					}
+				}
+			}
+			else
+			{
+				if (t_z == root_z)
+				{
+					if (t_x - 2 <= root_x && root_x <= t_x + 2)
+					{
+						check = false;
+					}
+				}
+			}
+		}
 	}
 	else if (map_type == MapType::CHECK_POINT_TWO)
 	{
+		for (auto& npc : b_zombie2)
+		{
+			if (npc._state != ZombieState::SPAWN) continue;
 
+			int root_x = (int)npc.zombie->GetX();
+			int root_z = (int)npc.zombie->GetZ();
+
+			float result_root_x = npc.zombie->GetX() - root_x;
+			float result_root_z = npc.zombie->GetZ() - root_z;
+
+			if (result_root_x > 0.5f)
+				root_x += 1;
+			if (result_root_z > 0.5f)
+				root_z += 1;
+
+			if (cl.player->special_dir == DIR::HEIGHT)
+			{
+				if (t_x == root_x)
+				{
+					if (t_z - 2 <= root_z && root_z <= t_z + 2)
+					{
+						check = false;
+					}
+				}
+			}
+			else
+			{
+				if (t_z == root_z)
+				{
+					if (t_x - 2 <= root_x && root_x <= t_x + 2)
+					{
+						check = false;
+					}
+				}
+			}
+		}
 	}
 	else if (map_type == MapType::CHECK_POINT_FINAL)
 	{
+		for (auto& npc : b_zombie3)
+		{
+			if (npc._state != ZombieState::SPAWN) continue;
 
-	}
-	else
-	{
+			int root_x = (int)npc.zombie->GetX();
+			int root_z = (int)npc.zombie->GetZ();
 
+			float result_root_x = npc.zombie->GetX() - root_x;
+			float result_root_z = npc.zombie->GetZ() - root_z;
+
+			if (result_root_x > 0.5f)
+				root_x += 1;
+			if (result_root_z > 0.5f)
+				root_z += 1;
+
+			if (cl.player->special_dir == DIR::HEIGHT)
+			{
+				if (t_x == root_x)
+				{
+					if (t_z - 2 <= root_z && root_z <= t_z + 2)
+					{
+						check = false;
+					}
+				}
+			}
+			else
+			{
+				if (t_z == root_z)
+				{
+					if (t_x - 2 <= root_x && root_x <= t_x + 2)
+					{
+						check = false;
+					}
+				}
+			}
+		}
 	}
 
 	if (check)
 	{
-
+		EngineerBuildBarricade(t_x, t_z, cl.player->special_dir);
+		Send_engineer_skill_packet(cl._id, t_x, t_z);
 	}
 	else
 	{

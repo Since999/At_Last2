@@ -487,6 +487,14 @@ struct sc_commander_special_packet			// 서버에서 커맨더가 특수능력 사용했다고 알
 	char bullet;												// 해당 ID 의 총알 수
 };
 
+struct sc_engineer_barrigate_build_packet		// 서버에서 엔지니어가 특수능력 사용했다고 알려주는 패킷
+{
+	unsigned short size;
+	MsgType type;										// 메시지 타입 ENGINEER_SPECIAL
+	short x, z;												// 바리게이트 중심 위치
+	DIR dir;													// 방향
+};
+
 struct sc_player_attack_packet						// 서버에서 클라이언트에게 누가 공격하고 있는지 알려주기
 {
 	unsigned short size;
