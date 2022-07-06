@@ -22,15 +22,15 @@
    height ="30"
    duration="1.0">
     <Image
-      image ="Resources/Particle/Smoke/Smoke.png"/>
+      image ="Resources/Particle/Smoke/Smoke10.png"/>
     <Image
-      image ="Resources/Particle/Smoke/Smoke2.png"/>
+      image ="Resources/Particle/Smoke/Smoke10.png"/>
     <Image
-      image ="Resources/Particle/Smoke/Smoke3.png"/>
+      image ="Resources/Particle/Smoke/Smoke10.png"/>
     <Image
-      image ="Resources/Particle/Smoke/Smoke4.png"/>
+      image ="Resources/Particle/Smoke/Smoke10.png"/>
     <Image
-      image ="Resources/Particle/Smoke/Smoke5.png"/>
+      image ="Resources/Particle/Smoke/Smoke10.png"/>
 
     </Particle>
 </ParticleSystem>
