@@ -2,7 +2,7 @@
 
 #include "Zombie.h"
 
-//#define ENABLE_NETWORK
+#define ENABLE_NETWORK
 
 struct BarricadePos {
 	float x;

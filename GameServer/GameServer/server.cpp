@@ -792,14 +792,6 @@ void Server::Send_player_rotate_packet(int c_id, int s_id, float m_x, float m_z)
 
 void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float p_z)
 {
-	// 총알이 소모되고 공격을 하였기 때문에 모두에게 공격이 되었다고 전달
-	for (auto& a_cl : g_clients)
-	{
-		if (a_cl._state != ClientState::INGAME) continue;
-
-		Send_player_attack_packet(a_cl._id, cl._id);
-	}
-	
 	bool collied_zombie = cl.player->PlayerAttack(p_x, p_z, npc.zombie->GetX(), npc.zombie->GetZ());
 
 	if (collied_zombie)
@@ -961,6 +953,14 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		cl.player->bullet -= 1;
 
 		Send_player_bullet_info_packet(cl._id, cl.player->bullet);
+
+		// 총알이 소모되고 공격을 하였기 때문에 모두에게 공격이 되었다고 전달
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_player_attack_packet(a_cl._id, cl._id);
+		}
 
 		switch (cl.map_type)
 		{
