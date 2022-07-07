@@ -46,6 +46,7 @@ public:
 	static BarricadePos two_barricade[32];
 	static BarricadePos three_barricade[30];
 	static BarricadePos three_barricade2[30];
+	static BarricadePos skill_barricade[3];
 
 	static array<Zombie, ROAD_ZOMBIE_NUM> r_zombie1;
 	static array<Zombie, ROAD_ZOMBIE_NUM> r_zombie2;

@@ -33,6 +33,7 @@ BarricadePos Network::one_barricade[42];
 BarricadePos Network::two_barricade[32];
 BarricadePos Network::three_barricade[30];
 BarricadePos Network::three_barricade2[30];
+BarricadePos Network::skill_barricade[3];
 
 atomic_int Network::fps_rate;
 
@@ -230,47 +231,96 @@ void Network::ProcessPacket(unsigned char* ptr)
 		int i = 0;
 		for (auto& bar : one_barricade)
 		{
-			//bar = Change_Client_Pos(packet->one_base[i]);
-			map[packet->one_base[i].z][packet->one_base[i++].x] = (char)MazeWall::BARRICADE;
+			bar = Change_Client_Pos(packet->one_base[i]);
+			if (packet->one_base[i].dir == DIR::HEIGHT)
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->one_base[i].z + b][packet->one_base[i].x] = (char)MazeWall::BARRICADE;
+				}
+			}
+			else
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->one_base[i].z][packet->one_base[i].x + b] = (char)MazeWall::BARRICADE;
+				}
+			}
+			i++;
 		}
 
 		i = 0;
 		for (auto& bar : two_barricade)
 		{
-			//bar = Change_Client_Pos(packet->two_base[i]);
-			map[packet->two_base[i].z][packet->two_base[i++].x] = (char)MazeWall::BARRICADE;
+			bar = Change_Client_Pos(packet->two_base[i]);
+			if (packet->two_base[i].dir == DIR::HEIGHT)
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->two_base[i].z + b][packet->two_base[i].x] = (char)MazeWall::BARRICADE;
+				}
+			}
+			else
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->two_base[i].z][packet->two_base[i].x + b] = (char)MazeWall::BARRICADE;
+				}
+			}
+			i++;
 		}
 
 		i = 0;
 		for (auto& bar : three_barricade)
 		{
-			//bar = Change_Client_Pos(packet->three_base[i]);
-			map[packet->three_base[i].z][packet->three_base[i++].x] = (char)MazeWall::BARRICADE;
+			bar = Change_Client_Pos(packet->three_base[i]);
+			if (packet->three_base[i].dir == DIR::HEIGHT)
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->three_base[i].z + b][packet->three_base[i].x] = (char)MazeWall::BARRICADE;
+				}
+			}
+			else
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->three_base[i].z][packet->three_base[i].x + b] = (char)MazeWall::BARRICADE;
+				}
+			}
+			i++;
 		}
 
 		i = 0;
 		for (auto& bar : three_barricade2)
 		{
-			//bar = Change_Client_Pos(packet->three_base2[i]);
-			map[packet->three_base2[i].z][packet->three_base2[i++].x] = (char)MazeWall::BARRICADE;
+			bar = Change_Client_Pos(packet->three_base2[i]);
+			if (packet->three_base2[i].dir == DIR::HEIGHT)
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->three_base2[i].z + b][packet->three_base2[i].x] = (char)MazeWall::BARRICADE;
+				}
+			}
+			else
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->three_base2[i].z][packet->three_base2[i].x + b] = (char)MazeWall::BARRICADE;
+				}
+			}
+			i++;
+		}
+
+		for (auto& bar : skill_barricade)
+		{
+			bar.dir = DIR::HEIGHT;
+			bar.x = -100;
+			bar.z = -100;
 		}
 
 		Send_request_packet(MsgType::CS_GAME_START_REQUEST);
 		barricade_req = true;
-		// packet.onebase -> 1거점 미로 시작 좌표, 방향
-		// packet.twobase -> 2거점 미로 시작 좌표, 방향
-		// packet.threebase -> 3거점1 미로 시작 좌표, 방향
-		// packet.threebase2 -> 3거점2 미로 시작 좌표, 방향
-		/*
-		iPos라는 구조체로 만들어져 있으며, x, z, DIR구조체(width, height)로 이루어져 있습니다.
-		iPos pos;
-		pos.x = packet.onebase[0].x;
-		pos.z = packet.onebase[0].z;
-		pos.dir = packet.onebase[0].dir;
-		이런식으로 복사해 오시거나 참조해가시면 될듯합니다.
-		dir 이 width 이면 x,z좌표 기준으로 좌측 2, 우측 2칸 5칸
-		dir 이 height 이면 x,z 좌표 기준으로 상 2, 하 2칸 5칸 입니다.
-		*/
 
 		break;
 	}
@@ -396,6 +446,20 @@ void Network::ProcessPacket(unsigned char* ptr)
 		int id = packet->id;
 
 		g_client[id]._type = packet->playertype;
+
+		if (g_client[id]._type == PlayerType::COMMANDER)
+		{
+			g_client[id].special_skill = 1;
+		}
+		else if (g_client[id]._type == PlayerType::ENGINEER)
+		{
+			g_client[id].special_skill = 3;
+		}
+		else if (g_client[id]._type == PlayerType::MERCENARY)
+		{
+			g_client[id].special_skill = 3;
+		}
+
 		g_client[id].hp = packet->hp;
 		g_client[id].maxhp = packet->maxhp;
 		g_client[id].x = packet->x;
@@ -471,8 +535,28 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_engineer_barrigate_build_packet* packet = reinterpret_cast<sc_engineer_barrigate_build_packet*>(ptr);
 		
-		map[packet->z][packet->x] = (char)MazeWall::BARRICADE;
+		BarricadePos temp;
+		temp.x = packet->x;
+		temp.z = packet->z;
+		temp.dir = packet->dir;
+		skill_barricade[3 - g_client[packet->id].special_skill] = temp;
 
+		if (packet->dir == DIR::HEIGHT)
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				map[packet->z + i][packet->x] = (char)MazeWall::BARRICADE;
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				map[packet->z][packet->x + i] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		g_client[packet->id].special_skill -= 1;
 		break;
 	}
 	case (int)MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL:

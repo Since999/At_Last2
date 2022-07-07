@@ -26,6 +26,8 @@ public:
 	atomic <ClientState> _state;
 	atomic <ClientAnimationState> _animation;
 
+	int special_skill;
+
 	atomic_bool special_skill_key;
 	atomic_int	special_id;
 

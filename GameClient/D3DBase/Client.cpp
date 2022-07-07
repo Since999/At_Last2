@@ -11,6 +11,7 @@ Client::Client()
 	rotate_speed = MathHelper::Pi *2;
 	special_skill_key = false;
 	special_id = -1;
+	special_skill = 0;
 }
 
 Client::~Client()

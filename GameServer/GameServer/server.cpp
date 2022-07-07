@@ -945,12 +945,13 @@ void Server::EngineerBuildBarricade(int bx, int bz, DIR dir)
 	}
 }
 
-void Server::Send_engineer_skill_packet(int c_id, int t_x, int t_z)
+void Server::Send_engineer_skill_packet(int c_id, int s_id, int t_x, int t_z)
 {
 	sc_engineer_barrigate_build_packet packet;
-	packet.dir = g_clients[c_id].player->special_dir;
+	packet.dir = g_clients[s_id].player->special_dir;
 	packet.x = t_x;
 	packet.z = t_z;
+	packet.id = s_id;
 	packet.size = sizeof(packet);
 	packet.type = MsgType::SC_ENGINEER_SPECIAL;
 	g_clients[c_id].do_send(sizeof(packet), &packet);
@@ -967,7 +968,18 @@ void Server::EngineerSpecialSkill(Client& cl)
 	bool check = true;	// true : 지을수 있음, false : 지을 수 없음
 	int t_x = 0, t_z = 0;
 
-	if (map_type != MapType::CHECK_POINT_ONE || map_type != MapType::CHECK_POINT_TWO || map_type != MapType::CHECK_POINT_FINAL)
+	int cl_root_x = (int)cl.player->x;
+	int cl_root_z = (int)cl.player->z;
+
+	float cl_result_root_x = cl.player->x - cl_root_x;
+	float cl_result_root_z = cl.player->z - cl_root_z;
+
+	if (cl_result_root_x > 0.5f)
+		cl_root_x += 1;
+	if (cl_result_root_z > 0.5f)
+		cl_root_z += 1;
+
+	if (map_type != MapType::CHECK_POINT_ONE && map_type != MapType::CHECK_POINT_TWO && map_type != MapType::CHECK_POINT_FINAL)
 	{
 		Send_fail_packet(cl._id, MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL);
 		return;
@@ -977,50 +989,50 @@ void Server::EngineerSpecialSkill(Client& cl)
 	{
 		if (cl.player->dir == Direction::UP)
 		{
-			t_x = cl.player->x;
-			t_z = cl.player->z - 1;
+			t_x = cl_root_x;
+			t_z = cl_root_z - 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::UP_RIGHT)
 		{
-			t_x = cl.player->x + 1;
-			t_z = cl.player->z - 1;
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z - 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::RIGHT)
 		{
-			t_x = cl.player->x + 1;
-			t_z = cl.player->z;
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::DOWN_RIGHT)
 		{
-			t_x = cl.player->x + 1;
-			t_z = cl.player->z + 1;
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z + 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::DOWN)
 		{
-			t_x = cl.player->x;
-			t_z = cl.player->z + 1;
+			t_x = cl_root_x;
+			t_z = cl_root_z + 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::DOWN_LEFT)
 		{
-			t_x = cl.player->x - 1;
-			t_z = cl.player->z + 1;
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z + 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::LEFT)
 		{
-			t_x = cl.player->x - 1;
-			t_z = cl.player->z;
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::UP_LEFT)
 		{
-			t_x = cl.player->x - 1;
-			t_z = cl.player->z - 1;
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z - 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 	}
@@ -1028,50 +1040,50 @@ void Server::EngineerSpecialSkill(Client& cl)
 	{
 		if (cl.player->dir == Direction::UP)
 		{
-			t_x = cl.player->x;
-			t_z = cl.player->z - 1;
+			t_x = cl_root_x;
+			t_z = cl_root_z - 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::UP_RIGHT)
 		{
-			t_x = cl.player->x + 1;
-			t_z = cl.player->z - 1;
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z - 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::RIGHT)
 		{
-			t_x = cl.player->x + 1;
-			t_z = cl.player->z;
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::DOWN_RIGHT)
 		{
-			t_x = cl.player->x + 1;
-			t_z = cl.player->z + 1;
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z + 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::DOWN)
 		{
-			t_x = cl.player->x;
-			t_z = cl.player->z + 1;
+			t_x = cl_root_x;
+			t_z = cl_root_z + 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::DOWN_LEFT)
 		{
-			t_x = cl.player->x - 1;
-			t_z = cl.player->z + 1;
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z + 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::LEFT)
 		{
-			t_x = cl.player->x - 1;
-			t_z = cl.player->z;
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::UP_LEFT)
 		{
-			t_x = cl.player->x - 1;
-			t_z = cl.player->z - 1;
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z - 1;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 	}
@@ -1197,7 +1209,20 @@ void Server::EngineerSpecialSkill(Client& cl)
 	if (check)
 	{
 		EngineerBuildBarricade(t_x, t_z, cl.player->special_dir);
-		Send_engineer_skill_packet(cl._id, t_x, t_z);
+
+		if (cl.player->special_dir == DIR::HEIGHT)
+		{
+			t_z -= 2;
+		}
+		else
+		{
+			t_x -= 2;
+		}
+
+		for (auto& other : g_clients)
+		{
+			Send_engineer_skill_packet(other._id, cl._id, t_x, t_z);
+		}
 	}
 	else
 	{

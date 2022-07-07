@@ -491,6 +491,7 @@ struct sc_engineer_barrigate_build_packet		// ¼­¹ö¿¡¼­ ¿£Áö´Ï¾î°¡ Æ¯¼ö´É·Â »ç¿ëÇ
 {
 	unsigned short size;
 	MsgType type;										// ¸Ş½ÃÁö Å¸ÀÔ ENGINEER_SPECIAL
+	char id;
 	short x, z;												// ¹Ù¸®°ÔÀÌÆ® Áß½É À§Ä¡
 	DIR dir;													// ¹æÇâ
 };
