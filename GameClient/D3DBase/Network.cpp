@@ -315,8 +315,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		for (auto& bar : skill_barricade)
 		{
 			bar.dir = DIR::HEIGHT;
-			bar.x = -100;
-			bar.z = -100;
+			bar.x = 800;
+			bar.z = 800;
 		}
 
 		Send_request_packet(MsgType::CS_GAME_START_REQUEST);
@@ -1322,6 +1322,25 @@ void Network::ProcessPacket(unsigned char* ptr)
 	case (int)MsgType::SC_GAME_END:
 	{
 		cout << "게임에 클리어하였습니다! 고생하셨습니다 \n";
+
+		break;
+	}
+	case (int)MsgType::SC_GM_MAP_CHANGE_MAP:
+	{
+		sc_gm_change_map_packet* packet = reinterpret_cast<sc_gm_change_map_packet*>(ptr);
+
+		g_client[packet->id].x = packet->x;
+		g_client[packet->id].z = packet->z;
+
+		break;
+	}
+	case (int)MsgType::SC_GM_ZOMBIE_ALL_KILL:
+	{
+
+		break;
+	}
+	case(int)MsgType::SC_GM_PLAYER_HP_UP:
+	{
 
 		break;
 	}

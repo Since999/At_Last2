@@ -1221,6 +1221,8 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 		for (auto& other : g_clients)
 		{
+			if (other._state != ClientState::INGAME) continue;
+
 			Send_engineer_skill_packet(other._id, cl._id, t_x, t_z);
 		}
 	}
@@ -1240,6 +1242,17 @@ void Server::MercenarySpecialSkill(Client& cl)
 	}
 
 
+}
+
+void Server::Send_gm_change_map_packet(int c_id, int s_id, int x, int z)
+{
+	sc_gm_change_map_packet packet;
+	packet.size = sizeof(packet);
+	packet.id = s_id;
+	packet.type = MsgType::SC_GM_MAP_CHANGE_MAP;
+	packet.x = x;
+	packet.z = z;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
 void Server::ProcessPacket(int client_id, unsigned char* p)
@@ -2165,6 +2178,228 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		packet.id = cl._id;
 		cl.do_send(sizeof(packet), &packet);
 		cl.idle_time = chrono::system_clock::now();
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_ROAD_ONE:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 43;
+			cl.player->z = 91;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 44;
+			cl.player->z = 91;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 45;
+			cl.player->z = 91;
+		}
+
+		cl.map_type = MapType::FIRST_PATH;
+		
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, cl.player->x, cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_ROAD_TWO:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 323;
+			cl.player->z = 338;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 323;
+			cl.player->z = 339;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 323;
+			cl.player->z = 340;
+		}
+
+		cl.map_type = MapType::SECOND_PATH;
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, cl.player->x, cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_ROAD_THREE:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 634;
+			cl.player->z = 338;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 634;
+			cl.player->z = 339;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 634;
+			cl.player->z = 340;
+		}
+
+		cl.map_type = MapType::FINAL_PATH;
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, cl.player->x, cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_BASE_ONE:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 200;
+			cl.player->z = 244;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 201;
+			cl.player->z = 244;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 202;
+			cl.player->z = 244;
+		}
+
+		cl.map_type = MapType::CHECK_POINT_ONE;
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, cl.player->x, cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_BASE_TWO:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 512;
+			cl.player->z = 338;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 512;
+			cl.player->z = 339;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 512;
+			cl.player->z = 340;
+		}
+
+		cl.map_type = MapType::CHECK_POINT_TWO;
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, cl.player->x, cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_BASE_THREE:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 823;
+			cl.player->z = 338;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 823;
+			cl.player->z = 339;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 823;
+			cl.player->z = 340;
+		}
+
+		cl.map_type = MapType::CHECK_POINT_FINAL;
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, cl.player->x, cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_ZOMBIE_ALL_KILL:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_PLAYER_HP_UP:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
 		break;
 	}
 	default:

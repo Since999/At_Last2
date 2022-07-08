@@ -103,6 +103,17 @@ enum class MsgType : char							// 서버에서 보내는 메세지 형식
 	CS_SPECIAL_SKILL_CHANGE,					// 스페셜 스킬 변경 요청
 	CS_SPECIAL_SKILL_REQUEST,					// 스페셜 스킬 사용 요청
 	CS_SERVER_REQUEST,							// 서버 응답 요청
+	CS_GM_MAP_CHANGE_ROAD_ONE,			// 길 1로 이동									키 : I
+	CS_GM_MAP_CHANGE_ROAD_TWO,			// 길 2로 이동									키 : O
+	CS_GM_MAP_CHANGE_ROAD_THREE,		// 길 3으로 이동								키 : P
+	CS_GM_MAP_CHANGE_BASE_ONE,			// 1거점으로 이동							키 : J
+	CS_GM_MAP_CHANGE_BASE_TWO,			// 2거점으로 이동							키 : K
+	CS_GM_MAP_CHANGE_BASE_THREE,		// 3거점으로 이동							키 : L
+	CS_GM_ZOMBIE_ALL_KILL,						// 누르면 좀비 모두 죽음					키 : N
+	CS_GM_PLAYER_HP_UP,							// 플레이어 HP 다시 풀로참				키 : M
+	SC_GM_MAP_CHANGE_MAP,					// 서버에서 맵 변경했다고 전달
+	SC_GM_ZOMBIE_ALL_KILL,						// 서버에서 해결시 전달
+	SC_GM_PLAYER_HP_UP,							// 서버에서 해결시 전달
 	SC_LOGIN_OK,										// 서버 -> 클라 로그인 승인 신호
 	SC_LOGIN_OTHER,									// 다른 플레이어 로그인시
 	SC_LOGIN_FAIL,										// 로그인 실패시
@@ -643,8 +654,8 @@ struct sc_door_open_packet
 	unsigned short size;
 	MsgType type;										// 메시지 타입 SC_DOOR_OPEN
 	char id;
-	int row, col;											// 문 위치
-	int size_x, size_z;									// 문 크기
+	short row, col;											// 문 위치
+	short size_x, size_z;									// 문 크기
 };
 
 struct sc_wait_packet
@@ -652,6 +663,29 @@ struct sc_wait_packet
 	unsigned short size;
 	MsgType type;
 	char id;
+};
+
+struct sc_gm_change_map_packet				// 서버에서 GM 명령으로 맵 변경 되었다고 전하는 패킷
+{
+	unsigned short size;
+	MsgType type;										// GM_MAP_CHANGE_맵종류
+	char id;													// 어떤 ID 가 이동했냐?
+	short x, z;												// x, y 좌표 설정
+};
+
+struct sc_gm_zombie_kill_packet					// 서버에서 GM 명령으로 좀비 모두 죽였다고 보내는 패킷
+{
+	unsigned short size;
+	MsgType type;										// GM_ZOMBIE_ALL_KILL
+	MapType map_type;								// 어느 맵의 좀비가 다 죽었는가?
+};
+
+struct sc_gm_player_hp_packet						// 서버에서 GM 명령으로 플레이어의 HP를 회복시키는 패킷
+{
+	unsigned short size;
+	MsgType type;										// GM_PLAYER_HP_UP
+	char id;													// 어떤 ID가 오름?
+	short hp;												// 오른 HP
 };
 #pragma pack(pop)
 
