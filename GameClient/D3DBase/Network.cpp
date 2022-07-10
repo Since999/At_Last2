@@ -1223,40 +1223,40 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::SECOND_PATH:
 		{
 			cout << (int)id << "Á×À½ \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			r_zombie2[id]._animation = ZombieAnimationState::DEAD;
+			r_zombie2[id]._state = ZombieState::DEAD;
 			//r_zombie2[id].~Zombie();
 			break;
 		}
 		case MapType::FINAL_PATH:
 		{
 			cout << (int)id << "Á×À½ \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			r_zombie3[id]._animation = ZombieAnimationState::DEAD;
+			r_zombie3[id]._state = ZombieState::DEAD;
 			//r_zombie3[id].~Zombie();
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
 			cout << (int)id << "Á×À½ \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			b_zombie1[id]._animation = ZombieAnimationState::DEAD;
+			b_zombie1[id]._state = ZombieState::DEAD;
 			//b_zombie1[id].~Zombie();
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
 			cout << (int)id << "Á×À½ \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			b_zombie2[id]._animation = ZombieAnimationState::DEAD;
+			b_zombie2[id]._state = ZombieState::DEAD;
 			//b_zombie2[id].~Zombie();
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
 			cout << (int)id << "Á×À½ \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			b_zombie3[id]._animation = ZombieAnimationState::DEAD;
+			b_zombie3[id]._state = ZombieState::DEAD;
 			//b_zombie3[id].~Zombie();
 			break;
 		}
