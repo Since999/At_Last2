@@ -63,6 +63,8 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		barricade.push_back(Network::three_barricade[i]);
 	}for (int i = 0; i < 30; ++i) {
 		barricade.push_back(Network::three_barricade2[i]);
+	}for (int i = 0; i < 3; ++i) {
+		barricade.push_back(Network::skill_barricade[i]);
 	}
 #else
 	for (int i = 0; i < 10; ++i) {

@@ -27,6 +27,7 @@ void Client::do_send(int num_bytes, void* mess)
 
 Player::Player()
 {
+	dir = Direction::NONE;
 }
 
 Player::~Player()
@@ -679,7 +680,6 @@ Commander::Commander()
 {
 	//hp = 100, maxhp = 100;
 	hp = 1000, maxhp = 1000;
-	shp = 100, maxshp = 100;
 	attack = 5;
 	interaction = 10;
 	x = 63.0f , z = 55.0f;
@@ -687,6 +687,7 @@ Commander::Commander()
 	//speed = 1.0f;
 	speed = 5.0f;
 	bullet = 30;
+	special_skill = 1;
 }
 
 Commander::~Commander()
@@ -698,7 +699,6 @@ Engineer::Engineer()
 {
 	//hp = 75, maxhp = 75;
 	hp = 1000, maxhp = 1000;
-	shp = 100, maxshp = 100;
 	attack = 3;
 	interaction = 15;
 	x = 65.0f, z = 55.0f;
@@ -706,6 +706,8 @@ Engineer::Engineer()
 	//speed = 0.8f;
 	speed = 5.0f;
 	bullet = 30;
+	special_skill = 3;
+	special_dir = DIR::HEIGHT;
 }
 
 Engineer::~Engineer()
@@ -717,7 +719,6 @@ Mercynary::Mercynary()
 {
 	//hp = 125, maxhp = 125;
 	hp = 1000, maxhp = 1000;
-	shp = 100, maxshp = 100;
 	attack = 7;
 	interaction = 5;
 	x = 67.0f, z = 55.0f;
@@ -725,6 +726,7 @@ Mercynary::Mercynary()
 	//speed = 1.2f;
 	speed = 5.0f;
 	bullet = 30;
+	special_skill = 3;
 }
 
 Mercynary::~Mercynary()

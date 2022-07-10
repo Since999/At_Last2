@@ -25,11 +25,6 @@ mutex Server::num_lock;
 mutex Server::spawn_lock;
 mutex Server::map_lock;
 
-//chrono::system_clock::time_point Server::start_time;
-//chrono::system_clock::time_point Server::end_time;
-//chrono::system_clock::time_point Server::zombie_start_time;
-//chrono::system_clock::time_point Server::zombie_end_time;
-
 chrono::milliseconds Server::sec;
 float Server::s_speed;
 float Server::z_speed;
@@ -37,6 +32,7 @@ float Server::z_speed;
 bool Server::zombie_send;
 int Server::door_num;
 bool Server::game_start;
+
 Server::Server()
 {
 	wcout.imbue(locale("korean"));
@@ -147,8 +143,6 @@ void Server::Send_select_packet(int c_id, int s_id)
 	packet.playertype = g_clients[c_id]._type;
 	packet.hp = g_clients[c_id].player->hp;
 	packet.maxhp = g_clients[c_id].player->maxhp;
-	packet.shp = g_clients[c_id].player->shp;
-	packet.maxshp = g_clients[c_id].player->maxshp;
 	packet.x = g_clients[c_id].player->x;
 	packet.z = g_clients[c_id].player->z;
 	packet.bullet = g_clients[c_id].player->bullet;
@@ -514,104 +508,58 @@ void Server::PlaceZombie(MapType m_type)
 void Server::ChangeMapType(Client& cl)
 {
 	MapType change = MapType::NONE;
-	switch (cl.map_type)
+	if ((One_Road_Pos.x < cl.player->x && cl.player->x < One_Road_Pos3.x) && (One_Road_Pos.z < cl.player->z && cl.player->z <One_Base_Pos.z - 1))
 	{
-	case MapType::SPAWN:
-		if ((One_Road_Pos.x < cl.player->x && cl.player->x < One_Road_Pos3.x) && (One_Road_Pos.z < cl.player->z && cl.player->z <One_Base_Pos.z - 1))
-		{
-			change = MapType::FIRST_PATH;
-			//cl.map_lock.lock();
-			cl.map_type = MapType::FIRST_PATH;
-			//cl.map_lock.unlock();
-
-			if (zombie_send == false)
-			{
-				for (auto& s_cl : g_clients)
-				{
-					//s_cl.state_lock.lock();
-					if (s_cl._state != ClientState::INGAME)
-					{
-						//s_cl.state_lock.unlock();
-						continue;
-					}
-					//s_cl.state_lock.unlock();
-
-					AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
-				}
-
-				zombie_send = true;
-			}
-		}
-
-		cl.zombie_list.clear();
-
-		break;
-	case MapType::FIRST_PATH:
-		if ((One_Base_Pos.x < cl.player->x && cl.player->x < One_Base_End_Pos.x) && (One_Base_Pos.z < cl.player->z && cl.player->z < One_Base_End_Pos.z))
-		{
-			change = MapType::CHECK_POINT_ONE;
-			//cl.map_lock.lock();
-			cl.map_type = MapType::CHECK_POINT_ONE;
-			//cl.map_lock.unlock();
-		}
-
-		cl.zombie_list.clear();
-		break;
-	case MapType::SECOND_PATH:
-		if ((TWO_Base_Pos.x < cl.player->x && cl.player->x < TWO_Base_End_Pos.x) && (TWO_Base_Pos.z < cl.player->z && cl.player->z < TWO_Base_End_Pos.z))
-		{
-			change = MapType::CHECK_POINT_TWO;
-			//cl.map_lock.lock();
-			cl.map_type = MapType::CHECK_POINT_TWO;
-			//cl.map_lock.unlock();
-		}
-
-		cl.zombie_list.clear();
-		break;
-	case MapType::FINAL_PATH:
-		if ((THREE_Base_Pos.x < cl.player->x && cl.player->x < THREE_Base_End_Pos2.x) && (THREE_Base_Pos.z < cl.player->z && cl.player->z < THREE_Base_End_Pos.z))
-		{
-			change = MapType::CHECK_POINT_FINAL;
-			//cl.map_lock.lock();
-			cl.map_type = MapType::CHECK_POINT_FINAL;
-			//cl.map_lock.unlock();
-		}
-
-		cl.zombie_list.clear();
-		break;
-	case MapType::CHECK_POINT_ONE:
-		if ((Two_Road_Pos.x < cl.player->x && cl.player->x < TWO_Base_Pos.x ) && (Two_Road_Pos.z < cl.player->z && cl.player->z < Two_Road_Pos.z + ROAD_SIZE))
-		{
-			change = MapType::SECOND_PATH;
-			//cl.map_lock.lock();
-			cl.map_type = MapType::SECOND_PATH;
-			//cl.map_lock.unlock();
-		}
-
-		cl.zombie_list.clear();
-		break;
-	case MapType::CHECK_POINT_TWO:
-		if ((Three_Road_Pos.x < cl.player->x && cl.player->x <THREE_Base_Pos.x ) && (Three_Road_Pos.z < cl.player->z && cl.player->z < Three_Road_Pos.z + ROAD_SIZE))
-		{
-			change = MapType::FINAL_PATH;
-			//cl.map_lock.lock();
-			cl.map_type = MapType::FINAL_PATH;
-			//cl.map_lock.unlock();
-		}
-
-		cl.zombie_list.clear();
-		break;
-	case MapType::CHECK_POINT_FINAL:
-		if ((Exit_Pos.x < cl.player->x && cl.player->x < Exit_End_Pos.x) && (Exit_Pos.z < cl.player->z && cl.player->z < Exit_End_Pos.z))
-		{
-			change = MapType::EXIT;
-			//cl.map_lock.lock();
-			cl.map_type = MapType::EXIT;
-			//cl.map_lock.unlock();
-		}
-		break;
+		change = MapType::FIRST_PATH;
+		cl.map_type = MapType::FIRST_PATH;
+	}
+	else if ((One_Base_Pos.x < cl.player->x && cl.player->x < One_Base_End_Pos.x) && (One_Base_Pos.z < cl.player->z && cl.player->z < One_Base_End_Pos.z))
+	{
+		change = MapType::CHECK_POINT_ONE;
+		cl.map_type = MapType::CHECK_POINT_ONE;
+	}
+	else if ((TWO_Base_Pos.x < cl.player->x && cl.player->x < TWO_Base_End_Pos.x) && (TWO_Base_Pos.z < cl.player->z && cl.player->z < TWO_Base_End_Pos.z))
+	{
+		change = MapType::CHECK_POINT_TWO;
+		cl.map_type = MapType::CHECK_POINT_TWO;
+	}
+	else if ((THREE_Base_Pos.x < cl.player->x && cl.player->x < THREE_Base_End_Pos2.x) && (THREE_Base_Pos.z < cl.player->z && cl.player->z < THREE_Base_End_Pos.z))
+	{
+		change = MapType::CHECK_POINT_FINAL;
+		cl.map_type = MapType::CHECK_POINT_FINAL;
+	}
+	else if((Two_Road_Pos.x < cl.player->x&& cl.player->x < TWO_Base_Pos.x) && (Two_Road_Pos.z < cl.player->z&& cl.player->z < Two_Road_Pos.z + ROAD_SIZE))
+	{
+		change = MapType::SECOND_PATH;
+		cl.map_type = MapType::SECOND_PATH;
+	}
+	else if ((Three_Road_Pos.x < cl.player->x && cl.player->x < THREE_Base_Pos.x) && (Three_Road_Pos.z < cl.player->z && cl.player->z < Three_Road_Pos.z + ROAD_SIZE))
+	{
+		change = MapType::FINAL_PATH;
+		cl.map_type = MapType::FINAL_PATH;
+	}
+	else if ((Exit_Pos.x < cl.player->x && cl.player->x < Exit_End_Pos.x) && (Exit_Pos.z < cl.player->z && cl.player->z < Exit_End_Pos.z))
+	{
+		change = MapType::EXIT;
+		cl.map_type = MapType::EXIT;
 	}
 
+	cl.zombie_list.clear();
+	if (zombie_send == false)
+	{
+		for (auto& s_cl : g_clients)
+		{
+			if (s_cl._state != ClientState::INGAME)
+			{
+				continue;
+			}
+
+			AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
+		}
+
+		zombie_send = true;
+	}
+		
 	if (MapCheck(cl.map_type))
 	{
 		//cout << "좀비를 스폰시킵니다 \n";
@@ -842,6 +790,423 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 
 	if(npc._state == ZombieState::SPAWN)
 		npc.zombie->hp = hp;
+}
+
+void Server::Send_commander_skill_packet(int c_id, int s_id)
+{
+	sc_commander_special_packet packet;
+	packet.bullet = g_clients[s_id].player->bullet;
+	packet.hp = g_clients[s_id].player->hp;
+	packet.id = s_id;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_COMMANDER_SPECIAL;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void Server::ResurrectionPlayer(Client& cl)
+{
+	cl._state = ClientState::INGAME;
+	int max_hp = cl.player->maxhp;
+	cl.player->hp = max_hp;
+	cl.player->bullet = 30;
+
+	for (auto& s_cl : g_clients)
+	{
+		if (s_cl._state == ClientState::INGAME) continue;
+
+		Send_commander_skill_packet(s_cl._id, cl._id);
+	}
+}
+
+void Server::Send_commander_skill_check_packet(int c_id, int s_id)
+{
+	sc_player_co_special_check_packet packet;
+	packet.id = s_id;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_COMMANDER_SPECIAL_CHECK;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void Server::CommanderSpecialSkill(Client& cl)
+{
+	if (cl.player->special_skill == 0)
+	{
+		Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
+		return;
+	}
+
+	for (auto& other : g_clients)
+	{
+		if (other._id == cl._id)
+		{
+			continue;
+		}
+
+		if (other._state != ClientState::DEAD)
+		{
+			continue;
+		}
+
+		if (Distance(cl.player->x, cl.player->z, other.player->x, other.player->z) <= 2.0f)
+		{
+			Send_commander_skill_check_packet(cl._id, other._id);
+		}
+
+	}
+}
+
+bool Server::EngineerSpecialSkillMapCheck(int x, int z, DIR dir)
+{
+	if (dir == DIR::HEIGHT)
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			if (map.map[z][x - 2 + i] != (char)MazeWall::ROAD)
+			{
+				return false;
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			if (map.map[z - 2 + i][x] != (char)MazeWall::ROAD)
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+void Server::EngineerBuildBarricade(int bx, int bz, DIR dir)
+{
+	if (dir == DIR::HEIGHT)
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			map.map[bz - 2 + i][bx] = (char)MazeWall::BARRICADE;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			map.map[bz][bx - 2 + i] = (char)MazeWall::BARRICADE;
+		}
+	}
+}
+
+void Server::Send_engineer_skill_packet(int c_id, int s_id, int t_x, int t_z)
+{
+	sc_engineer_barrigate_build_packet packet;
+	packet.dir = g_clients[s_id].player->special_dir;
+	packet.x = t_x;
+	packet.z = t_z;
+	packet.id = s_id;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_ENGINEER_SPECIAL;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void Server::EngineerSpecialSkill(Client& cl)
+{
+	if (cl.player->special_skill == 0)
+	{
+		Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
+		return;
+	}
+
+	bool check = true;	// true : 지을수 있음, false : 지을 수 없음
+	int t_x = 0, t_z = 0;
+
+	int cl_root_x = (int)cl.player->x;
+	int cl_root_z = (int)cl.player->z;
+
+	float cl_result_root_x = cl.player->x - cl_root_x;
+	float cl_result_root_z = cl.player->z - cl_root_z;
+
+	if (cl_result_root_x > 0.5f)
+		cl_root_x += 1;
+	if (cl_result_root_z > 0.5f)
+		cl_root_z += 1;
+
+	if (map_type != MapType::CHECK_POINT_ONE && map_type != MapType::CHECK_POINT_TWO && map_type != MapType::CHECK_POINT_FINAL)
+	{
+		Send_fail_packet(cl._id, MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL);
+		return;
+	}
+
+	if (cl.player->special_dir == DIR::HEIGHT)
+	{
+		if (cl.player->dir == Direction::UP)
+		{
+			t_x = cl_root_x;
+			t_z = cl_root_z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::UP_RIGHT)
+		{
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::RIGHT)
+		{
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::DOWN_RIGHT)
+		{
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::DOWN)
+		{
+			t_x = cl_root_x;
+			t_z = cl_root_z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::DOWN_LEFT)
+		{
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::LEFT)
+		{
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+		else if (cl.player->dir == Direction::UP_LEFT)
+		{
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
+		}
+	}
+	else
+	{
+		if (cl.player->dir == Direction::UP)
+		{
+			t_x = cl_root_x;
+			t_z = cl_root_z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::UP_RIGHT)
+		{
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::RIGHT)
+		{
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::DOWN_RIGHT)
+		{
+			t_x = cl_root_x + 1;
+			t_z = cl_root_z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::DOWN)
+		{
+			t_x = cl_root_x;
+			t_z = cl_root_z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::DOWN_LEFT)
+		{
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z + 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::LEFT)
+		{
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+		else if (cl.player->dir == Direction::UP_LEFT)
+		{
+			t_x = cl_root_x - 1;
+			t_z = cl_root_z - 1;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
+		}
+	}
+
+	if (map_type == MapType::CHECK_POINT_ONE)
+	{
+		for (auto& npc : b_zombie1)
+		{
+			if (npc._state != ZombieState::SPAWN) continue;
+
+			int root_x = (int)npc.zombie->GetX();
+			int root_z = (int)npc.zombie->GetZ();
+
+			float result_root_x = npc.zombie->GetX() - root_x;
+			float result_root_z = npc.zombie->GetZ() - root_z;
+
+			if (result_root_x > 0.5f)
+				root_x += 1;
+			if (result_root_z > 0.5f)
+				root_z += 1;
+
+			if (cl.player->special_dir == DIR::HEIGHT)
+			{
+				if (t_x == root_x)
+				{
+					if (t_z - 2 <= root_z && root_z <= t_z + 2)
+					{
+						check = false;
+					}
+				}
+			}
+			else
+			{
+				if (t_z == root_z)
+				{
+					if (t_x - 2 <= root_x && root_x <= t_x + 2)
+					{
+						check = false;
+					}
+				}
+			}
+		}
+	}
+	else if (map_type == MapType::CHECK_POINT_TWO)
+	{
+		for (auto& npc : b_zombie2)
+		{
+			if (npc._state != ZombieState::SPAWN) continue;
+
+			int root_x = (int)npc.zombie->GetX();
+			int root_z = (int)npc.zombie->GetZ();
+
+			float result_root_x = npc.zombie->GetX() - root_x;
+			float result_root_z = npc.zombie->GetZ() - root_z;
+
+			if (result_root_x > 0.5f)
+				root_x += 1;
+			if (result_root_z > 0.5f)
+				root_z += 1;
+
+			if (cl.player->special_dir == DIR::HEIGHT)
+			{
+				if (t_x == root_x)
+				{
+					if (t_z - 2 <= root_z && root_z <= t_z + 2)
+					{
+						check = false;
+					}
+				}
+			}
+			else
+			{
+				if (t_z == root_z)
+				{
+					if (t_x - 2 <= root_x && root_x <= t_x + 2)
+					{
+						check = false;
+					}
+				}
+			}
+		}
+	}
+	else if (map_type == MapType::CHECK_POINT_FINAL)
+	{
+		for (auto& npc : b_zombie3)
+		{
+			if (npc._state != ZombieState::SPAWN) continue;
+
+			int root_x = (int)npc.zombie->GetX();
+			int root_z = (int)npc.zombie->GetZ();
+
+			float result_root_x = npc.zombie->GetX() - root_x;
+			float result_root_z = npc.zombie->GetZ() - root_z;
+
+			if (result_root_x > 0.5f)
+				root_x += 1;
+			if (result_root_z > 0.5f)
+				root_z += 1;
+
+			if (cl.player->special_dir == DIR::HEIGHT)
+			{
+				if (t_x == root_x)
+				{
+					if (t_z - 2 <= root_z && root_z <= t_z + 2)
+					{
+						check = false;
+					}
+				}
+			}
+			else
+			{
+				if (t_z == root_z)
+				{
+					if (t_x - 2 <= root_x && root_x <= t_x + 2)
+					{
+						check = false;
+					}
+				}
+			}
+		}
+	}
+
+	if (check)
+	{
+		EngineerBuildBarricade(t_x, t_z, cl.player->special_dir);
+
+		if (cl.player->special_dir == DIR::HEIGHT)
+		{
+			t_z -= 2;
+		}
+		else
+		{
+			t_x -= 2;
+		}
+
+		for (auto& other : g_clients)
+		{
+			if (other._state != ClientState::INGAME) continue;
+
+			Send_engineer_skill_packet(other._id, cl._id, t_x, t_z);
+		}
+	}
+	else
+	{
+		Send_fail_packet(cl._id, MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL);
+	}
+
+}
+
+void Server::MercenarySpecialSkill(Client& cl)
+{
+	if (cl.player->special_skill == 0)
+	{
+		Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
+		return;
+	}
+
+
+}
+
+void Server::Send_gm_change_map_packet(int c_id, int s_id, int x, int z)
+{
+	sc_gm_change_map_packet packet;
+	packet.size = sizeof(packet);
+	packet.id = s_id;
+	packet.type = MsgType::SC_GM_MAP_CHANGE_MAP;
+	packet.x = x;
+	packet.z = z;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
 void Server::ProcessPacket(int client_id, unsigned char* p)
@@ -1249,6 +1614,50 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		cl.player->z = packet->z;
 		cl.move_lock.unlock();
 
+		// 플레이어 방향 정하기
+		{
+			if (0.75f < packet->t_x && packet->t_x <= 1.0f)
+		{
+			cl.player->dir = Direction::RIGHT;
+		}
+			else if (0.25f < packet->t_x && packet->t_x <= 0.75f)
+		{
+			if (packet->t_z > 0.0f)
+			{
+				cl.player->dir = Direction::UP_RIGHT;
+			}
+			else
+			{
+				cl.player->dir = Direction::DOWN_RIGHT;
+			}
+		}
+			else if (-0.25f < packet->t_x && packet->t_x <= 0.25f)
+		{
+			if (packet->t_z > 0.0f)
+			{
+				cl.player->dir = Direction::UP;
+			}
+			else
+			{
+				cl.player->dir = Direction::DOWN;
+			}
+		}
+			else if (-0.75f < packet->t_x && packet->t_x <= -0.25f)
+		{
+			if (packet->t_z > 0.0f)
+			{
+				cl.player->dir = Direction::UP_LEFT;
+			}
+			else
+			{
+				cl.player->dir = Direction::DOWN_LEFT;
+			}
+		}
+			else
+		{
+			cl.player->dir = Direction::LEFT;
+		}
+		}
 
 		// 미리 주변 뷰리스트 확인
 		unordered_set<int> near_zombie_list;
@@ -1430,12 +1839,12 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 					break;
 			}
 
-			ChangeMapType(cl);
-
 			//if (escape == false)
 			//{
 			//	Send_fail_packet(cl._id, MsgType::SC_PLAYER_SEARCH_FAIL);
 			//}
+
+			ChangeMapType(cl);
 
 			switch (map_type)
 			{
@@ -1564,14 +1973,84 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	}
 	case (int)MsgType::CS_PLAYER_SPECIAL:
 	{
-		//cl.state_lock.lock();
 		if (cl._state != ClientState::INGAME)
 		{
-			//cl.state_lock.unlock();
 			break;
 		}
-		//cl.state_lock.unlock();
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			CommanderSpecialSkill(cl);
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			EngineerSpecialSkill(cl);
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			MercenarySpecialSkill(cl);
+		}
+
 		cl.idle_time = chrono::system_clock::now();
+		break;
+	}
+	case (int)MsgType::CS_SPECIAL_SKILL_CHANGE:
+	{
+		cs_special_req_packet* packet = reinterpret_cast<cs_special_req_packet*>(p);
+
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			for (auto& other : g_clients)
+			{
+				if (other._id == cl._id) continue;
+				if (other._state != ClientState::DEAD) continue;
+				if (other._id == packet->id) continue;
+
+				if (Distance(cl.player->x, cl.player->z, other.player->x, other.player->z) <= 2.0f)
+				{
+					Send_commander_skill_check_packet(cl._id, other._id);
+				}
+			}
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+
+		}
+
+
+		break;
+	}
+	case (int)MsgType::CS_SPECIAL_SKILL_REQUEST:
+	{
+		cs_special_req_packet* packet = reinterpret_cast<cs_special_req_packet*>(p);
+
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			ResurrectionPlayer(g_clients[packet->id]);
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			
+		}
+
 		break;
 	}
 	case (int)MsgType::CS_BARRICADE_REQUEST:
@@ -1656,6 +2135,318 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		packet.id = cl._id;
 		cl.do_send(sizeof(packet), &packet);
 		cl.idle_time = chrono::system_clock::now();
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_ROAD_ONE:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 43.0f;
+			cl.player->z = 91.0f;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 44.0f;
+			cl.player->z = 91.0f;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 45.0f;
+			cl.player->z = 91.0f;
+		}
+
+		cl.map_type = MapType::FIRST_PATH;
+		
+		if (zombie_send == false)
+		{
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME)
+				{
+					continue;
+				}
+
+				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
+			}
+
+			zombie_send = true;
+		}
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, (int)cl.player->x, (int)cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_ROAD_TWO:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 323.0f;
+			cl.player->z = 338.0f;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 323.0f;
+			cl.player->z = 339.0f;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 323.0f;
+			cl.player->z = 340.0f;
+		}
+
+		cl.map_type = MapType::SECOND_PATH;
+
+		if (zombie_send == false)
+		{
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME)
+				{
+					continue;
+				}
+
+				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
+			}
+
+			zombie_send = true;
+		}
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, (int)cl.player->x, (int)cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_ROAD_THREE:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 634.0f;
+			cl.player->z = 338.0f;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 634.0f;
+			cl.player->z = 339.0f;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 634.0f;
+			cl.player->z = 340.0f;
+		}
+
+		cl.map_type = MapType::FINAL_PATH;
+
+		if (zombie_send == false)
+		{
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME)
+				{
+					continue;
+				}
+
+				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
+			}
+
+			zombie_send = true;
+		}
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, (int)cl.player->x, (int)cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_BASE_ONE:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 200.0f;
+			cl.player->z = 244.0f;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 201.0f;
+			cl.player->z = 244.0f;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 202.0f;
+			cl.player->z = 244.0f;
+		}
+
+		cl.map_type = MapType::CHECK_POINT_ONE;
+
+		if (zombie_send == false)
+		{
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME)
+				{
+					continue;
+				}
+
+				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
+			}
+
+			zombie_send = true;
+		}
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, (int)cl.player->x, (int)cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_BASE_TWO:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 512.0f;
+			cl.player->z = 338.0f;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 512.0f;
+			cl.player->z = 339.0f;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 512.0f;
+			cl.player->z = 340.0f;
+		}
+
+		cl.map_type = MapType::CHECK_POINT_TWO;
+
+		if (zombie_send == false)
+		{
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME)
+				{
+					continue;
+				}
+
+				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
+			}
+
+			zombie_send = true;
+		}
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, (int)cl.player->x, (int)cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_MAP_CHANGE_BASE_THREE:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		if (cl._type == PlayerType::COMMANDER)
+		{
+			cl.player->x = 823.0f;
+			cl.player->z = 338.0f;
+		}
+		else if (cl._type == PlayerType::ENGINEER)
+		{
+			cl.player->x = 823.0f;
+			cl.player->z = 339.0f;
+		}
+		else if (cl._type == PlayerType::MERCENARY)
+		{
+			cl.player->x = 823.0f;
+			cl.player->z = 340.0f;
+		}
+
+		cl.map_type = MapType::CHECK_POINT_FINAL;
+
+		if (zombie_send == false)
+		{
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME)
+				{
+					continue;
+				}
+
+				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
+			}
+
+			zombie_send = true;
+		}
+
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
+
+			Send_gm_change_map_packet(a_cl._id, cl._id, (int)cl.player->x, (int)cl.player->z);
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_ZOMBIE_ALL_KILL:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
+		break;
+	}
+	case (int)MsgType::CS_GM_PLAYER_HP_UP:
+	{
+		if (cl._state != ClientState::INGAME)
+		{
+			break;
+		}
+
 		break;
 	}
 	default:

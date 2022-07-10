@@ -33,6 +33,7 @@ BarricadePos Network::one_barricade[42];
 BarricadePos Network::two_barricade[32];
 BarricadePos Network::three_barricade[30];
 BarricadePos Network::three_barricade2[30];
+BarricadePos Network::skill_barricade[3];
 
 atomic_int Network::fps_rate;
 
@@ -141,6 +142,24 @@ void Network::Send_rotate_packet(float m_x, float m_z)
 	_socket.do_send(sizeof(packet), &packet);
 }
 
+void Network::Send_commander_special_req_packet(int c_id)
+{
+	cs_special_req_packet packet;
+	packet.size = sizeof(packet);
+	packet.id = c_id;
+	packet.type = MsgType::CS_SPECIAL_SKILL_REQUEST;
+	_socket.do_send(sizeof(packet), &packet);
+}
+
+void Network::Send_commander_special_change_packet(int c_id)
+{
+	cs_special_req_packet packet;
+	packet.size = sizeof(packet);
+	packet.id = c_id;
+	packet.type = MsgType::CS_SPECIAL_SKILL_CHANGE;
+	_socket.do_send(sizeof(packet), &packet);
+}
+
 void Network::ProcessPacket(unsigned char* ptr)
 {
 	int packet_type = (int)ptr[2];
@@ -213,46 +232,95 @@ void Network::ProcessPacket(unsigned char* ptr)
 		for (auto& bar : one_barricade)
 		{
 			bar = Change_Client_Pos(packet->one_base[i]);
-			map[packet->one_base[i].z][packet->one_base[i++].x] = (char)MazeWall::BARRICADE;
+			if (packet->one_base[i].dir == DIR::HEIGHT)
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->one_base[i].z + b][packet->one_base[i].x] = (char)MazeWall::BARRICADE;
+				}
+			}
+			else
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->one_base[i].z][packet->one_base[i].x + b] = (char)MazeWall::BARRICADE;
+				}
+			}
+			i++;
 		}
 
 		i = 0;
 		for (auto& bar : two_barricade)
 		{
 			bar = Change_Client_Pos(packet->two_base[i]);
-			map[packet->two_base[i].z][packet->two_base[i++].x] = (char)MazeWall::BARRICADE;
+			if (packet->two_base[i].dir == DIR::HEIGHT)
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->two_base[i].z + b][packet->two_base[i].x] = (char)MazeWall::BARRICADE;
+				}
+			}
+			else
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->two_base[i].z][packet->two_base[i].x + b] = (char)MazeWall::BARRICADE;
+				}
+			}
+			i++;
 		}
 
 		i = 0;
 		for (auto& bar : three_barricade)
 		{
 			bar = Change_Client_Pos(packet->three_base[i]);
-			map[packet->three_base[i].z][packet->three_base[i++].x] = (char)MazeWall::BARRICADE;
+			if (packet->three_base[i].dir == DIR::HEIGHT)
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->three_base[i].z + b][packet->three_base[i].x] = (char)MazeWall::BARRICADE;
+				}
+			}
+			else
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->three_base[i].z][packet->three_base[i].x + b] = (char)MazeWall::BARRICADE;
+				}
+			}
+			i++;
 		}
 
 		i = 0;
 		for (auto& bar : three_barricade2)
 		{
 			bar = Change_Client_Pos(packet->three_base2[i]);
-			map[packet->three_base2[i].z][packet->three_base2[i++].x] = (char)MazeWall::BARRICADE;
+			if (packet->three_base2[i].dir == DIR::HEIGHT)
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->three_base2[i].z + b][packet->three_base2[i].x] = (char)MazeWall::BARRICADE;
+				}
+			}
+			else
+			{
+				for (int b = 0; b < 5; b++)
+				{
+					map[packet->three_base2[i].z][packet->three_base2[i].x + b] = (char)MazeWall::BARRICADE;
+				}
+			}
+			i++;
+		}
+
+		for (auto& bar : skill_barricade)
+		{
+			bar.dir = DIR::HEIGHT;
+			bar.x = 800;
+			bar.z = 800;
 		}
 
 		Send_request_packet(MsgType::CS_GAME_START_REQUEST);
 		barricade_req = true;
-		// packet.onebase -> 1거점 미로 시작 좌표, 방향
-		// packet.twobase -> 2거점 미로 시작 좌표, 방향
-		// packet.threebase -> 3거점1 미로 시작 좌표, 방향
-		// packet.threebase2 -> 3거점2 미로 시작 좌표, 방향
-		/*
-		iPos라는 구조체로 만들어져 있으며, x, z, DIR구조체(width, height)로 이루어져 있습니다.
-		iPos pos;
-		pos.x = packet.onebase[0].x;
-		pos.z = packet.onebase[0].z;
-		pos.dir = packet.onebase[0].dir;
-		이런식으로 복사해 오시거나 참조해가시면 될듯합니다.
-		dir 이 width 이면 x,z좌표 기준으로 좌측 2, 우측 2칸 5칸
-		dir 이 height 이면 x,z 좌표 기준으로 상 2, 하 2칸 5칸 입니다.
-		*/
 
 		break;
 	}
@@ -378,10 +446,22 @@ void Network::ProcessPacket(unsigned char* ptr)
 		int id = packet->id;
 
 		g_client[id]._type = packet->playertype;
+
+		if (g_client[id]._type == PlayerType::COMMANDER)
+		{
+			g_client[id].special_skill = 1;
+		}
+		else if (g_client[id]._type == PlayerType::ENGINEER)
+		{
+			g_client[id].special_skill = 3;
+		}
+		else if (g_client[id]._type == PlayerType::MERCENARY)
+		{
+			g_client[id].special_skill = 3;
+		}
+
 		g_client[id].hp = packet->hp;
 		g_client[id].maxhp = packet->maxhp;
-		g_client[id].shp = packet->shp;
-		g_client[id].maxshp = packet->maxshp;
 		g_client[id].x = packet->x;
 		g_client[id].z = packet->z;
 		g_client[id].bullet = packet->bullet;
@@ -406,6 +486,89 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_PLAYER_SPECIAL:
 	{
+		break;
+	}
+	case (int)MsgType::SC_COMMANDER_SPECIAL:
+	{
+		sc_commander_special_packet* packet = reinterpret_cast<sc_commander_special_packet*>(ptr);
+
+		if (packet->id == my_id)
+		{
+			cout << "부활하였습니다 \n";
+		}
+		else
+		{
+			if (g_client[packet->id]._type == PlayerType::ENGINEER)
+			{
+				cout << "엔지니어가 부활하였습니다. \n";
+			}
+			else
+			{
+				cout << "용병이 부활하였습니다. \n";
+			}
+		}
+
+		g_client[packet->id].hp = packet->hp;
+		g_client[packet->id].bullet = packet->bullet;
+
+		break;
+	}
+	case (int)MsgType::SC_COMMANDER_SPECIAL_CHECK:
+	{
+		sc_player_co_special_check_packet* packet = reinterpret_cast<sc_player_co_special_check_packet*>(ptr);
+
+		if (g_client[packet->id]._type == PlayerType::ENGINEER)
+		{
+			cout << "엔지니어를 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
+		}
+		else
+		{
+			cout << "용병을 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
+		}
+
+		g_client[my_id].special_skill_key = true;
+		g_client[my_id].special_id = packet->id;
+
+		break;
+	}
+	case (int)MsgType::SC_ENGINEER_SPECIAL:
+	{
+		sc_engineer_barrigate_build_packet* packet = reinterpret_cast<sc_engineer_barrigate_build_packet*>(ptr);
+		
+		BarricadePos temp;
+		temp.x = packet->x;
+		temp.z = packet->z;
+		temp.dir = packet->dir;
+		skill_barricade[3 - g_client[packet->id].special_skill] = temp;
+
+		if (packet->dir == DIR::HEIGHT)
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				map[packet->z + i][packet->x] = (char)MazeWall::BARRICADE;
+			}
+		}
+		else
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				map[packet->z][packet->x + i] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		g_client[packet->id].special_skill -= 1;
+		break;
+	}
+	case (int)MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL:
+	{
+		cout << "해당 지역에 지을 수 없습니다. \n";
+
+		break;
+	}
+	case (int)MsgType::SC_PLAYER_SPECIAL_NUM_ZERO:
+	{
+		cout << "스페셜 스킬 사용 횟수가 없어 사용하지 못했습니다. \n";
+
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_DEAD:
@@ -1060,40 +1223,40 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::SECOND_PATH:
 		{
 			cout << (int)id << "죽음 \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			r_zombie2[id]._animation = ZombieAnimationState::DEAD;
+			r_zombie2[id]._state = ZombieState::DEAD;
 			//r_zombie2[id].~Zombie();
 			break;
 		}
 		case MapType::FINAL_PATH:
 		{
 			cout << (int)id << "죽음 \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			r_zombie3[id]._animation = ZombieAnimationState::DEAD;
+			r_zombie3[id]._state = ZombieState::DEAD;
 			//r_zombie3[id].~Zombie();
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
 			cout << (int)id << "죽음 \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			b_zombie1[id]._animation = ZombieAnimationState::DEAD;
+			b_zombie1[id]._state = ZombieState::DEAD;
 			//b_zombie1[id].~Zombie();
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
 			cout << (int)id << "죽음 \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			b_zombie2[id]._animation = ZombieAnimationState::DEAD;
+			b_zombie2[id]._state = ZombieState::DEAD;
 			//b_zombie2[id].~Zombie();
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
 			cout << (int)id << "죽음 \n";
-			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
-			r_zombie1[id]._state = ZombieState::DEAD;
+			b_zombie3[id]._animation = ZombieAnimationState::DEAD;
+			b_zombie3[id]._state = ZombieState::DEAD;
 			//b_zombie3[id].~Zombie();
 			break;
 		}
@@ -1159,6 +1322,25 @@ void Network::ProcessPacket(unsigned char* ptr)
 	case (int)MsgType::SC_GAME_END:
 	{
 		cout << "게임에 클리어하였습니다! 고생하셨습니다 \n";
+
+		break;
+	}
+	case (int)MsgType::SC_GM_MAP_CHANGE_MAP:
+	{
+		sc_gm_change_map_packet* packet = reinterpret_cast<sc_gm_change_map_packet*>(ptr);
+
+		g_client[packet->id].x = packet->x;
+		g_client[packet->id].z = packet->z;
+
+		break;
+	}
+	case (int)MsgType::SC_GM_ZOMBIE_ALL_KILL:
+	{
+
+		break;
+	}
+	case(int)MsgType::SC_GM_PLAYER_HP_UP:
+	{
 
 		break;
 	}

@@ -46,6 +46,7 @@ public:
 	static BarricadePos two_barricade[32];
 	static BarricadePos three_barricade[30];
 	static BarricadePos three_barricade2[30];
+	static BarricadePos skill_barricade[3];
 
 	static array<Zombie, ROAD_ZOMBIE_NUM> r_zombie1;
 	static array<Zombie, ROAD_ZOMBIE_NUM> r_zombie2;
@@ -91,6 +92,8 @@ public:
 	static void send_player_move_packet(float t_x, float t_z, float speed, float x, float z);
 	static void Do_Timer();
 	static void Send_request_packet(MsgType type);
+	static void Send_commander_special_req_packet(int c_id);
+	static void Send_commander_special_change_packet(int c_id);
 	static void Send_chat_packet(char* msg);
 	static void Send_attack_packet(int m_x, int m_z);
 	static void Send_rotate_packet(float m_x, float m_z);

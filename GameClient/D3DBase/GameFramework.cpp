@@ -595,7 +595,7 @@ void CGameFramework::ProcessInput()
 	if (!bProcessedByScene)
 	{
 		DWORD dwDirection = 0;
-		
+
 		if ((pKeysBuffer['W'] & 0xF0)) dwDirection |= DIR_FORWARD;
 		if ((pKeysBuffer['S'] & 0xF0)) dwDirection |= DIR_BACKWARD;
 		if ((pKeysBuffer['A'] & 0xF0)) dwDirection |= DIR_LEFT;
@@ -622,6 +622,63 @@ void CGameFramework::ProcessInput()
 			network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
 		}
 
+		if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false && network.g_client[network.my_id].special_skill > 0)
+		{
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_PLAYER_SPECIAL);
+		}
+
+		if ((pKeysBuffer['C'] & 0xF0) && network.g_client[network.my_id].special_skill_key == true)
+		{
+			network.g_client[network.my_id].special_skill_key = false;
+			network.Send_commander_special_req_packet(network.g_client[network.my_id].special_id);
+		}
+
+		if ((pKeysBuffer['V'] & 0xF0) && network.g_client[network.my_id].special_skill_key == true)
+		{
+			network.g_client[network.my_id].special_skill_key = false;
+			network.Send_commander_special_req_packet(network.g_client[network.my_id].special_id);
+		}
+
+		if ((pKeysBuffer['I'] & 0xF0) && network.key_down_state == false) {
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_ROAD_ONE);
+		}
+
+		if ((pKeysBuffer['O'] & 0xF0) && network.key_down_state == false) {
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_ROAD_TWO);
+		}
+
+		if ((pKeysBuffer['P'] & 0xF0) && network.key_down_state == false) {
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_ROAD_THREE);
+		}
+
+		if ((pKeysBuffer['J'] & 0xF0) && network.key_down_state == false) {
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_ONE);
+		}
+
+		if ((pKeysBuffer['K'] & 0xF0) && network.key_down_state == false) {
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_TWO);
+		}
+
+		if ((pKeysBuffer['L'] & 0xF0) && network.key_down_state == false) {
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_THREE);
+		}
+
+		if ((pKeysBuffer['M'] & 0xF0) && network.key_down_state == false) {
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_TWO);
+		}
+
+		if ((pKeysBuffer['N'] & 0xF0) && network.key_down_state == false) {
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_THREE);
+		}
 #endif
 
 		float cxDelta = 0.0f, cyDelta = 0.0f;
