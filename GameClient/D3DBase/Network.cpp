@@ -1334,13 +1334,12 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 		break;
 	}
-	case (int)MsgType::SC_GM_ZOMBIE_ALL_KILL:
-	{
-
-		break;
-	}
 	case(int)MsgType::SC_GM_PLAYER_HP_UP:
 	{
+		sc_gm_player_hp_packet* packet = reinterpret_cast<sc_gm_player_hp_packet*>(ptr);
+
+		g_client[packet->id].hp = packet->hp;
+		cout << packet->id << "가 " << packet->hp << "로 회복하였습니다 \n";
 
 		break;
 	}

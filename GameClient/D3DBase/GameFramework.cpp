@@ -670,14 +670,14 @@ void CGameFramework::ProcessInput()
 			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_THREE);
 		}
 
-		if ((pKeysBuffer['M'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_TWO);
-		}
-
 		if ((pKeysBuffer['N'] & 0xF0) && network.key_down_state == false) {
 			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_THREE);
+			network.Send_request_packet(MsgType::CS_GM_ZOMBIE_ALL_KILL);
+		}
+
+		if ((pKeysBuffer['M'] & 0xF0) && network.key_down_state == false) {
+			network.key_down_state = true;
+			network.Send_request_packet(MsgType::CS_GM_PLAYER_HP_UP);
 		}
 #endif
 
