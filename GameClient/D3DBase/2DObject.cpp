@@ -192,4 +192,5 @@ void CTrail::Animate(float fTimeElapsed)
 	CParticleObject::Animate(fTimeElapsed);
 	transparent = cur_time / duration;
 	transparent = 1.f - clamp(transparent, 0.f, 1.f);
+	transparent *= transparent;
 }
