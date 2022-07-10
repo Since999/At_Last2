@@ -26,7 +26,7 @@ void CBullet::Animate(float fTimeElapsed)
 		XMFLOAT3 pos = Vector3::Add(pre_pos, Vector3::ScalarProduct(sub, i * 5, false));
 		float rand_val = ((float)rand() / (float)RAND_MAX) - 0.5f;
 		XMFLOAT3 right = Vector3::CrossProduct(direction, XMFLOAT3( 0.0f, 1.0f, 0.0f ));
-		XMFLOAT3 random_pos = Vector3::ScalarProduct(right, rand_val * 20, false);
+		XMFLOAT3 random_pos = Vector3::ScalarProduct(right, rand_val * 5, false);
 		pos = Vector3::Add(pos, random_pos);
 		ParticleSystem::GetInstance()->AddTrail(pos, L"smoke");
 	}

@@ -4,14 +4,17 @@ class C2DObject :
     public CGameObject
 {
 protected:
+    static int root_par_index;
     static CMesh* mesh;
     XMFLOAT2 size;
+    float transparent = 1.f;
 public:
     C2DObject();
     //static vector<CVertex> Create2DMesh();
     virtual void Animate(float fTimeElapsed);
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera = NULL);
+    virtual float GetTransparent() const { return transparent; }
 };
 
 
@@ -39,6 +42,7 @@ private:
 public:
     CTrail(float duration, const XMFLOAT2& size, const XMFLOAT3& position, vector<CMaterial*>* materials);
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera = NULL);
+    virtual void Animate(float fTimeElapsed);
 };
 
 class CParticleBuilder {

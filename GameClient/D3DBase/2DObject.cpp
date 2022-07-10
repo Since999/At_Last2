@@ -4,6 +4,7 @@
 #include "2DShader.h"
 
 CMesh* C2DObject::mesh = NULL;
+int C2DObject::root_par_index = (int)ROOT_PARAMATER_INDEX::GAMEOBJECT;
 
 C2DObject::C2DObject()
 {
@@ -45,7 +46,7 @@ void C2DObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCam
 		m_pMaterial->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, 0);
 	}
 
-	pd3dCommandList->SetGraphicsRootDescriptorTable(2, m_d3dCbvGPUDescriptorHandle);
+	pd3dCommandList->SetGraphicsRootDescriptorTable(root_par_index, m_d3dCbvGPUDescriptorHandle);
 	
 	if (mesh) mesh->Render(pd3dCommandList);
 #ifdef _DEBUG
@@ -73,7 +74,7 @@ void C2DObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D12_G
 		m_pMaterial->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, 0);
 	}
 
-	pd3dCommandList->SetGraphicsRootDescriptorTable(2, desc_handle);
+	pd3dCommandList->SetGraphicsRootDescriptorTable(root_par_index, desc_handle);
 
 	if (mesh) mesh->Render(pd3dCommandList);
 #ifdef _DEBUG
@@ -131,7 +132,7 @@ void CParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList,
 		mat->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, 0);
 	}
 
-	pd3dCommandList->SetGraphicsRootDescriptorTable(2, desc_handle);
+	pd3dCommandList->SetGraphicsRootDescriptorTable(root_par_index, desc_handle);
 
 	if (mesh) mesh->Render(pd3dCommandList);
 #ifdef _DEBUG
@@ -176,7 +177,7 @@ void CTrail::Render(ID3D12GraphicsCommandList* pd3dCommandList,
 		mat->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, 0);
 	}
 
-	pd3dCommandList->SetGraphicsRootDescriptorTable(2, desc_handle);
+	pd3dCommandList->SetGraphicsRootDescriptorTable(root_par_index, desc_handle);
 
 	if (mesh) mesh->Render(pd3dCommandList);
 #ifdef _DEBUG
@@ -184,4 +185,12 @@ void CTrail::Render(ID3D12GraphicsCommandList* pd3dCommandList,
 		cout << "Error(2DObject): no mesh" << endl;
 	}
 #endif
+}
+
+void CTrail::Animate(float fTimeElapsed)
+{
+	CParticleObject::Animate(fTimeElapsed);
+	transparent = cur_time / duration;
+	transparent = 1.f - clamp(transparent, 0.f, 1.f);
+	transparent *= transparent;
 }

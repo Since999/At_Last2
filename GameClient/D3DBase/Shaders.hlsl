@@ -24,10 +24,24 @@ float4 PSTextured(VS_TEXTURED_OUTPUT input) : SV_TARGET
 	return(result);
 }
 
-
-VS_TEXTURED_OUTPUT VSParticle(VS_TEXTURED_INPUT input)
+struct PARTICLE_INPUT
 {
-	VS_TEXTURED_OUTPUT output;
+	float3 position : POSITION;
+	float3 normal : NORMAL;
+	float2 uv : TEXCOORD;
+};
+
+struct PARTICLE_OUTPUT
+{
+	//float4 positionH    : SV_POSITION;
+	//float4 positionW    : POSITION0;
+	float4 position    : SV_POSITION;
+	float2 uv : TEXCOORD;
+};
+
+PARTICLE_OUTPUT VSParticle(PARTICLE_INPUT input)
+{
+	PARTICLE_OUTPUT output;
 	//float4 rotation = float4(m_xmf4x4View._13, m_xmf4x4View._23, m_xmf4x4View._33, 1.0f);
 	//float4 toCamera = mul(float4(input.position, 1.0f), );
 	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
@@ -35,10 +49,10 @@ VS_TEXTURED_OUTPUT VSParticle(VS_TEXTURED_INPUT input)
 	return(output);
 }
 
-float4 PSParticle(VS_TEXTURED_OUTPUT input) : SV_TARGET
+float4 PSParticle(PARTICLE_OUTPUT input) : SV_TARGET
 {
 	float4 cColor = gtxtTexture.Sample(gSamplerState, input.uv);
-
+	cColor.a = cColor.a * Transparent;
 	float4 result = cColor;
 
 	return(result);

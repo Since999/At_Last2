@@ -56,6 +56,7 @@ void C2DShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList
 	for (CGameObject* object : object_list) {
 		CB_GAMEOBJECT_INFO* pbMappedcbGameObject = (CB_GAMEOBJECT_INFO*)((UINT8*)m_pcbMappedGameObjects + (i * ncbElementBytes));
 		XMStoreFloat4x4(&pbMappedcbGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&object->m_xmf4x4World)));
+		pbMappedcbGameObject->transparent = ((C2DObject*)object)->GetTransparent();
 		++i;
 		if (i >= max_object) break;
 	}

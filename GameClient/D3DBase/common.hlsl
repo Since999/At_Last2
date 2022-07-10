@@ -15,6 +15,7 @@ cbuffer cbCameraInfo : register(b1)
 cbuffer cbGameObjectInfo : register(b2)
 {
 	matrix		gmtxGameObject : packoffset(c0);
+    float       Transparent : packoffset(c4);
 };
 
 cbuffer AnimationObjectInfo : register(b3)

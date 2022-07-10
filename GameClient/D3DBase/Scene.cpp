@@ -98,7 +98,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 {
 	ID3D12RootSignature* pd3dGraphicsRootSignature = NULL;
 
-	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[4];
+	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[5];
 
 	pd3dDescriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
 	pd3dDescriptorRanges[0].NumDescriptors = 1;
@@ -143,7 +143,7 @@ ID3D12RootSignature* CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevic
 	pd3dRootParameters[object].DescriptorTable.NumDescriptorRanges = 1;
 	pd3dRootParameters[object].DescriptorTable.pDescriptorRanges =
 		&pd3dDescriptorRanges[0]; //GameObject
-	pd3dRootParameters[object].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	pd3dRootParameters[object].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
 	auto texture = (int)ROOT_PARAMATER_INDEX::TEXTURE;
 	pd3dRootParameters[texture].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
