@@ -6,7 +6,6 @@
 #define MAX_PARTICLE 3000
 #define MAX_PARTICLE_TYPE 50
 
-
 class C2DShader :
     public CObjectsShader
 {
@@ -16,7 +15,7 @@ public:
 	C2DShader(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig);
 	C2DShader() {}
 	~C2DShader();
-
+	
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
@@ -33,7 +32,6 @@ public:
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual D3D12_BLEND_DESC CreateBlendState();
-
 };
 
 #define MAX_UI 100

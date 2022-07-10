@@ -18,8 +18,8 @@
   </Particle>
   <Particle
    name ="smoke"
-   width ="30"
-   height ="30"
+   width ="10"
+   height ="10"
    duration="1.0">
     <Image
       image ="Resources/Particle/Smoke/Smoke10.png"/>
