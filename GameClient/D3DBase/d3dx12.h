@@ -1495,7 +1495,7 @@ struct CD3DX12_CPU_DESCRIPTOR_HANDLE : public D3D12_CPU_DESCRIPTOR_HANDLE
     }
     CD3DX12_CPU_DESCRIPTOR_HANDLE& Offset(INT offsetInDescriptors, UINT descriptorIncrementSize)
     {
-        ptr += offsetInDescriptors * descriptorIncrementSize;
+        ptr += (UINT)offsetInDescriptors * descriptorIncrementSize;
         return *this;
     }
     CD3DX12_CPU_DESCRIPTOR_HANDLE& Offset(INT offsetScaledByIncrementSize)

@@ -63,3 +63,16 @@ public:
         return new CTrail(duration, size, position, materials);
     }
 };
+
+class CProgressBar : public CUIObject {
+private:
+    float max_value;
+    float value;
+    float factor;
+    atomic_int* value_ptr = NULL;
+    XMFLOAT4X4 origin_mat;
+public:
+    CProgressBar(float width, float height, float x, float y, CMaterial* material, float max_value, atomic_int* value_ptr = NULL);
+    void SetValue(float value);
+    virtual void Animate(float fTimeElapsed);
+};

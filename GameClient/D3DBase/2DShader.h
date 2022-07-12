@@ -3,7 +3,7 @@
 #include "2DObject.h"
 #include <map>
 #include <string>
-#define MAX_PARTICLE 3000
+#define MAX_PARTICLE 10000
 #define MAX_PARTICLE_TYPE 50
 
 class C2DShader :
@@ -50,8 +50,11 @@ public:
 	UISystem(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig);
 	~UISystem();
 
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	void AddUI(float width, float height, float x, float y, const wstring& image_file_name);
+	void AddProgressBar(float width, float height, float x, float y, const wstring& image_file_name);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 

@@ -194,3 +194,31 @@ void CTrail::Animate(float fTimeElapsed)
 	transparent = 1.f - clamp(transparent, 0.f, 1.f);
 	transparent *= transparent;
 }
+
+CProgressBar::CProgressBar(float width, float height, float x, float y, CMaterial* material, float max_value, atomic_int* value_ptr)
+	:CUIObject(width, height, x, y, material), max_value(max_value), value_ptr(value_ptr)
+{
+	origin_mat = m_xmf4x4World;
+	factor = 1;
+}
+
+void CProgressBar::SetValue(float value)
+{
+	this->value = value;
+	this->factor = value / max_value;
+}
+
+float smooth_time = 0.5f;
+
+void CProgressBar::Animate(float fTimeElapsed)
+{
+	CUIObject::Animate(fTimeElapsed);
+	if (value_ptr) {
+		value = (*value_ptr);
+	}
+	float real_factor = value / max_value;
+	float m = real_factor - factor;
+	factor = factor + m * (fTimeElapsed / smooth_time);
+	XMMATRIX mtxScale = XMMatrixScaling(factor, 1, 1);
+	m_xmf4x4World = Matrix4x4::Multiply(mtxScale, origin_mat);
+}
