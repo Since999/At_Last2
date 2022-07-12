@@ -344,3 +344,13 @@ private:
 public:
 	C2DMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 };
+
+class C2DMeshLeftAnchor : public CMesh
+{
+public:
+	static C2DMeshLeftAnchor* GetInstance();
+private:
+	static C2DMeshLeftAnchor* singleton;
+public:
+	C2DMeshLeftAnchor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+};
