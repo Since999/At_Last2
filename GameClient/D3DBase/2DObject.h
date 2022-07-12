@@ -75,4 +75,7 @@ public:
     CProgressBar(float width, float height, float x, float y, CMaterial* material, float max_value, atomic_int* value_ptr = NULL);
     void SetValue(float value);
     virtual void Animate(float fTimeElapsed);
+
+    virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+    virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera = NULL);
 };

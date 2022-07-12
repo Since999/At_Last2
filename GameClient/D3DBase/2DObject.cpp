@@ -200,6 +200,7 @@ CProgressBar::CProgressBar(float width, float height, float x, float y, CMateria
 {
 	origin_mat = m_xmf4x4World;
 	factor = 1;
+	SetMesh(0, C2DMeshLeftAnchor::GetInstance());
 }
 
 void CProgressBar::SetValue(float value)
@@ -221,4 +222,71 @@ void CProgressBar::Animate(float fTimeElapsed)
 	factor = factor + m * (fTimeElapsed / smooth_time);
 	XMMATRIX mtxScale = XMMatrixScaling(factor, 1, 1);
 	m_xmf4x4World = Matrix4x4::Multiply(mtxScale, origin_mat);
+}
+
+void CProgressBar::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	OnPrepareRender();
+
+	if (m_pMaterial)
+	{
+		if (m_pMaterial->m_pShader)
+		{
+			m_pMaterial->m_pShader->Render(pd3dCommandList, pCamera);
+			m_pMaterial->m_pShader->UpdateShaderVariables(pd3dCommandList);
+		}
+	}
+
+	if (m_pMaterial && m_pMaterial->m_pTexture) {
+		m_pMaterial->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, 0);
+	}
+
+	pd3dCommandList->SetGraphicsRootDescriptorTable(root_par_index, m_d3dCbvGPUDescriptorHandle);
+
+	if (m_ppMeshes)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList);
+		}
+	}
+#ifdef _DEBUG
+	else {
+		cout << "Error(2DObject): no mesh" << endl;
+	}
+#endif
+}
+
+void CProgressBar::Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera)
+{
+	OnPrepareRender();
+
+	if (m_pMaterial)
+	{
+		if (m_pMaterial->m_pShader)
+		{
+			m_pMaterial->m_pShader->Render(pd3dCommandList, pCamera);
+			m_pMaterial->m_pShader->UpdateShaderVariables(pd3dCommandList);
+		}
+	}
+
+	if (m_pMaterial && m_pMaterial->m_pTexture) {
+		m_pMaterial->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, 0);
+	}
+
+	pd3dCommandList->SetGraphicsRootDescriptorTable(root_par_index, desc_handle);
+
+	if (m_ppMeshes)
+	{
+		for (int i = 0; i < m_nMeshes; i++)
+		{
+			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList);
+		}
+	}
+
+#ifdef _DEBUG
+	else {
+		cout << "Error(2DObject): no mesh" << endl;
+	}
+#endif
 }
