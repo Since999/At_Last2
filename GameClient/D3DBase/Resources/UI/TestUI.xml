@@ -82,6 +82,12 @@
   y ="1055"
   image="Resources/UI/stage.png"/>
 
+  <BAR
+width ="500"
+height ="10"
+x = "1000"
+y ="200"
+image="Resources/UI/background.png"/>
       <!-- <UI
     width ="50"
     height ="50"

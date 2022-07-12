@@ -52,7 +52,7 @@ D3D12_INPUT_LAYOUT_DESC C2DShader::CreateInputLayout()
 void C2DShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
-	int i = 0;
+	unsigned int i = 0;
 	for (CGameObject* object : object_list) {
 		CB_GAMEOBJECT_INFO* pbMappedcbGameObject = (CB_GAMEOBJECT_INFO*)((UINT8*)m_pcbMappedGameObjects + (i * ncbElementBytes));
 		XMStoreFloat4x4(&pbMappedcbGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&object->m_xmf4x4World)));
@@ -107,7 +107,7 @@ void C2DShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCam
 	/*for (CGameObject* object : object_list) {
 		object->Render(pd3dCommandList, pCamera);
 	}*/
-	int i = 0;
+	unsigned int i = 0;
 	D3D12_GPU_DESCRIPTOR_HANDLE handle;
 	for (CGameObject* object : object_list) {
 		handle.ptr = m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i);
@@ -174,6 +174,23 @@ UISystem::~UISystem()
 	if (camera) delete camera;
 }
 
+void UISystem::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
+	unsigned int i = 0;
+	float size = 900 / object_list.size();
+
+	for (CGameObject* object : object_list) {
+		CB_GAMEOBJECT_INFO* pbMappedcbGameObject = (CB_GAMEOBJECT_INFO*)((UINT8*)m_pcbMappedGameObjects + (i * ncbElementBytes));
+		auto trans_mat = object->m_xmf4x4World;
+		trans_mat._43 = 910 - size * i;
+		XMStoreFloat4x4(&pbMappedcbGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&trans_mat)));
+		pbMappedcbGameObject->transparent = ((C2DObject*)object)->GetTransparent();
+		++i;
+		if (i >= max_object) break;
+	}
+}
+
 void UISystem::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
 	max_object = MAX_UI;
@@ -191,6 +208,16 @@ void UISystem::AddUI(float width, float height, float x, float y, const wstring&
 	CMaterial* material = new CMaterial();
 	material->SetTexture(texture);
 	CGameObject* object = new CUIObject(width, height, x, y, material);
+	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
+	AddObject(object);
+}
+
+void UISystem::AddProgressBar(float width, float height, float x, float y, const wstring& image_file_name)
+{
+	CTexture* texture = GetTexture(image_file_name);
+	CMaterial* material = new CMaterial();
+	material->SetTexture(texture);
+	CGameObject* object = new CProgressBar(width, height, x, y, material, 100, &(Network::g_client[Network::my_id].hp));
 	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
 	AddObject(object);
 }

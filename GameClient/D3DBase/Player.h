@@ -135,7 +135,10 @@ public:
 	CMainGamePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext=NULL, int nMeshes=1,string mesh="", const wchar_t* texture=L"" );
 	virtual ~CMainGamePlayer();
 
-	void SetPlayerInfo(Client* info) { server_player_info = info; }
+	void SetPlayerInfo(Client* info) {
+		server_player_info = info;
+		info->hp = 100;
+	}
 	Client* GetPlayerInfo() { return server_player_info; }
 
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);

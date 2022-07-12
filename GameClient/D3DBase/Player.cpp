@@ -480,4 +480,8 @@ void CMainGamePlayer::Fire()
 	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(
 		new CBullet(pos, dir));
 		//new CBullet(GetPosition(), dir));
+
+	//test
+	server_player_info->hp -= 10;
+	//test
 }

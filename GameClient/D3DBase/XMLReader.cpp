@@ -26,6 +26,14 @@ bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
         image_file_name = std::wstring(xml.GetAttrib(L"image").operator LPCWSTR());
         ui->AddUI(width, height, x, y, image_file_name);
     }
+    while (xml.FindElem(L"BAR")) {
+        width = _wtof(xml.GetAttrib(L"width"));
+        height = _wtof(xml.GetAttrib(L"height"));
+        x = _wtof(xml.GetAttrib(L"x"));
+        y = _wtof(xml.GetAttrib(L"y"));
+        image_file_name = std::wstring(xml.GetAttrib(L"image").operator LPCWSTR());
+        ui->AddProgressBar(width, height, x, y, image_file_name);
+    }
     return true;
 }
 
