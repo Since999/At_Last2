@@ -234,16 +234,22 @@ void Network::ProcessPacket(unsigned char* ptr)
 			bar = Change_Client_Pos(packet->one_base[i]);
 			if (packet->one_base[i].dir == DIR::HEIGHT)
 			{
-				for (int b = 0; b < 5; b++)
+				for (int a = 0; a < 3; ++a)
 				{
-					map[packet->one_base[i].z + b][packet->one_base[i].x] = (char)MazeWall::BARRICADE;
+					for (int b = 0; b < 5; ++b)
+					{
+						map[packet->one_base[i].z - 2 + b][packet->one_base[i].x - 1 + a] = (char)MazeWall::BARRICADE;
+					}
 				}
 			}
 			else
 			{
-				for (int b = 0; b < 5; b++)
+				for (int a = 0; a < 3; ++a)
 				{
-					map[packet->one_base[i].z][packet->one_base[i].x + b] = (char)MazeWall::BARRICADE;
+					for (int b = 0; b < 5; ++b)
+					{
+						map[packet->one_base[i].z - 1 + a][packet->one_base[i].x - 2 + b] = (char)MazeWall::BARRICADE;
+					}
 				}
 			}
 			i++;
@@ -255,16 +261,22 @@ void Network::ProcessPacket(unsigned char* ptr)
 			bar = Change_Client_Pos(packet->two_base[i]);
 			if (packet->two_base[i].dir == DIR::HEIGHT)
 			{
-				for (int b = 0; b < 5; b++)
+				for (int a = 0; a < 3; ++a)
 				{
-					map[packet->two_base[i].z + b][packet->two_base[i].x] = (char)MazeWall::BARRICADE;
+					for (int b = 0; b < 5; b++)
+					{
+						map[packet->two_base[i].z -2 + b][packet->two_base[i].x -1 +a] = (char)MazeWall::BARRICADE;
+					}
 				}
 			}
 			else
 			{
-				for (int b = 0; b < 5; b++)
+				for (int a = 0; a < 3; ++a)
 				{
-					map[packet->two_base[i].z][packet->two_base[i].x + b] = (char)MazeWall::BARRICADE;
+					for (int b = 0; b < 5; b++)
+					{
+						map[packet->two_base[i].z - 1 + a][packet->two_base[i].x - 2 + b] = (char)MazeWall::BARRICADE;
+					}
 				}
 			}
 			i++;
@@ -276,16 +288,22 @@ void Network::ProcessPacket(unsigned char* ptr)
 			bar = Change_Client_Pos(packet->three_base[i]);
 			if (packet->three_base[i].dir == DIR::HEIGHT)
 			{
-				for (int b = 0; b < 5; b++)
+				for (int a = 0; a < 3; ++a)
 				{
-					map[packet->three_base[i].z + b][packet->three_base[i].x] = (char)MazeWall::BARRICADE;
+					for (int b = 0; b < 5; b++)
+					{
+						map[packet->three_base[i].z - 2 + b][packet->three_base[i].x - 1 + a] = (char)MazeWall::BARRICADE;
+					}
 				}
 			}
 			else
 			{
-				for (int b = 0; b < 5; b++)
+				for (int a = 0; a < 3; ++a)
 				{
-					map[packet->three_base[i].z][packet->three_base[i].x + b] = (char)MazeWall::BARRICADE;
+					for (int b = 0; b < 5; b++)
+					{
+						map[packet->three_base[i].z - 1 + a][packet->three_base[i].x - 2 + b] = (char)MazeWall::BARRICADE;
+					}
 				}
 			}
 			i++;
@@ -297,16 +315,22 @@ void Network::ProcessPacket(unsigned char* ptr)
 			bar = Change_Client_Pos(packet->three_base2[i]);
 			if (packet->three_base2[i].dir == DIR::HEIGHT)
 			{
-				for (int b = 0; b < 5; b++)
+				for (int a = 0; a < 3; ++a)
 				{
-					map[packet->three_base2[i].z + b][packet->three_base2[i].x] = (char)MazeWall::BARRICADE;
+					for (int b = 0; b < 5; b++)
+					{
+						map[packet->three_base2[i].z - 2 + b][packet->three_base2[i].x - 1 + a] = (char)MazeWall::BARRICADE;
+					}
 				}
 			}
 			else
 			{
-				for (int b = 0; b < 5; b++)
+				for (int a = 0; a < 3; ++a)
 				{
-					map[packet->three_base2[i].z][packet->three_base2[i].x + b] = (char)MazeWall::BARRICADE;
+					for (int b = 0; b < 5; b++)
+					{
+						map[packet->three_base2[i].z - 1 + a][packet->three_base2[i].x - 2 + b] = (char)MazeWall::BARRICADE;
+					}
 				}
 			}
 			i++;
