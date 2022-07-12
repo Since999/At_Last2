@@ -81,13 +81,18 @@
   x ="995"
   y ="1055"
   image="Resources/UI/stage.png"/>
-
-  <BAR
+  <UI
 width ="500"
 height ="10"
 x = "1000"
 y ="200"
 image="Resources/UI/background.png"/>
+  <BAR
+width ="500"
+height ="10"
+x = "1000"
+y ="200"
+image="Resources/UI/HP_BAR.png"/>
       <!-- <UI
     width ="50"
     height ="50"
