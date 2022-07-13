@@ -112,7 +112,6 @@ enum class MsgType : char							// 서버에서 보내는 메세지 형식
 	CS_GM_ZOMBIE_ALL_KILL,						// 누르면 좀비 모두 죽음					키 : N
 	CS_GM_PLAYER_HP_UP,							// 플레이어 HP 다시 풀로참				키 : M
 	SC_GM_MAP_CHANGE_MAP,					// 서버에서 맵 변경했다고 전달
-	SC_GM_ZOMBIE_ALL_KILL,						// 서버에서 해결시 전달
 	SC_GM_PLAYER_HP_UP,							// 서버에서 해결시 전달
 	SC_LOGIN_OK,										// 서버 -> 클라 로그인 승인 신호
 	SC_LOGIN_OTHER,									// 다른 플레이어 로그인시
@@ -671,13 +670,6 @@ struct sc_gm_change_map_packet				// 서버에서 GM 명령으로 맵 변경 되었다고 전하�
 	MsgType type;										// GM_MAP_CHANGE_맵종류
 	char id;													// 어떤 ID 가 이동했냐?
 	short x, z;												// x, y 좌표 설정
-};
-
-struct sc_gm_zombie_kill_packet					// 서버에서 GM 명령으로 좀비 모두 죽였다고 보내는 패킷
-{
-	unsigned short size;
-	MsgType type;										// GM_ZOMBIE_ALL_KILL
-	MapType map_type;								// 어느 맵의 좀비가 다 죽었는가?
 };
 
 struct sc_gm_player_hp_packet						// 서버에서 GM 명령으로 플레이어의 HP를 회복시키는 패킷

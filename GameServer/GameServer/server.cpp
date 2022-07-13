@@ -508,37 +508,37 @@ void Server::PlaceZombie(MapType m_type)
 void Server::ChangeMapType(Client& cl)
 {
 	MapType change = MapType::NONE;
-	if ((One_Road_Pos.x < cl.player->x && cl.player->x < One_Road_Pos3.x) && (One_Road_Pos.z < cl.player->z && cl.player->z <One_Base_Pos.z - 1))
+	if ((cl.map_type != MapType::FIRST_PATH) && (One_Road_Pos.x < cl.player->x && cl.player->x < One_Road_Pos3.x) && (One_Road_Pos.z < cl.player->z && cl.player->z <One_Base_Pos.z - 1))
 	{
 		change = MapType::FIRST_PATH;
 		cl.map_type = MapType::FIRST_PATH;
 	}
-	else if ((One_Base_Pos.x < cl.player->x && cl.player->x < One_Base_End_Pos.x) && (One_Base_Pos.z < cl.player->z && cl.player->z < One_Base_End_Pos.z))
+	else if ((cl.map_type != MapType::CHECK_POINT_ONE) && (One_Base_Pos.x < cl.player->x && cl.player->x < One_Base_End_Pos.x) && (One_Base_Pos.z < cl.player->z && cl.player->z < One_Base_End_Pos.z))
 	{
 		change = MapType::CHECK_POINT_ONE;
 		cl.map_type = MapType::CHECK_POINT_ONE;
 	}
-	else if ((TWO_Base_Pos.x < cl.player->x && cl.player->x < TWO_Base_End_Pos.x) && (TWO_Base_Pos.z < cl.player->z && cl.player->z < TWO_Base_End_Pos.z))
+	else if ((cl.map_type != MapType::CHECK_POINT_TWO) && (TWO_Base_Pos.x < cl.player->x && cl.player->x < TWO_Base_End_Pos.x) && (TWO_Base_Pos.z < cl.player->z && cl.player->z < TWO_Base_End_Pos.z))
 	{
 		change = MapType::CHECK_POINT_TWO;
 		cl.map_type = MapType::CHECK_POINT_TWO;
 	}
-	else if ((THREE_Base_Pos.x < cl.player->x && cl.player->x < THREE_Base_End_Pos2.x) && (THREE_Base_Pos.z < cl.player->z && cl.player->z < THREE_Base_End_Pos.z))
+	else if ((cl.map_type != MapType::CHECK_POINT_FINAL) && (THREE_Base_Pos.x < cl.player->x && cl.player->x < THREE_Base_End_Pos2.x) && (THREE_Base_Pos.z < cl.player->z && cl.player->z < THREE_Base_End_Pos.z))
 	{
 		change = MapType::CHECK_POINT_FINAL;
 		cl.map_type = MapType::CHECK_POINT_FINAL;
 	}
-	else if((Two_Road_Pos.x < cl.player->x&& cl.player->x < TWO_Base_Pos.x) && (Two_Road_Pos.z < cl.player->z&& cl.player->z < Two_Road_Pos.z + ROAD_SIZE))
+	else if((cl.map_type != MapType::SECOND_PATH) && (Two_Road_Pos.x < cl.player->x&& cl.player->x < TWO_Base_Pos.x) && (Two_Road_Pos.z < cl.player->z&& cl.player->z < Two_Road_Pos.z + ROAD_SIZE))
 	{
 		change = MapType::SECOND_PATH;
 		cl.map_type = MapType::SECOND_PATH;
 	}
-	else if ((Three_Road_Pos.x < cl.player->x && cl.player->x < THREE_Base_Pos.x) && (Three_Road_Pos.z < cl.player->z && cl.player->z < Three_Road_Pos.z + ROAD_SIZE))
+	else if ((cl.map_type != MapType::FINAL_PATH) && (Three_Road_Pos.x < cl.player->x && cl.player->x < THREE_Base_Pos.x) && (Three_Road_Pos.z < cl.player->z && cl.player->z < Three_Road_Pos.z + ROAD_SIZE))
 	{
 		change = MapType::FINAL_PATH;
 		cl.map_type = MapType::FINAL_PATH;
 	}
-	else if ((Exit_Pos.x < cl.player->x && cl.player->x < Exit_End_Pos.x) && (Exit_Pos.z < cl.player->z && cl.player->z < Exit_End_Pos.z))
+	else if ((cl.map_type != MapType::EXIT) && (Exit_Pos.x < cl.player->x && cl.player->x < Exit_End_Pos.x) && (Exit_Pos.z < cl.player->z && cl.player->z < Exit_End_Pos.z))
 	{
 		change = MapType::EXIT;
 		cl.map_type = MapType::EXIT;
@@ -560,7 +560,7 @@ void Server::ChangeMapType(Client& cl)
 		zombie_send = true;
 	}
 		
-	if (MapCheck(cl.map_type))
+	if (MapCheck(cl.map_type)) 
 	{
 		//cout << "좀비를 스폰시킵니다 \n";
 		switch (map_type)
@@ -630,7 +630,9 @@ void Server::ChangeMapType(Client& cl)
 		map_type = cl.map_type;
 
 		if (change == MapType::CHECK_POINT_ONE || change == MapType::CHECK_POINT_TWO || change == MapType::CHECK_POINT_FINAL)
+		{
 			AddTimer(0, EVENT_TYPE::EVENT_NPC_SPAWN, 4000);
+		}
 	}
 }
 
@@ -1206,6 +1208,16 @@ void Server::Send_gm_change_map_packet(int c_id, int s_id, int x, int z)
 	packet.type = MsgType::SC_GM_MAP_CHANGE_MAP;
 	packet.x = x;
 	packet.z = z;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void Server::Send_gm_hp_packet(int c_id, int s_id)
+{
+	sc_gm_player_hp_packet packet;
+	packet.size = sizeof(packet);
+	packet.id = s_id;
+	packet.hp = g_clients[s_id].player->hp;
+	packet.type = MsgType::SC_GM_PLAYER_HP_UP;
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -2438,6 +2450,82 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
+		switch (cl.map_type)
+		{
+		case MapType::FIRST_PATH:
+		{
+			for (auto& zom : r_zombie1)
+			{
+				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
+				{
+					ZombieDead(zom, MapType::FIRST_PATH);
+				}
+			}
+
+			break;
+		}
+		case MapType::SECOND_PATH:
+		{
+			for (auto& zom : r_zombie2)
+			{
+				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
+				{
+					ZombieDead(zom, MapType::SECOND_PATH);
+				}
+			}
+
+			break;
+		}
+		case MapType::FINAL_PATH:
+		{
+			for (auto& zom : r_zombie3)
+			{
+				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
+				{
+					ZombieDead(zom, MapType::FINAL_PATH);
+				}
+			}
+
+			break;
+		}
+		case MapType::CHECK_POINT_ONE:
+		{
+			for (auto& zom : b_zombie1)
+			{
+				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
+				{
+					ZombieDead(zom, MapType::CHECK_POINT_ONE);
+				}
+			}
+
+			break;
+		}
+		case MapType::CHECK_POINT_TWO:
+		{
+			for (auto& zom : b_zombie2)
+			{
+				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
+				{
+					ZombieDead(zom, MapType::CHECK_POINT_TWO);
+				}
+			}
+
+			break;
+		}
+		case MapType::CHECK_POINT_FINAL:
+		{
+			for (auto& zom : b_zombie3)
+			{
+				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
+				{
+					ZombieDead(zom, MapType::CHECK_POINT_FINAL);
+				}
+			}
+
+			break;
+		}
+		}
+
 		break;
 	}
 	case (int)MsgType::CS_GM_PLAYER_HP_UP:
@@ -2445,6 +2533,17 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		if (cl._state != ClientState::INGAME)
 		{
 			break;
+		}
+
+		int maxhp = cl.player->maxhp;
+		cl.player->hp = maxhp;
+
+		for (auto& other : g_clients)
+		{
+			if (other._state != ClientState::INGAME)
+				continue;
+
+			Send_gm_hp_packet(other._id, cl._id);
 		}
 
 		break;
