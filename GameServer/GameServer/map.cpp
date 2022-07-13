@@ -165,36 +165,42 @@ void Map::ChangeWall(iPos pos, bool p)
 	Object obj;
 	if (p)
 	{
-		for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
 		{
-			map[pos.z][i] = (char)MazeWall::BARRICADE;
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				map[j][i] = (char)MazeWall::BARRICADE;
 
-			obj.row = i;
-			obj.col = pos.z;
-			obj.size_x = 1;
-			obj.size_z = 1;
-			obj.state = ObjectState::NORMAL;
-			obj.type = ObjectType::BARRICADE;
-			obj.x = (float)i;
-			obj.z = pos.z;
-			map_info.Barricade.emplace_back(obj);
+				obj.row = i;
+				obj.col = pos.z;
+				obj.size_x = 1;
+				obj.size_z = 1;
+				obj.state = ObjectState::NORMAL;
+				obj.type = ObjectType::BARRICADE;
+				obj.x = (float)i;
+				obj.z = pos.z;
+				map_info.Barricade.emplace_back(obj);
+			}
 		}
 	}
 	else
 	{
-		for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
 		{
-			map[i][pos.x] = (char)MazeWall::BARRICADE;
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				map[i][j] = (char)MazeWall::BARRICADE;
 
-			obj.row = pos.x;
-			obj.col = i;
-			obj.size_x = 1;
-			obj.size_z = 1;
-			obj.state = ObjectState::NORMAL;
-			obj.type = ObjectType::BARRICADE;
-			obj.x = pos.x;
-			obj.z = (float)i;
-			map_info.Barricade.emplace_back(obj);
+				obj.row = pos.x;
+				obj.col = i;
+				obj.size_x = 1;
+				obj.size_z = 1;
+				obj.state = ObjectState::NORMAL;
+				obj.type = ObjectType::BARRICADE;
+				obj.x = pos.x;
+				obj.z = (float)i;
+				map_info.Barricade.emplace_back(obj);
+			}
 		}
 	}
 }
@@ -203,22 +209,28 @@ bool Map::CheckBarricade(iPos pos, bool p)
 {
 	if (p)
 	{
-		for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
 		{
-			if (map[pos.z][i] == (char)MazeWall::BARRICADE)
-				return true;
-			if (map[pos.z][i] == (char)MazeWall::WALL)
-				return true;
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				if (map[j][i] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[j][i] == (char)MazeWall::WALL)
+					return true;
+			}
 		}
 	}
 	else
 	{
-		for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
 		{
-			if (map[i][pos.x] == (char)MazeWall::BARRICADE)
-				return true;
-			if (map[i][pos.x] == (char)MazeWall::WALL)
-				return true;
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				if (map[i][j] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[i][j] == (char)MazeWall::WALL)
+					return true;
+			}
 		}
 	}
 
@@ -238,9 +250,18 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 
 	vector<iPos> barricade_pos;
 	iPos temp_pos;
-	int i = 0;
 	for (int z = 5; z < end_pos.z - pos.z - 5; ++z) {
 		for (int x = 5; x < end_pos.x - pos.x - 5; ++x) {
+			if (temp_map[z][x].mapdata != (char)MazeWall::WALL && temp_map[z][x].check == false)
+			{
+				temp_map[z][x].check = true;
+				temp_pos.x = x;
+				temp_pos.z = z;
+				barricade_pos.emplace_back(temp_pos);
+			}
+			
+			// 이전 바리게이트 위치 생성기
+			/*
 			if (temp_map[z][x].mapdata == (char)MazeWall::WALL)
 			{
 				if (temp_map[z - 1][x].check == true || temp_map[z + 1][x].check == true || temp_map[z][x - 1].check == true || temp_map[z][x + 1].check == true)
@@ -251,7 +272,6 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 					temp_pos.x = x;
 					temp_pos.z = z;
 					barricade_pos.emplace_back(temp_pos);
-					i++;
 				}
 				if (temp_map[z + 1][x].mapdata != (char)MazeWall::WALL)
 				{
@@ -259,7 +279,6 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 					temp_pos.x = x;
 					temp_pos.z = z;
 					barricade_pos.emplace_back(temp_pos);
-					i++;
 				}
 				if (temp_map[z][x - 1].mapdata != (char)MazeWall::WALL)
 				{
@@ -267,7 +286,6 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 					temp_pos.x = x;
 					temp_pos.z = z;
 					barricade_pos.emplace_back(temp_pos);
-					i++;
 				}
 				if (temp_map[z][x + 1].mapdata != (char)MazeWall::WALL)
 				{
@@ -275,9 +293,9 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 					temp_pos.x = x;
 					temp_pos.z = z;
 					barricade_pos.emplace_back(temp_pos);
-					i++;
 				}
 			}
+			*/
 		}
 	}
 
@@ -340,6 +358,10 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 
 					rPos.x = barricade_pos[random_pos].x + pos.x;
 					rPos.z = barricade_pos[random_pos].z + pos.z;
+
+					if (CheckBarricade(rPos, false))
+						continue;
+
 					break;
 				}
 			}
@@ -369,6 +391,10 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 
 					rPos.x = barricade_pos[random_pos].x + pos.x;
 					rPos.z = barricade_pos[random_pos].z + pos.z;
+
+					if (CheckBarricade(rPos, false))
+						continue;
+
 					break;
 				}
 			}
