@@ -7,6 +7,8 @@ Client::Client()
 	mouse_click_time = chrono::system_clock::now();
 	idle_time = chrono::system_clock::now();
 	server_time = 1000;
+	map_type = MapType::SPAWN;
+	_zombie_send_overflow = false;
 }
 
 Client::~Client()

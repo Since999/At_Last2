@@ -42,6 +42,7 @@ public:
 	mutex move_lock;
 	mutex list_lock;
 	mutex size_lock;
+	mutex send_lock;
 
 	atomic_bool send_start_packet;
 
@@ -57,6 +58,7 @@ public:
 
 	unsigned char zombie_send_buf[MAX_BUFFER_SIZE];
 	atomic_int _zombie_prev_size;
+	atomic_bool _zombie_send_overflow;
 
 	chrono::system_clock::time_point mouse_click_time;
 	chrono::system_clock::time_point idle_time;

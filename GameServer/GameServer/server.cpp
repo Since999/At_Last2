@@ -508,37 +508,38 @@ void Server::PlaceZombie(MapType m_type)
 void Server::ChangeMapType(Client& cl)
 {
 	MapType change = MapType::NONE;
-	if ((cl.map_type != MapType::FIRST_PATH) && (One_Road_Pos.x < cl.player->x && cl.player->x < One_Road_Pos3.x) && (One_Road_Pos.z < cl.player->z && cl.player->z <One_Base_Pos.z - 1))
+
+	if ((cl.map_type != MapType::FIRST_PATH) && ((One_Road_Pos.x <= cl.player->x && cl.player->x <= One_Road_Pos3.x) && (One_Road_Pos.z <= cl.player->z && cl.player->z <= One_Base_Pos.z - 1)))
 	{
 		change = MapType::FIRST_PATH;
 		cl.map_type = MapType::FIRST_PATH;
 	}
-	else if ((cl.map_type != MapType::CHECK_POINT_ONE) && (One_Base_Pos.x < cl.player->x && cl.player->x < One_Base_End_Pos.x) && (One_Base_Pos.z < cl.player->z && cl.player->z < One_Base_End_Pos.z))
+	else if ((cl.map_type != MapType::CHECK_POINT_ONE) && ((One_Base_Pos.x <= cl.player->x && cl.player->x <= One_Base_End_Pos.x) && (One_Base_Pos.z <= cl.player->z && cl.player->z <= One_Base_End_Pos.z)))
 	{
 		change = MapType::CHECK_POINT_ONE;
 		cl.map_type = MapType::CHECK_POINT_ONE;
 	}
-	else if ((cl.map_type != MapType::CHECK_POINT_TWO) && (TWO_Base_Pos.x < cl.player->x && cl.player->x < TWO_Base_End_Pos.x) && (TWO_Base_Pos.z < cl.player->z && cl.player->z < TWO_Base_End_Pos.z))
+	else if ((cl.map_type != MapType::CHECK_POINT_TWO) && ((TWO_Base_Pos.x <= cl.player->x && cl.player->x <= TWO_Base_End_Pos.x) && (TWO_Base_Pos.z <= cl.player->z && cl.player->z <= TWO_Base_End_Pos.z)))
 	{
 		change = MapType::CHECK_POINT_TWO;
 		cl.map_type = MapType::CHECK_POINT_TWO;
 	}
-	else if ((cl.map_type != MapType::CHECK_POINT_FINAL) && (THREE_Base_Pos.x < cl.player->x && cl.player->x < THREE_Base_End_Pos2.x) && (THREE_Base_Pos.z < cl.player->z && cl.player->z < THREE_Base_End_Pos.z))
+	else if ((cl.map_type != MapType::CHECK_POINT_FINAL) && ((THREE_Base_Pos.x <= cl.player->x && cl.player->x <= THREE_Base_End_Pos2.x) && (THREE_Base_Pos.z <= cl.player->z && cl.player->z <= THREE_Base_End_Pos.z)))
 	{
 		change = MapType::CHECK_POINT_FINAL;
 		cl.map_type = MapType::CHECK_POINT_FINAL;
 	}
-	else if((cl.map_type != MapType::SECOND_PATH) && (Two_Road_Pos.x < cl.player->x&& cl.player->x < TWO_Base_Pos.x) && (Two_Road_Pos.z < cl.player->z&& cl.player->z < Two_Road_Pos.z + ROAD_SIZE))
+	else if((cl.map_type != MapType::SECOND_PATH) && ((Two_Road_Pos.x <= cl.player->x&& cl.player->x <= TWO_Base_Pos.x) && (Two_Road_Pos.z <= cl.player->z&& cl.player->z <= Two_Road_Pos.z + ROAD_SIZE)))
 	{
 		change = MapType::SECOND_PATH;
 		cl.map_type = MapType::SECOND_PATH;
 	}
-	else if ((cl.map_type != MapType::FINAL_PATH) && (Three_Road_Pos.x < cl.player->x && cl.player->x < THREE_Base_Pos.x) && (Three_Road_Pos.z < cl.player->z && cl.player->z < Three_Road_Pos.z + ROAD_SIZE))
+	else if ((cl.map_type != MapType::FINAL_PATH) && ((Three_Road_Pos.x <= cl.player->x && cl.player->x <= THREE_Base_Pos.x) && (Three_Road_Pos.z <= cl.player->z && cl.player->z <= Three_Road_Pos.z + ROAD_SIZE)))
 	{
 		change = MapType::FINAL_PATH;
 		cl.map_type = MapType::FINAL_PATH;
 	}
-	else if ((cl.map_type != MapType::EXIT) && (Exit_Pos.x < cl.player->x && cl.player->x < Exit_End_Pos.x) && (Exit_Pos.z < cl.player->z && cl.player->z < Exit_End_Pos.z))
+	else if ((cl.map_type != MapType::EXIT) && ((Exit_Pos.x <= cl.player->x && cl.player->x <= Exit_End_Pos.x) && (Exit_Pos.z <= cl.player->z && cl.player->z <= Exit_End_Pos.z)))
 	{
 		change = MapType::EXIT;
 		cl.map_type = MapType::EXIT;
@@ -655,6 +656,43 @@ void Server::Send_player_bullet_info_packet(int c_id, int bullet)
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
+bool Server::ZombieSendInsert(int c_id, void* packet, int size)
+{
+	if (g_clients[c_id]._zombie_prev_size + size > 1800)
+	{
+		g_clients[c_id].send_lock.lock();
+		if (g_clients[c_id]._zombie_send_overflow)
+		{
+			g_clients[c_id].send_lock.unlock();
+			return false;
+		}
+
+		g_clients[c_id]._zombie_send_overflow = true;
+		g_clients[c_id].send_lock.unlock();
+
+		for (auto& cl : g_clients)
+		{
+			if (cl._state != ClientState::INGAME)	continue;
+
+			cl.size_lock.lock();
+			cl.do_send(cl._zombie_prev_size, cl.zombie_send_buf);
+			cl._zombie_prev_size = 0;
+			ZeroMemory(cl.zombie_send_buf, sizeof(cl.zombie_send_buf));
+			cl.size_lock.unlock();
+		}
+
+		g_clients[c_id]._zombie_send_overflow = false;
+		return false;
+	}
+
+	g_clients[c_id].size_lock.lock();
+	memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, packet, size);
+	g_clients[c_id]._zombie_prev_size += size;
+	g_clients[c_id].size_lock.unlock();
+
+	return true;
+}
+
 void Server::Send_zombie_info_packet(int c_id, int z_id, int hp, MapType m_type)
 {
 	sc_update_zombie_info_packet packet;
@@ -664,10 +702,21 @@ void Server::Send_zombie_info_packet(int c_id, int z_id, int hp, MapType m_type)
 	packet.type = MsgType::SC_UPDATE_ZOMBIE_INFO;
 	packet.map_type = m_type;
 	//g_clients[c_id].do_send(sizeof(packet), &packet);
-	g_clients[c_id].size_lock.lock();
-	memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
-	g_clients[c_id]._zombie_prev_size += packet.size;
-	g_clients[c_id].size_lock.unlock();
+
+	//g_clients[c_id].size_lock.lock();
+	//memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
+	//g_clients[c_id]._zombie_prev_size += packet.size;
+	//g_clients[c_id].size_lock.unlock();
+	bool send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+	if (send == false)
+	{
+		while (1)
+		{
+			if(g_clients[c_id]._zombie_send_overflow == false)
+				send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+			if (send) break;
+		}
+	}
 }
 
 void Server::Send_player_reload_packet(int c_id, int s_id, int bullet)
@@ -1601,19 +1650,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	}
 	case (int)MsgType::CS_PLAYER_MOVE:
 	{
-		//cl.state_lock.lock();
 		if (cl._state != ClientState::INGAME)
 		{
-			//cl.state_lock.unlock();
 			break;
 		}
-		//cl.state_lock.unlock();
 
 		cs_move_packet* packet = reinterpret_cast<cs_move_packet*>(p);
 
 		for (auto &other : g_clients)
 		{
-			if (other._id == client_id) continue;
 			if (other._state != ClientState::INGAME) continue;
 
 			Send_player_move_packet(other._id, client_id, packet->x, packet->z, packet->t_x, packet->t_z, packet->speed);
@@ -2172,23 +2217,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			cl.player->z = 91.0f;
 		}
 
-		cl.map_type = MapType::FIRST_PATH;
-		
-		if (zombie_send == false)
-		{
-			for (auto& s_cl : g_clients)
-			{
-				if (s_cl._state != ClientState::INGAME)
-				{
-					continue;
-				}
-
-				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
-			}
-
-			zombie_send = true;
-		}
-
 		for (auto& a_cl : g_clients)
 		{
 			if (a_cl._state != ClientState::INGAME) continue;
@@ -2219,23 +2247,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			cl.player->x = 323.0f;
 			cl.player->z = 340.0f;
-		}
-
-		cl.map_type = MapType::SECOND_PATH;
-
-		if (zombie_send == false)
-		{
-			for (auto& s_cl : g_clients)
-			{
-				if (s_cl._state != ClientState::INGAME)
-				{
-					continue;
-				}
-
-				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
-			}
-
-			zombie_send = true;
 		}
 
 		for (auto& a_cl : g_clients)
@@ -2270,23 +2281,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			cl.player->z = 340.0f;
 		}
 
-		cl.map_type = MapType::FINAL_PATH;
-
-		if (zombie_send == false)
-		{
-			for (auto& s_cl : g_clients)
-			{
-				if (s_cl._state != ClientState::INGAME)
-				{
-					continue;
-				}
-
-				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
-			}
-
-			zombie_send = true;
-		}
-
 		for (auto& a_cl : g_clients)
 		{
 			if (a_cl._state != ClientState::INGAME) continue;
@@ -2317,23 +2311,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			cl.player->x = 202.0f;
 			cl.player->z = 244.0f;
-		}
-
-		cl.map_type = MapType::CHECK_POINT_ONE;
-
-		if (zombie_send == false)
-		{
-			for (auto& s_cl : g_clients)
-			{
-				if (s_cl._state != ClientState::INGAME)
-				{
-					continue;
-				}
-
-				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
-			}
-
-			zombie_send = true;
 		}
 
 		for (auto& a_cl : g_clients)
@@ -2368,23 +2345,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			cl.player->z = 340.0f;
 		}
 
-		cl.map_type = MapType::CHECK_POINT_TWO;
-
-		if (zombie_send == false)
-		{
-			for (auto& s_cl : g_clients)
-			{
-				if (s_cl._state != ClientState::INGAME)
-				{
-					continue;
-				}
-
-				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
-			}
-
-			zombie_send = true;
-		}
-
 		for (auto& a_cl : g_clients)
 		{
 			if (a_cl._state != ClientState::INGAME) continue;
@@ -2415,23 +2375,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			cl.player->x = 823.0f;
 			cl.player->z = 340.0f;
-		}
-
-		cl.map_type = MapType::CHECK_POINT_FINAL;
-
-		if (zombie_send == false)
-		{
-			for (auto& s_cl : g_clients)
-			{
-				if (s_cl._state != ClientState::INGAME)
-				{
-					continue;
-				}
-
-				AddTimer(s_cl._id, EVENT_TYPE::EVENT_NPC_SEND, 33);
-			}
-
-			zombie_send = true;
 		}
 
 		for (auto& a_cl : g_clients)
@@ -2570,10 +2513,22 @@ void Server::Send_zombie_spawn_packet(int c_id, int z_id, float x, float z, Zomb
 	packet.hp = hp;
 	packet.angle = angle;
 	//g_clients[c_id].do_send(sizeof(packet), &packet);
-	g_clients[c_id].size_lock.lock();
-	memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
-	g_clients[c_id]._zombie_prev_size += packet.size;
-	g_clients[c_id].size_lock.unlock();
+
+	// g_clients[c_id].size_lock.lock();
+	// memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
+	// g_clients[c_id]._zombie_prev_size += packet.size;
+	// g_clients[c_id].size_lock.unlock();
+
+	bool send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+	if (send == false)
+	{
+		while (1)
+		{
+			if (g_clients[c_id]._zombie_send_overflow == false)
+				send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+			if (send) break;
+		}
+	}
 }
 
 bool Server::NCDis_check(int c_id,  NPC& npc)
@@ -2900,10 +2855,22 @@ void Server::Send_zombie_move_packet(int c_id, int z_id, float x, float z, MapTy
 	packet.speed = speed;
 	packet.dir = dir;
 	//g_clients[c_id].do_send(sizeof(packet), &packet);
-	g_clients[c_id].size_lock.lock();
-	memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
-	g_clients[c_id]._zombie_prev_size += packet.size;
-	g_clients[c_id].size_lock.unlock();
+	// 
+	//g_clients[c_id].size_lock.lock();
+	//memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
+	//g_clients[c_id]._zombie_prev_size += packet.size;
+	//g_clients[c_id].size_lock.unlock();
+
+	bool send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+	if (send == false)
+	{
+		while (1)
+		{
+			if (g_clients[c_id]._zombie_send_overflow == false)
+				send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+			if (send) break;
+		}
+	}
 }
 
 void Server::Send_zombie_dead_packet(int c_id, int z_id, MapType m_type)
@@ -2914,10 +2881,22 @@ void Server::Send_zombie_dead_packet(int c_id, int z_id, MapType m_type)
 	packet.size = sizeof(packet);
 	packet.type = MsgType::SC_ZOMBIE_DEAD;
 	//g_clients[c_id].do_send(sizeof(packet), &packet);
-	g_clients[c_id].size_lock.lock();
-	memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
-	g_clients[c_id]._zombie_prev_size += packet.size;
-	g_clients[c_id].size_lock.unlock();
+	
+	//g_clients[c_id].size_lock.lock();
+	//memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
+	//g_clients[c_id]._zombie_prev_size += packet.size;
+	//g_clients[c_id].size_lock.unlock();
+
+	bool send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+	if (send == false)
+	{
+		while (1)
+		{
+			if (g_clients[c_id]._zombie_send_overflow == false)
+				send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+			if (send) break;
+		}
+	}
 }
 
 void Server::ZombieDead(NPC& npc, MapType m_type)
@@ -3205,10 +3184,22 @@ void Server::Send_zombie_attack_packet(int c_id, int z_id, MapType m_type)
 	packet.size = sizeof(packet);
 	packet.type = MsgType::SC_ZOMBIE_ATTACK;
 	//g_clients[c_id].do_send(sizeof(packet), &packet);
-	g_clients[c_id].size_lock.lock();
-	memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
-	g_clients[c_id]._zombie_prev_size += packet.size;
-	g_clients[c_id].size_lock.unlock();
+
+	//g_clients[c_id].size_lock.lock();
+	//memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
+	//g_clients[c_id]._zombie_prev_size += packet.size;
+	//g_clients[c_id].size_lock.unlock();
+
+	bool send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+	if (send == false)
+	{
+		while (1)
+		{
+			if (g_clients[c_id]._zombie_send_overflow == false)
+				send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+			if (send) break;
+		}
+	}
 }
 
 void Server::ZombiePlayerAttack(NPC& npc, MapType m_type)
@@ -3622,10 +3613,22 @@ void Server::Send_zombie_search_packet(int c_id, int s_id, int z_id, MapType m_t
 	packet.size = sizeof(packet);
 	packet.type = MsgType::SC_ZOMBIE_SEARCH;
 	//g_clients[c_id].do_send(sizeof(packet), &packet);
-	g_clients[c_id].size_lock.lock();
-	memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
-	g_clients[c_id]._zombie_prev_size += packet.size;
-	g_clients[c_id].size_lock.unlock();
+
+	//g_clients[c_id].size_lock.lock();
+	//memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
+	//g_clients[c_id]._zombie_prev_size += packet.size;
+	//g_clients[c_id].size_lock.unlock();
+
+	bool send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+	if (send == false)
+	{
+		while (1)
+		{
+			if (g_clients[c_id]._zombie_send_overflow == false)
+				send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+			if (send) break;
+		}
+	}
 }
 
 void Server::Send_zombie_arrive_packet(int c_id, int z_id, MapType m_type, Direction dir)
@@ -3636,10 +3639,22 @@ void Server::Send_zombie_arrive_packet(int c_id, int z_id, MapType m_type, Direc
 	packet.size = sizeof(packet);
 	packet.type = MsgType::SC_ZOMBIE_ARRIVE;
 	packet.dir = dir;
-	g_clients[c_id].size_lock.lock();
-	memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
-	g_clients[c_id]._zombie_prev_size += packet.size;
-	g_clients[c_id].size_lock.unlock();
+	
+	//g_clients[c_id].size_lock.lock();
+	//memcpy(g_clients[c_id].zombie_send_buf + g_clients[c_id]._zombie_prev_size, &packet, sizeof(packet));
+	//g_clients[c_id]._zombie_prev_size += packet.size;
+	//g_clients[c_id].size_lock.unlock();
+
+	bool send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+	if (send == false)
+	{
+		while (1)
+		{
+			if (g_clients[c_id]._zombie_send_overflow == false)
+				send = ZombieSendInsert(c_id, &packet, sizeof(packet));
+			if (send) break;
+		}
+	}
 }
 
 void Server::SearchZombieAstar(int col, int row, Client& cl, NPC& npc)

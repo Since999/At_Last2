@@ -28,7 +28,7 @@ const char* const SERVER_IP = "220.94.221.236";
 const int MAX_PLAYER = 3;							// 플레이어 수
 const int MAX_ZOMBIE_NPC = 100;				// 최대 좀비 수
 const int MAX_OBJECT = 100;
-const int MAX_BUFFER_SIZE = 3072;			// 버퍼 크기
+const int MAX_BUFFER_SIZE = 4096;			// 버퍼 크기
 const int MAX_CHAT_SIZE = 200;
 
 const int MAX_NAME_SIZE = 20;					// 플레이어 이름 길이

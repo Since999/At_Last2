@@ -139,4 +139,5 @@ public:
 	static void ZombieSend();
 	static bool ZombieRemain( NPC& npc);
 	static float ZombieSetAngle(NPC& npc, Client& cl);
+	static bool ZombieSendInsert(int c_id, void* packet, int size);
 };

@@ -1401,6 +1401,14 @@ void volatile Network::ProcessData(Exp_Over& exp_over, int& size)
 			int temp = (int)((packet_start[1] * 256) + packet_start[0]);
 
 			packet_size = temp;
+			if (packet_size > 850)
+			{
+				cout << "packet_size : " << packet_size << "\n";
+				packet_size = 0;
+				remain_data = 0;
+				_prev_size = 0;
+				break;
+			}
 		}
 		else { 
 			break;
