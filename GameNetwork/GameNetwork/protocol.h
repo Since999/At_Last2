@@ -293,6 +293,8 @@ struct cs_move_packet								// 클라이언트에서 서버로 움직이는 방향 전송
 	float t_x, t_z;											// 플레이어 방향
 	float speed;											// 플레이어 스피드
 	float x, z;												// 플레이어 좌표
+	float rotation_angle;									// 플레이어 회전
+	bool in_input;											// 플레이어 입력했는가?
 };
 
 struct cs_rotate_packet								// 클라이언트에서 서버로 플레이어가 회전한 마우스 위치를 전송
@@ -421,6 +423,8 @@ struct sc_player_move_packet						// 서버에서 플레이어가 이동하면 보내주는 패킷
 	float x, z;												// 플레이어 위치
 	float t_x, t_z;											// 플레이어 방향
 	float speed;
+	float rotation_angle;									// 플레이어 회전
+	bool in_input;											// 플레이어 입력했는가?
 };
 
 struct sc_player_rotate_packet								// 서버에서 플레이어가 회전한 마우스 위치를 전송
@@ -481,7 +485,7 @@ struct sc_player_special_packet					// 서버에서 클라이언트에게 특수능력 사용 했�
 	bool success;											// 발동 했는지 안했는지
 };
 
-struct sc_player_co_special_check_packet			// 커맨더 특수능력 사용 여부 체크하는 패킷
+struct sc_player_co_special_check_packet		// 커맨더 특수능력 사용 여부 체크하는 패킷
 {
 	unsigned short size;
 	MsgType type;										// SPECIAL_CHECK
@@ -495,6 +499,13 @@ struct sc_commander_special_packet			// 서버에서 커맨더가 특수능력 사용했다고 알
 	char id;													// 살려낸 ID
 	short hp;												// 해당 ID 의 체력
 	char bullet;												// 해당 ID 의 총알 수
+};
+
+struct sc_player_en_special_check_packet		// 엔지니어 특수능력 사용 여부 체크하는 패킷
+{
+	unsigned short size;
+	MsgType type;										// SPECIAL_CHECK
+	short x, z;												// 어디에 지을거냐
 };
 
 struct sc_engineer_barrigate_build_packet		// 서버에서 엔지니어가 특수능력 사용했다고 알려주는 패킷

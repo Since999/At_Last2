@@ -87,7 +87,7 @@ public:
 	static void Send_barricade_packet(int c_id);
 	static void Send_game_start_packet(int c_id);
 	static void Send_select_packet(int c_id, int s_id);
-	static void Send_player_move_packet(int c_id, int s_id, float x, float z,  float t_x, float t_z, float speed);
+	static void Send_player_move_packet(int c_id, int s_id, float x, float z,  float t_x, float t_z, float speed, float rotation, bool input);
 	static void Send_player_attack_packet(int c_id, int a_id);
 	static void Send_player_bullet_info_packet(int c_id, int bullet);
 	static void Send_player_dead_packet(int c_id, int d_id);
@@ -98,6 +98,7 @@ public:
 	static void Send_commander_skill_packet(int c_id, int s_id);
 	static void Send_commander_skill_check_packet(int c_id, int s_id);
 	static void Send_engineer_skill_packet(int c_id,int s_id, int t_x, int t_z);
+	static void Send_engineer_skill_check_packet(int c_id, int x, int z);
 	static void Send_viewlist_put_packet(int c_id, int z_id, MapType m_type, float z_x, float z_z, MsgType msg, ZombieType z_type);
 	static void Send_viewlist_remove_packet(int c_id, int z_id, MapType m_type);
 	static void Send_search_packet(int c_id, int x, int z, ObjectType _type);

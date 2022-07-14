@@ -150,7 +150,7 @@ void Server::Send_select_packet(int c_id, int s_id)
 	g_clients[s_id].do_send(sizeof(packet), &packet);
 }
 
-void Server::Send_player_move_packet(int c_id, int s_id, float x, float z, float t_x, float t_z, float speed)
+void Server::Send_player_move_packet(int c_id, int s_id, float x, float z, float t_x, float t_z, float speed, float rotation, bool input)
 {
 	sc_player_move_packet packet;
 	packet.id = s_id;
@@ -161,6 +161,8 @@ void Server::Send_player_move_packet(int c_id, int s_id, float x, float z, float
 	packet.t_x = t_x;
 	packet.t_z = t_z;
 	packet.speed = speed;
+	packet.rotation_angle = rotation;
+	packet.in_input = input;
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -908,23 +910,29 @@ void Server::CommanderSpecialSkill(Client& cl)
 
 bool Server::EngineerSpecialSkillMapCheck(int x, int z, DIR dir)
 {
-	if (dir == DIR::HEIGHT)
+	if (dir == DIR::WIDTH)
 	{
-		for (int i = 0; i < 5; ++i)
+		for (int j = 0; j < 3; ++j)
 		{
-			if (map.map[z][x - 2 + i] != (char)MazeWall::ROAD)
+			for (int i = 0; i < 5; ++i)
 			{
-				return false;
+				if (map.map[z -1 +j][x - 2 + i] != (char)MazeWall::ROAD)
+				{
+					return false;
+				}
 			}
 		}
 	}
 	else
 	{
-		for (int i = 0; i < 5; ++i)
+		for (int j = 0; j < 3; ++j)
 		{
-			if (map.map[z - 2 + i][x] != (char)MazeWall::ROAD)
+			for (int i = 0; i < 5; ++i)
 			{
-				return false;
+				if (map.map[z - 2 + i][x - 1 + j] != (char)MazeWall::ROAD)
+				{
+					return false;
+				}
 			}
 		}
 	}
@@ -936,16 +944,22 @@ void Server::EngineerBuildBarricade(int bx, int bz, DIR dir)
 {
 	if (dir == DIR::HEIGHT)
 	{
-		for (int i = 0; i < 5; ++i)
+		for (int j = 0; j < 3; ++j)
 		{
-			map.map[bz - 2 + i][bx] = (char)MazeWall::BARRICADE;
+			for (int i = 0; i < 5; ++i)
+			{
+				map.map[bz - 2 + i][bx - 1 + j] = (char)MazeWall::BARRICADE;
+			}
 		}
 	}
 	else
 	{
-		for (int i = 0; i < 5; ++i)
+		for (int j = 0; j < 3; ++j)
 		{
-			map.map[bz][bx - 2 + i] = (char)MazeWall::BARRICADE;
+			for (int i = 0; i < 5; ++i)
+			{
+				map.map[bz - 1 + j][bx - 2 + i] = (char)MazeWall::BARRICADE;
+			}
 		}
 	}
 }
@@ -959,6 +973,16 @@ void Server::Send_engineer_skill_packet(int c_id, int s_id, int t_x, int t_z)
 	packet.id = s_id;
 	packet.size = sizeof(packet);
 	packet.type = MsgType::SC_ENGINEER_SPECIAL;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void Server::Send_engineer_skill_check_packet(int c_id, int x, int z)
+{
+	sc_player_en_special_check_packet packet;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_ENGINEER_SPECIAL_CHECK;
+	packet.x = x;
+	packet.z = z;
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -995,49 +1019,49 @@ void Server::EngineerSpecialSkill(Client& cl)
 		if (cl.player->dir == Direction::UP)
 		{
 			t_x = cl_root_x;
-			t_z = cl_root_z - 1;
+			t_z = cl_root_z - 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::UP_RIGHT)
 		{
-			t_x = cl_root_x + 1;
-			t_z = cl_root_z - 1;
+			t_x = cl_root_x + 2;
+			t_z = cl_root_z - 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::RIGHT)
 		{
-			t_x = cl_root_x + 1;
+			t_x = cl_root_x + 2;
 			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::DOWN_RIGHT)
 		{
-			t_x = cl_root_x + 1;
-			t_z = cl_root_z + 1;
+			t_x = cl_root_x + 2;
+			t_z = cl_root_z + 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::DOWN)
 		{
 			t_x = cl_root_x;
-			t_z = cl_root_z + 1;
+			t_z = cl_root_z + 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::DOWN_LEFT)
 		{
-			t_x = cl_root_x - 1;
-			t_z = cl_root_z + 1;
+			t_x = cl_root_x - 2;
+			t_z = cl_root_z + 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::LEFT)
 		{
-			t_x = cl_root_x - 1;
+			t_x = cl_root_x - 2;
 			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 		else if (cl.player->dir == Direction::UP_LEFT)
 		{
-			t_x = cl_root_x - 1;
-			t_z = cl_root_z - 1;
+			t_x = cl_root_x - 2;
+			t_z = cl_root_z - 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
 		}
 	}
@@ -1046,49 +1070,49 @@ void Server::EngineerSpecialSkill(Client& cl)
 		if (cl.player->dir == Direction::UP)
 		{
 			t_x = cl_root_x;
-			t_z = cl_root_z - 1;
+			t_z = cl_root_z - 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::UP_RIGHT)
 		{
-			t_x = cl_root_x + 1;
-			t_z = cl_root_z - 1;
+			t_x = cl_root_x + 3;
+			t_z = cl_root_z - 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::RIGHT)
 		{
-			t_x = cl_root_x + 1;
+			t_x = cl_root_x + 3;
 			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::DOWN_RIGHT)
 		{
-			t_x = cl_root_x + 1;
-			t_z = cl_root_z + 1;
+			t_x = cl_root_x + 3;
+			t_z = cl_root_z + 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::DOWN)
 		{
 			t_x = cl_root_x;
-			t_z = cl_root_z + 1;
+			t_z = cl_root_z + 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::DOWN_LEFT)
 		{
-			t_x = cl_root_x - 1;
-			t_z = cl_root_z + 1;
+			t_x = cl_root_x - 3;
+			t_z = cl_root_z + 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::LEFT)
 		{
-			t_x = cl_root_x - 1;
+			t_x = cl_root_x - 3;
 			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 		else if (cl.player->dir == Direction::UP_LEFT)
 		{
-			t_x = cl_root_x - 1;
-			t_z = cl_root_z - 1;
+			t_x = cl_root_x - 3;
+			t_z = cl_root_z - 2;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
 		}
 	}
@@ -1213,6 +1237,9 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 	if (check)
 	{
+		Send_engineer_skill_check_packet(cl._id, t_x, t_z);
+
+		/*
 		EngineerBuildBarricade(t_x, t_z, cl.player->special_dir);
 
 		if (cl.player->special_dir == DIR::HEIGHT)
@@ -1230,6 +1257,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 			Send_engineer_skill_packet(other._id, cl._id, t_x, t_z);
 		}
+		*/
 	}
 	else
 	{
@@ -1661,7 +1689,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			if (other._state != ClientState::INGAME) continue;
 
-			Send_player_move_packet(other._id, client_id, packet->x, packet->z, packet->t_x, packet->t_z, packet->speed);
+			Send_player_move_packet(other._id, client_id, packet->x, packet->z, packet->t_x, packet->t_z, packet->speed, packet->rotation_angle, packet->in_input);
 		}
 
 		cl.move_lock.lock();

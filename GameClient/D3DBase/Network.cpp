@@ -454,6 +454,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		g_client[id].t_x = packet->t_x;
 		g_client[id].t_z = packet->t_z;
 		g_client[id].speed = packet->speed;
+		g_client[id].is_input = packet->in_input;
+		g_client[id].rotation_angle = packet->rotation_angle;
 
 		break;
 	}
@@ -1436,7 +1438,7 @@ void Network::send_player_select_packet(PlayerType type)
 	_socket.do_send(sizeof(packet), &packet);
 }
 
-void Network::send_player_move_packet(float t_x, float t_z, float speed, float x, float z)
+void Network::send_player_move_packet(float t_x, float t_z, float speed, float x, float z, float rotation, bool input)
 {
 	cs_move_packet packet;
 	packet.t_x = t_x;
@@ -1446,6 +1448,8 @@ void Network::send_player_move_packet(float t_x, float t_z, float speed, float x
 	packet.z = z;
 	packet.size = sizeof(packet);
 	packet.type = MsgType::CS_PLAYER_MOVE;
+	packet.in_input = input;
+	packet.rotation_angle = rotation;
 	_socket.do_send(sizeof(packet), &packet);
 }
 
@@ -1462,7 +1466,7 @@ void Network::Send_chat_packet(char* msg)
 void Network::PlayerMove(int p_id)
 {
 	// 0.1초마다 플레이어 좌표, 방향, 속도 보내기
-	send_player_move_packet(g_client[p_id].t_x, g_client[p_id].t_z, g_client[p_id].speed, g_client[p_id].x, g_client[p_id].z);
+	send_player_move_packet(g_client[p_id].t_x, g_client[p_id].t_z, g_client[p_id].speed, g_client[p_id].x, g_client[p_id].z, g_client[p_id].rotation_angle, g_client[p_id].is_input);
 
 	AddTimer(p_id, EVENT_TYPE::PLAYER_MOVE, 100);
 }

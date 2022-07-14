@@ -89,7 +89,7 @@ public:
 	static void ProcessPacket(unsigned char* ptr);
 	static void volatile ProcessData(Exp_Over& exp_over, int &size);
 	static void Work();
-	static void send_player_move_packet(float t_x, float t_z, float speed, float x, float z);
+	static void send_player_move_packet(float t_x, float t_z, float speed, float x, float z, float rotation, bool input);
 	static void Do_Timer();
 	static void Send_request_packet(MsgType type);
 	static void Send_commander_special_req_packet(int c_id);
