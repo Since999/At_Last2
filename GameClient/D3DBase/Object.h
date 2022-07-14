@@ -208,3 +208,8 @@ public:
 	virtual void OnPrepareRender() { }
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 };
+
+class CBarricade : public CGameObject {
+	CBarricade();
+
+};
