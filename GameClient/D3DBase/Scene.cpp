@@ -37,10 +37,8 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	CAnimationObjectShader* ani_shader = new CAnimationObjectShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 	m_ppShaders[1] = ani_shader;
 
-	CStaticObjectShader* static_shader = new CStaticObjectShader();
-	static_shader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	static_shader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
-	m_ppShaders[2] = static_shader;
+	
+	m_ppShaders[2] = CStaticObjectShader::InitInstance(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	C2DShader* particle_shader = new C2DShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 	m_ppShaders[3] = particle_shader;

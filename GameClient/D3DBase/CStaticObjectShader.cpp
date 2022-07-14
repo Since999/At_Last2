@@ -2,6 +2,22 @@
 #include "ShadowShader.h"
 #include "Network.h"
 
+CStaticObjectShader* CStaticObjectShader::singleton = NULL;
+ CStaticObjectShader* CStaticObjectShader::GetInstance()
+ {
+	 if (singleton) return singleton;
+	 return NULL;
+ }
+
+ CStaticObjectShader* CStaticObjectShader::InitInstance(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+ {
+	 if (singleton) return singleton;
+	 singleton = new CStaticObjectShader();
+	 singleton->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	 singleton->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
+	 return singleton;
+ }
+
 CStaticObjectShader::CStaticObjectShader()
 {
 }
@@ -82,7 +98,7 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		barricade.push_back(pos);
 	}
 #endif
-	object_num = barricade.size();
+	object_num = barricade.size() + MAX_ADDITIONAL_OBJECT;
 	vector<CTexture*> textures;
 	auto tex = CTexturePool::GetInstance()->GetTexture(L"no_texture.png");
 	textures.push_back(tex);
@@ -100,18 +116,17 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	}
 
 	OldModelLoader model_loader;
-	std::vector<CMesh*> tmp;
-	model_loader.LoadModelWithTranslation(pd3dDevice, pd3dCommandList, std::string("Resources/Model/Barricada Concreto.fbx"), tmp);
+	model_loader.LoadModelWithTranslation(pd3dDevice, pd3dCommandList, std::string("Resources/Model/Barricada Concreto.fbx"), mesh);
 
 	CStaticObject* static_object = NULL;
 
 	float bottom = -500.0f;
-	int i = 0;
+	
 	for(auto& bar_info : barricade){
-		static_object = new CStaticObject(tmp.size());
-		static_object->SetNumberOfMeshes(tmp.size());
-		for (int j = 0; j < tmp.size(); ++j) {
-			static_object->SetMesh(j, tmp[j]);
+		static_object = new CStaticObject(mesh.size());
+		static_object->SetNumberOfMeshes(mesh.size());
+		for (int j = 0; j < mesh.size(); ++j) {
+			static_object->SetMesh(j, mesh[j]);
 		}
 		
 		//pRotatingObject->SetMesh(0, pCubeMesh);
@@ -126,13 +141,13 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		}
 		//pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		//pRotatingObject->SetRotationSpeed(10.0f * (i % 10));
-		static_object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		static_object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * cb_size));
 		objects.push_back(static_object);
-		i++;
+		cb_size++;
 	}
 	m_pd3dcbGameObjects->Map(0, NULL, (void**)&m_pcbMappedGameObjects);
 	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
-	for (int j = 0; j < objects.size(); j++)
+	for (UINT j = 0; j < objects.size(); j++)
 	{
 		CB_GAMEOBJECT_INFO* pbMappedcbGameObject = (CB_GAMEOBJECT_INFO*)((UINT8*)m_pcbMappedGameObjects + (j * ncbElementBytes));
 		XMStoreFloat4x4(&pbMappedcbGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&objects[j]->m_xmf4x4World)));
@@ -177,4 +192,46 @@ void CStaticObjectShader::ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommand
 	for (auto& object : objects) {
 		object->ShadowMapRender(pd3dCommandList, NULL);
 	}
+}
+
+void CStaticObjectShader::AddBarricade(const BarricadePos& barricade)
+{
+	CStaticObject* static_object = NULL;
+
+	auto tex = CTexturePool::GetInstance()->GetTexture(L"no_texture.png");
+
+	CMaterial* material = new CMaterial();
+	material->SetTexture(tex);
+
+	float bottom = -500.0f;
+	static_object = new CStaticObject(mesh.size());
+	static_object->SetNumberOfMeshes(mesh.size());
+	for (int j = 0; j < mesh.size(); ++j) {
+		static_object->SetMesh(j, mesh[j]);
+	}
+
+	//pRotatingObject->SetMesh(0, pCubeMesh);
+	static_object->SetMaterial(material);
+	static_object->SetPosition(barricade.x, bottom, barricade.z);
+	static_object->Scale(0.1f);
+
+	if (barricade.dir == DIR::WIDTH) {
+		static_object->Rotate(0.0f, 0.0f, 0.0f);
+	}
+	else {
+		static_object->Rotate(0.0f, 90.0f, 0.0f);
+	}
+
+	static_object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * cb_size));
+	objects.push_back(static_object);
+	cb_size++;
+
+	m_pd3dcbGameObjects->Map(0, NULL, (void**)&m_pcbMappedGameObjects);
+	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
+	for (int j = 0; j < objects.size(); j++)
+	{
+		CB_GAMEOBJECT_INFO* pbMappedcbGameObject = (CB_GAMEOBJECT_INFO*)((UINT8*)m_pcbMappedGameObjects + (j * ncbElementBytes));
+		XMStoreFloat4x4(&pbMappedcbGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&objects[j]->m_xmf4x4World)));
+	}
+	m_pd3dcbGameObjects->Unmap(0, NULL);
 }
