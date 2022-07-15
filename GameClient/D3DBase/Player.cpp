@@ -467,7 +467,7 @@ void CMainGamePlayer::Fire()
 	XMFLOAT3 pos = Vector3::Add(Vector3::Add(GetPosition(), Vector3::ScalarProduct(dir, 100.f, false)), XMFLOAT3(0.0f, 700.0f, 0.0f));
 	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(
 		new CBullet(pos, dir));
-		//new CBullet(GetPosition(), dir));
+	Network::Send_attack_packet(server_player_info->mx, server_player_info->mz);
 
 	//test
 	server_player_info->hp -= 10;
