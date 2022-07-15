@@ -55,7 +55,7 @@ public:
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	void AddUI(float width, float height, float x, float y, const wstring& image_file_name);
 	void AddProgressBar(float width, float height, float x, float y, const wstring& image_file_name);
-	void AddNumberUI(float width, float height, float x, float y, float* value_ptr = NULL);
+	void AddNumberUI(float width, float height, float x, float y, int digit, int* value_ptr = NULL);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 

@@ -221,9 +221,9 @@ void UISystem::AddUI(float width, float height, float x, float y, const wstring&
 	AddObject(object);
 }
 
-void UISystem::AddNumberUI(float width, float height, float x, float y, float* value_ptr)
+void UISystem::AddNumberUI(float width, float height, float x, float y, int digit, int* value_ptr)
 {
-	CGameObject* object = new CNumberUI(width, height, x, y, *this, value_ptr);
+	CGameObject* object = new CNumberUI(width, height, x, y, digit, *this, value_ptr);
 	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
 	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(object);
 }

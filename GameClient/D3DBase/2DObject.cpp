@@ -345,17 +345,17 @@ void CNumberUIComponent::Render(ID3D12GraphicsCommandList* pd3dCommandList,
 #endif
 }
 
-CNumberUI::CNumberUI(float width, float height, float x, float y, UISystem& ui, float* value_ptr)
+CNumberUI::CNumberUI(float width, float height, float x, float y, int digit, UISystem& ui, int* value_ptr)
 	:CGameObject(0), value_ptr(value_ptr)
 {
-	float w = width / component.size();
+	float w = width / digit;
 
 	float right = x + width / 2 - w / 2;
 	float Cx;
 	
-	for (int i = 0; i < component.size(); ++i) {
+	for (int i = 0; i < digit; ++i) {
 		Cx = right - w * i;
-		component[i] = new CNumberUIComponent(w, height, Cx, y);
+		component.push_back(new CNumberUIComponent(w, height, Cx, y));
 		ui.AddObject(component[i]);
 	}
 }

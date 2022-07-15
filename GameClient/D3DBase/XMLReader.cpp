@@ -3,12 +3,14 @@
 #include "XMLReader.h"
 #include "2DObject.h"
 
-map<wstring, float*> CXMLReader::variable_map;
+map<wstring, int*> CXMLReader::variable_map;
 
-const map<wstring, float*>& CXMLReader::GetVariable_map()
+const map<wstring, int*>& CXMLReader::GetVariable_map()
 {
     if (!variable_map.empty()) return variable_map;
-    variable_map.emplace(L"hp", &(Network::g_client[Network::my_id].speed));
+    variable_map.emplace(L"skill", &(Network::g_client[Network::my_id].special_skill));
+    variable_map.emplace(L"left bullet", &(Network::g_client[Network::my_id].left_bullet));
+    
     return variable_map;
 }
 
@@ -56,10 +58,11 @@ void CXMLReader::GetNumberUI(CMarkup& xml, UISystem* ui)
         float height = _wtof(xml.GetAttrib(L"height"));
         float x = _wtof(xml.GetAttrib(L"x"));
         float y = _wtof(xml.GetAttrib(L"y"));
+        int digit = _wtoi(xml.GetAttrib(L"digit"));
         wstring variable_name = std::wstring(xml.GetAttrib(L"variable").operator LPCWSTR());
         auto& found = map.find(variable_name);
         if (found != map.end()) {
-            ui->AddNumberUI(width, height, x, y, (*found).second);
+            ui->AddNumberUI(width, height, x, y, digit, (*found).second);
         }
 #ifdef _DEBUG
         else {

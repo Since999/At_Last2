@@ -98,10 +98,10 @@ public:
 class CNumberUI : public CGameObject {
 private:
     float value = 0;
-    array<CNumberUIComponent*, 3> component;
-    float* value_ptr = NULL;
+    vector<CNumberUIComponent*> component;
+    int* value_ptr = NULL;
 public:
-    CNumberUI(float width, float height, float x, float y, UISystem& ui, float* value_ptr = NULL);
+    CNumberUI(float width, float height, float x, float y, int digit, UISystem& ui, int* value_ptr = NULL);
 
     virtual void Animate(float fTimeElapsed);
 

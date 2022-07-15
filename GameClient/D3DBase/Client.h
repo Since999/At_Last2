@@ -35,6 +35,8 @@ public:
 
 	Direction _dir;
 	//mutex hp_lock;
+
+	int left_bullet;
 public:
 	Client();
 	~Client();
