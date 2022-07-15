@@ -290,3 +290,88 @@ void CProgressBar::Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D1
 	}
 #endif
 }
+
+
+vector<CTexture*> CNumberUIComponent::textures;
+
+void CNumberUIComponent::SetTextures(vector<CTexture*> tex)
+{
+	textures = tex;
+}
+
+CNumberUIComponent::CNumberUIComponent(float width, float height, float x, float y) 
+	: CUIObject(width, height, x, y)
+{
+
+}
+
+void CNumberUIComponent::Render(ID3D12GraphicsCommandList* pd3dCommandList, 
+	const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera)
+{
+	OnPrepareRender();
+
+	/*if (m_pMaterial)
+	{
+		if (m_pMaterial->m_pShader)
+		{
+			m_pMaterial->m_pShader->Render(pd3dCommandList, pCamera);
+			m_pMaterial->m_pShader->UpdateShaderVariables(pd3dCommandList);
+		}
+	}*/
+
+	//if (m_pMaterial && m_pMaterial->m_pTexture) {
+	//	m_pMaterial->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, 0);
+	//}
+	if (value < 0) return;
+	if (value < textures.size()) {
+		textures[value]->UpdateShaderVariable(pd3dCommandList, 0, 0);
+	}
+#ifdef _DEBUG
+	else {
+		cout << "error (NumberUI): value is over size" << endl;
+		cout << "value: " << value << ", texture: " << textures.size() << endl;
+		return;
+	}
+#endif
+
+	pd3dCommandList->SetGraphicsRootDescriptorTable(root_par_index, desc_handle);
+
+	if (mesh) mesh->Render(pd3dCommandList);
+
+#ifdef _DEBUG
+	else {
+		cout << "Error(2DObject): no mesh" << endl;
+	}
+#endif
+}
+
+CNumberUI::CNumberUI(float width, float height, float x, float y, int digit, UISystem& ui, int* value_ptr)
+	:CGameObject(0), value_ptr(value_ptr)
+{
+	float w = width / digit;
+
+	float right = x + width / 2 - w / 2;
+	float Cx;
+	
+	for (int i = 0; i < digit; ++i) {
+		Cx = right - w * i;
+		component.push_back(new CNumberUIComponent(w, height, Cx, y));
+		ui.AddObject(component[i]);
+	}
+}
+
+void CNumberUI::Animate(float fTimeElapsed)
+{
+	if (value_ptr) {
+		value = *value_ptr;
+	}
+	int i = 0;
+	for ( ; value / pow(10, i) >= 1 && i < component.size(); ++i) {
+		int num = value / pow(10, i);
+		num = num % 10;
+		component[i]->SetValue(num);
+	}
+	for (; i < component.size(); ++i) {
+		component[i]->SetValue(0);
+	}
+}

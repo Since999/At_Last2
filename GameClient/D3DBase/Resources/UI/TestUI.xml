@@ -93,6 +93,14 @@ height ="10"
 x = "1000"
 y ="200"
 image="Resources/UI/HP_BAR.png"/>
+
+  <Number
+width ="500"
+height ="100"
+x = "1500"
+y ="500"
+digit ="3"
+variable ="left bullet"/>
       <!-- <UI
     width ="50"
     height ="50"

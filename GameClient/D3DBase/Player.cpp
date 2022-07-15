@@ -443,6 +443,8 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 	}
 
 	pre_location = curr_location;
+
+	fire_time -= fTimeElapsed;
 }
 
 void CMainGamePlayer::StartFire()
@@ -462,13 +464,18 @@ void CMainGamePlayer::StopFire()
 #include "CStaticObjectShader.h"
 void CMainGamePlayer::Fire()
 {
+	if (server_player_info->left_bullet <= 0) {
+		return;
+	}
+	server_player_info->left_bullet -= 1;
 	XMFLOAT3 dir = XMFLOAT3(-server_player_info->mx, 0.0f, server_player_info->mz);
 	dir = Vector3::Normalize(dir);
 	XMFLOAT3 pos = Vector3::Add(Vector3::Add(GetPosition(), Vector3::ScalarProduct(dir, 100.f, false)), XMFLOAT3(0.0f, 700.0f, 0.0f));
 	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(
 		new CBullet(pos, dir));
-		//new CBullet(GetPosition(), dir));
-
+#ifdef ENABLE_NETWORK
+	Network::Send_attack_packet(server_player_info->mx, server_player_info->mz);
+#endif
 	//test
 	server_player_info->hp -= 10;
 	auto position = GetPosition();

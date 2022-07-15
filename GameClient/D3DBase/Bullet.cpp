@@ -6,6 +6,7 @@ CBullet::CBullet(const XMFLOAT3& position, const XMFLOAT3& direction, float spee
 	:direction(direction), speed(speed)
 {
 	SetPosition(position);
+	initial_position = position;
 }
 
 void CBullet::Animate(float fTimeElapsed)
@@ -33,7 +34,10 @@ void CBullet::Animate(float fTimeElapsed)
 
 
 	time += fTimeElapsed;
-	if (time > 0.2f) {
+	if (Vector3::Length(Vector3::Subtract(initial_position, GetPosition())) > 2000.f) {
 		CGameFramework::GetInstance()->GetCurruntScene()->RemoveObject(this);
+	}
+	if (time > 0.2f) {
+		
 	}
 }

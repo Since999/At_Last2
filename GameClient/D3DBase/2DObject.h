@@ -1,5 +1,8 @@
 #pragma once
 #include "Object.h"
+
+class UISystem;
+
 class C2DObject :
     public CGameObject
 {
@@ -20,7 +23,7 @@ public:
 
 class CUIObject : public C2DObject {
 public:
-    CUIObject(float width, float height, float x, float y, CMaterial* material);
+    CUIObject(float width, float height, float x, float y, CMaterial* material = NULL);
     virtual void Animate(float fTimeElapsed);
 };
 
@@ -78,4 +81,31 @@ public:
 
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera = NULL);
+};
+
+class CNumberUIComponent : public CUIObject {
+private:
+    static vector<CTexture*> textures;
+    int value = 0;
+public:
+    static void SetTextures(vector<CTexture*> textures);
+    CNumberUIComponent(float width, float height, float x, float y);
+    virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, const D3D12_GPU_DESCRIPTOR_HANDLE& desc_handle, CCamera* pCamera = NULL);
+
+    void SetValue(int val) { value = val; }
+};
+
+class CNumberUI : public CGameObject {
+private:
+    float value = 0;
+    vector<CNumberUIComponent*> component;
+    int* value_ptr = NULL;
+public:
+    CNumberUI(float width, float height, float x, float y, int digit, UISystem& ui, int* value_ptr = NULL);
+
+    virtual void Animate(float fTimeElapsed);
+
+    virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList) {}
+    virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL) {}
+    virtual void ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL) {}
 };

@@ -5,6 +5,7 @@ class CBullet :
 {
 private:
     XMFLOAT3 direction;
+    XMFLOAT3 initial_position;
     float speed;
     float time = 0.0f;
 public:

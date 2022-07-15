@@ -3,6 +3,17 @@
 #include "XMLReader.h"
 #include "2DObject.h"
 
+map<wstring, int*> CXMLReader::variable_map;
+
+const map<wstring, int*>& CXMLReader::GetVariable_map()
+{
+    if (!variable_map.empty()) return variable_map;
+    variable_map.emplace(L"skill", &(Network::g_client[Network::my_id].special_skill));
+    variable_map.emplace(L"left bullet", &(Network::g_client[Network::my_id].left_bullet));
+    
+    return variable_map;
+}
+
 bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
 {
     CMarkup xml;
@@ -34,7 +45,32 @@ bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
         image_file_name = std::wstring(xml.GetAttrib(L"image").operator LPCWSTR());
         ui->AddProgressBar(width, height, x, y, image_file_name);
     }
+    GetNumberUI(xml, ui);
+    
     return true;
+}
+
+void CXMLReader::GetNumberUI(CMarkup& xml, UISystem* ui)
+{
+    const auto& map = GetVariable_map();
+    while (xml.FindElem(L"Number")) {
+        float width = _wtof(xml.GetAttrib(L"width"));
+        float height = _wtof(xml.GetAttrib(L"height"));
+        float x = _wtof(xml.GetAttrib(L"x"));
+        float y = _wtof(xml.GetAttrib(L"y"));
+        int digit = _wtoi(xml.GetAttrib(L"digit"));
+        wstring variable_name = std::wstring(xml.GetAttrib(L"variable").operator LPCWSTR());
+        auto& found = map.find(variable_name);
+        if (found != map.end()) {
+            ui->AddNumberUI(width, height, x, y, digit, (*found).second);
+        }
+#ifdef _DEBUG
+        else {
+            cout << "Error (GetNumberUI): no such variable in map." << endl;
+            wcout << "\tstring: " << variable_name << endl;
+        }
+#endif
+    }
 }
 
 void CXMLReader::LoadParticle(const wstring& file_name, ParticleSystem* sys)

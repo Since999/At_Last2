@@ -198,6 +198,15 @@ void UISystem::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, max_object, MAX_UI_TYPE);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	CreateConstantBufferViews(pd3dDevice, max_object, m_pd3dcbGameObjects, ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255));
+	wstring png = L".png";
+	wstring base_name = L"Resources/UI/0";
+	wstring file_name;
+	vector<CTexture*> textures;
+	for (int i = 0; i < 10; ++i) {
+		file_name = base_name + to_wstring(i) + png;
+		textures.push_back(GetTexture(file_name));
+	}
+	CNumberUIComponent::SetTextures(textures);
 
 	CXMLReader::GetUISetting("Resources/UI/TestUI.xml", this);
 }
@@ -210,6 +219,13 @@ void UISystem::AddUI(float width, float height, float x, float y, const wstring&
 	CGameObject* object = new CUIObject(width, height, x, y, material);
 	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
 	AddObject(object);
+}
+
+void UISystem::AddNumberUI(float width, float height, float x, float y, int digit, int* value_ptr)
+{
+	CGameObject* object = new CNumberUI(width, height, x, y, digit, *this, value_ptr);
+	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
+	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(object);
 }
 
 void UISystem::AddProgressBar(float width, float height, float x, float y, const wstring& image_file_name)
