@@ -2,12 +2,12 @@
 <UISystem>
   
 
-<UI
+<!-- <UI
   width ="180"
   height ="180"
   x ="150"
   y ="950"
-  image="Resources/UI/UV_Grid.jpg"/>
+  image="Resources/UI/UV_Grid.jpg"/> -->
 
 
 
@@ -68,12 +68,12 @@
     y ="1000"
     image="Resources/UI/Bclose.png"/>
 
-  <UI
+  <!-- <UI
   width ="200"
   height ="200"
   x ="150"
   y ="950"
-  image="Resources/UI/background.png"/>
+  image="Resources/UI/background.png"/> -->
 
   <UI
   width ="250"
@@ -95,10 +95,10 @@ y ="200"
 image="Resources/UI/HP_BAR.png"/>
 
   <Number
-width ="500"
-height ="100"
-x = "1500"
-y ="500"
+width ="50"
+height ="50"
+x = "1900"
+y ="50"
 digit ="3"
 variable ="left bullet"/>
       <!-- <UI
