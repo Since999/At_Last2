@@ -13,7 +13,7 @@
 #include "Configuration.h"
 #include "AnimationShader.h"
 #include "2DShader.h"
-
+#include "SoundSystem.h"
 CScene::CScene()
 {
 }
@@ -43,7 +43,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	C2DShader* particle_shader = new C2DShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 	m_ppShaders[3] = particle_shader;
 
-
+	CSoundSystem::GetInstance();
 	/*for(int i = 0; i< ROAD_ZOMBIE_NUM + FIRST_CHECK_POINT_ZOMBIE_NUM; ++i)
 	
 	{

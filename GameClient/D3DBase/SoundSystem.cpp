@@ -10,6 +10,7 @@ CSoundSystem* CSoundSystem::GetInstance()
 	if (singleton) return singleton;
 	
 	singleton = new CSoundSystem();
+	return singleton;
 }
 
 #define MAX_CHANNEL 10
