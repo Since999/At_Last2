@@ -10,6 +10,7 @@
 #include "StateMachine.h"
 #include "GameFramework.h"
 #include "Bullet.h"
+#include "SoundSystem.h"
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CPlayer
 
@@ -473,6 +474,8 @@ void CMainGamePlayer::Fire()
 	XMFLOAT3 pos = Vector3::Add(Vector3::Add(GetPosition(), Vector3::ScalarProduct(dir, 100.f, false)), XMFLOAT3(0.0f, 700.0f, 0.0f));
 	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(
 		new CBullet(pos, dir));
+
+	CSoundSystem::GetInstance()->Play(L"gun fire");
 #ifdef ENABLE_NETWORK
 	Network::Send_attack_packet(server_player_info->mx, server_player_info->mz);
 #endif

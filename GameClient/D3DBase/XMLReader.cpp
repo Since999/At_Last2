@@ -2,7 +2,7 @@
 #include "2DShader.h"
 #include "XMLReader.h"
 #include "2DObject.h"
-
+#include "SoundSystem.h"
 map<wstring, int*> CXMLReader::variable_map;
 
 const map<wstring, int*>& CXMLReader::GetVariable_map()
@@ -105,6 +105,31 @@ void CXMLReader::LoadParticle(const wstring& file_name, ParticleSystem* sys)
         xml.OutOfElem();
         materials->shrink_to_fit();
         sys->AddBuilder(name, duration, { width, height }, materials);
+    }
+    return;
+}
+
+void CXMLReader::LoadSound(const wstring& file_name, CSoundSystem* sys)
+{
+    CMarkup xml;
+    CString strFileName = file_name.c_str();
+    if (!xml.Load(strFileName))
+    {
+        return;
+    }
+    xml.FindElem(L"SoundSystem");
+    xml.IntoElem();
+    CString string_true { L"true" };
+    while (xml.FindElem(L"Sound")) {
+        wstring name;
+        string sound_file_name;
+        bool loop;
+        wstring channel;
+        name = wstring{ xml.GetAttrib(L"name") };
+        sound_file_name = string{ CT2CA( xml.GetAttrib(L"sound")) };
+        loop = xml.GetAttrib(L"loop") == string_true;
+        channel = xml.GetAttrib(L"channel");
+        sys->SetSound(name, sound_file_name, channel, loop);
     }
     return;
 }
