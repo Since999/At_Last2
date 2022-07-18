@@ -448,15 +448,15 @@ void Network::ProcessPacket(unsigned char* ptr)
 		sc_player_move_packet* packet = reinterpret_cast<sc_player_move_packet*>(ptr);
 
 		int id = packet->id;
-
-		g_client[id].x = packet->x;
-		g_client[id].z = packet->z;
-		g_client[id].t_x = packet->t_x;
-		g_client[id].t_z = packet->t_z;
-		g_client[id].speed = packet->speed;
-		g_client[id].is_input = packet->in_input;
-		g_client[id].rotation_angle = packet->rotation_angle;
-
+		if (id != Network::my_id) {
+			g_client[id].x = packet->x;
+			g_client[id].z = packet->z;
+			g_client[id].t_x = packet->t_x;
+			g_client[id].t_z = packet->t_z;
+			g_client[id].speed = packet->speed;
+			g_client[id].is_input = packet->in_input;
+			g_client[id].rotation_angle = packet->rotation_angle;
+		}
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_MOVE_FAIL:
