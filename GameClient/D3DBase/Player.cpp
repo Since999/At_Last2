@@ -479,13 +479,4 @@ void CMainGamePlayer::Fire()
 #ifdef ENABLE_NETWORK
 	Network::Send_attack_packet(server_player_info->mx, server_player_info->mz);
 #endif
-	//test
-	server_player_info->hp -= 10;
-	auto position = GetPosition();
-	BarricadePos tmp;
-	tmp.dir = DIR::WIDTH;
-	tmp.x = position.x;
-	tmp.z = position.z;
-	CStaticObjectShader::GetInstance()->AddBarricade(tmp);
-	//test
 }
