@@ -30,6 +30,7 @@ public:
 
 	atomic_bool special_skill_key;
 	atomic_int	special_id;
+	atomic_int zombie_kill_num;
 
 	chrono::system_clock::time_point move_time;
 

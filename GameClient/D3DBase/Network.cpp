@@ -36,6 +36,7 @@ BarricadePos Network::three_barricade2[30];
 BarricadePos Network::skill_barricade[3];
 
 atomic_int Network::fps_rate;
+atomic_int Network::remain_zombie;
 
 //mutex Network::move_lock;
 mutex Network::id_lock;
@@ -82,6 +83,7 @@ void Network::Initialize()
 	key_down_state = false;
 	total_time = chrono::system_clock::now();
 	key_down_time = chrono::system_clock::now();
+	remain_zombie = 0;
 
 	other_client_id1 = -1;
 	other_client_id2 = -1;
@@ -358,16 +360,19 @@ void Network::ProcessPacket(unsigned char* ptr)
 		break;
 	}
 	case (int)MsgType::SC_GAME_START_FAIL:
-	{
-		// 버퍼링 또는 로딩중 표시.
-		// 게임 시작했는지에 대한 타이머 질문에 대한 서버에서 아직 안됬다고 대답
-
-		//cout << "게임을 시작하는데 실패하였습니다. \n";
-		break;
-	}
+	d
 	case (int)MsgType::SC_PLAYER_ATTACK:
 	{
 		
+		break;
+	}
+	case (int)MsgType::SC_PLAYER_KILL_NUMBER:
+	{
+		sc_player_zombie_klil_packet* packet = reinterpret_cast<sc_player_zombie_klil_packet*>(ptr);
+
+		g_client[packet->id].zombie_kill_num = packet->zom_num;
+		cout << packet->id << "가 " << packet->zom_num << "만큼 죽여 " << g_client[packet->id].zombie_kill_num << "를 죽였습니다. \n";
+
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_ROTATE:
@@ -1016,6 +1021,15 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 		break;
 	}
+	case (int)MsgType::SC_ZOMBIE_NUMBER:
+	{
+		sc_zombie_num_packet* packet = reinterpret_cast<sc_zombie_num_packet*>(ptr);
+
+		remain_zombie = packet->zombie_num;
+		cout << "remain_zombie : " << remain_zombie << "\n";
+
+		break;
+	}
 	case (int)MsgType::SC_ZOMBIE_VIEWLIST_PUT:
 	{
 		sc_zombie_viewlist_packet* packet = reinterpret_cast<sc_zombie_viewlist_packet*>(ptr);
@@ -1228,6 +1242,82 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		}
 
+		break;
+	}
+	case (int)MsgType::SC_ZOMBIE_ALL_KILL:
+	{
+		sc_zombie_all_kill_packet* packet = reinterpret_cast<sc_zombie_all_kill_packet*>(ptr);
+
+		switch (packet->m_type)
+		{
+		case MapType::FIRST_PATH:
+		{
+			for (auto& zom : r_zombie1)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "1길 좀비 모두 사망 \n";
+			break;
+		}
+		case MapType::SECOND_PATH:
+		{
+			for (auto& zom : r_zombie2)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "2길 좀비 모두 사망 \n";
+			break;
+		}
+		case MapType::FINAL_PATH:
+		{
+			for (auto& zom : r_zombie3)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+				cout << "3길 좀비 모두 사망 \n";
+			break;
+		}
+		case MapType::CHECK_POINT_ONE:
+		{
+			for (auto& zom : b_zombie1)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "1거점 좀비 모두 사망 \n";
+
+			break;
+		}
+		case MapType::CHECK_POINT_TWO:
+		{
+			for (auto& zom : b_zombie2)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "2거점 좀비 모두 사망 \n";
+			break;
+		}
+		case MapType::CHECK_POINT_FINAL:
+		{
+			for (auto& zom : b_zombie3)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "3거점 좀비 모두 사망 \n";
+			break;
+		}
+		}
 		break;
 	}
 	case (int)MsgType::SC_ZOMBIE_DEAD:

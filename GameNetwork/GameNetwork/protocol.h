@@ -126,6 +126,7 @@ enum class MsgType : char							// 서버에서 보내는 메세지 형식
 	SC_PLAYER_MOVE_FAIL,							// 플레이어 이동 실패
 	SC_PLAYER_ROTATE,								// 플레이어가 회전
 	SC_PLAYER_ATTACK,								// 플레이어 공격
+	SC_PLAYER_KILL_NUMBER,						// 플레이어 좀비 죽인 수
 	SC_PLAYER_RELOAD_REQUEST,				// 플레이어 재장전 요청
 	SC_PLAYER_RELOAD,								// 플레이어 재장전 완료
 	SC_PLAYER_BUILD,								// 플레이어 설치
@@ -149,12 +150,14 @@ enum class MsgType : char							// 서버에서 보내는 메세지 형식
 	SC_ZOMBIE_MOVE,									// 좀비 이동
 	SC_ZOMBIE_ARRIVE,								// 좀비 도착
 	SC_ZOMBIE_REMAIN,								// 좀비 문 열기 남아있음
+	SC_ZOMBIE_NUMBER,								// 좀비 남은 숫자
 	SC_ZOMBIE_ATTACK,								// 좀비 공격
 	SC_ZOMBIE_MAD,									// 좀비 광폭화
 	SC_ZOMBIE_SEARCH,								// 좀비가 플레이어를 발견
 	SC_ZOMBIE_VIEWLIST_PUT,						// 좀비 뷰리스트
 	SC_ZOMBIE_VIEWLIST_REMOVE,				// 좀비 뷰리스트 제거
 	SC_ZOMBIE_DEAD,									// 좀비 사망
+	SC_ZOMBIE_ALL_KILL,							// 좀비 모두 한번에 사망
 	SC_UPDATE_PLAYER_INFO,						// 플레이어 정보 업데이트
 	SC_UPDATE_ZOMBIE_INFO,						// 좀비 정보 업데이트
 	SC_UPDATE_OBJECT_INFO,						// 오브젝트 정보 업데이트
@@ -544,7 +547,15 @@ struct sc_player_hp_packet							// 서버에서 클라이언트에게 클라이언트 HP가 몇 �
 	unsigned short size;
 	MsgType type;										// 메시지 타입 UPDATE_PLAYER_INFO
 	char id;													// 해당 ID의 hp
-	short hp;													// 클라이언트의  hp양
+	short hp;												// 클라이언트의  hp양
+};
+
+struct sc_player_zombie_klil_packet				// 서버에서 클라에게 이 클라가 좀비 몇마리 죽였다고 알려주는 패킷
+{
+	unsigned short size;
+	MsgType type;										// 메시지 타입 ZOMBIE_KILL_NUM
+	char id;													// 누가?
+	short zom_num;										// 죽인 좀비 숫자.
 };
 
 struct sc_zombie_spawn_packet					// 서버에서 클라이언트에게 좀비의 종류와 스폰 위치를 알려주는 패킷
@@ -623,6 +634,20 @@ struct sc_zombie_dead_packet						// 서버에서 클라이언트에게 좀비가 죽었다고 전�
 	MsgType type;										// 메시지 타입 ZOMBIE_DEAD
 	unsigned char id;
 	MapType m_type;									// 어느 맵에서 죽었나
+};
+
+struct sc_zombie_num_packet						// 서버에서 남은 좀비가 몇마리인지 보내는 패킷
+{
+	unsigned short size;
+	MsgType type;										// 메시지 타입 ZOMBIE_NUM
+	unsigned char zombie_num;						// 남은 좀비 마릿수
+};
+
+struct sc_zombie_all_kill_packet					// 서버에서 좀비가 다 죽었다고 보내는 패킷
+{
+	unsigned short size;
+	MsgType type;										// 메시지 타입 ZOMBIE_ALL_KILL
+	MapType m_type;									// 죽은 맵 타입
 };
 
 struct sc_update_zombie_info_packet			// 서버에서 변한 좀비의 정보를 전달

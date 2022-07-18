@@ -64,7 +64,8 @@ public:
 	static chrono::system_clock::time_point mouse_time;
 	static chrono::system_clock::time_point total_time;
 	static chrono::system_clock::time_point attack_time;
-
+	
+	static atomic_int remain_zombie;
 	static atomic_int fps_rate;
 
 	//static mutex move_lock;
