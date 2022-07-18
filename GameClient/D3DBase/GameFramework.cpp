@@ -82,8 +82,13 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CreateDepthStencilView();
 
 	BuildObjects();
-
+	StartEvent();
 	return(true);
+}
+
+void CGameFramework::StartEvent()
+{
+	m_pScene->StartEvent();
 }
 
 void CGameFramework::CreateShadowMap()

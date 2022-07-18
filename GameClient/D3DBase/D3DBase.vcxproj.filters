@@ -192,6 +192,9 @@
     <ClInclude Include="Bullet.h">
       <Filter>Objects\헤더</Filter>
     </ClInclude>
+    <ClInclude Include="SoundSystem.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3DBase.cpp">
@@ -314,6 +317,9 @@
     <ClCompile Include="Bullet.cpp">
       <Filter>Objects\소스</Filter>
     </ClCompile>
+    <ClCompile Include="SoundSystem.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="D3DBase.rc">
@@ -362,6 +368,9 @@
     </Xml>
     <Xml Include="Resources\UI\TestUI.xml">
       <Filter>리소스 파일\UI</Filter>
+    </Xml>
+    <Xml Include="Resources\Sound\Sound.xml">
+      <Filter>리소스 파일</Filter>
     </Xml>
   </ItemGroup>
 </Project>

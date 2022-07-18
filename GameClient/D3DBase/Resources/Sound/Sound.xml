@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SoundSystem>
+  
+
+<Sound
+  name = "gun fire"
+  sound = "Resources/Sound/gun fire.mp3"
+  loop = "false"
+  channel = "effect"/>
+  
+  <Sound
+    name = "test bgm"
+    sound = "Resources/Sound/scifi.mp3"
+    loop = "true"
+    channel = "bgm"/>
+  
+
+</SoundSystem>
