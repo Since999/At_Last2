@@ -1,0 +1,16 @@
+로비 - scifi
+인 게임 - deepblue
+웨이브 - instinct
+
+
+기본 총 - 212602__pgi__machine-gun-001-loop
+
+
+
+캐릭터 피격 - male-scream-5
+캐릭터 사망 - male-death-02
+캐릭터 특수능력 - 
+
+좀비 스폰 - zombie-spawn
+좀비 피격 - zombie-hit
+좀비 사망 - zombie-death-2
