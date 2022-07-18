@@ -336,3 +336,13 @@ void CScene::RemoveObjects()
 	}
 	remove_list.clear();
 }
+
+void CScene::StartEvent()
+{
+	CSoundSystem::GetInstance()->Play(L"main game bgm");
+}
+
+void CScene::StopEvent()
+{
+	CSoundSystem::GetInstance()->StopBGM();
+}

@@ -60,6 +60,8 @@ public:
 	CCamera* GetCamera() const { return m_pCamera; }
 
 	CPlayer* GetPlayer() const { return client_player; }
+
+	void StartEvent();
 private:
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd;

@@ -41,6 +41,9 @@ public:
 	CPlayer* m_pPlayer = NULL;
 	CPlayer* m_pPlayer2 = NULL;
 	CPlayer* m_pPlayer3 = NULL;
+
+	void StartEvent();
+	void StopEvent();
 private:
 	std::vector<CGameObject*> remove_list;
 	std::list<CGameObject*> object_list;

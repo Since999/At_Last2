@@ -21,6 +21,8 @@ CSoundSystem::CSoundSystem()
 
 	system->init(MAX_CHANNEL, FMOD_INIT_NORMAL, NULL);
 	CXMLReader::LoadSound(L"Resources/Sound/Sound.xml", this);
+	Channel* channel = NULL;
+	channel_pool.try_emplace(L"bgm", channel);
 }
 
 CSoundSystem::~CSoundSystem()
@@ -56,4 +58,17 @@ void CSoundSystem::Play(const wstring& name)
 	auto& found_channel = channel_pool.find(sound.channel);
 
 	system->playSound(sound.sound, 0, false, &(*found_channel).second);
+	
+}
+
+void CSoundSystem::StopBGM()
+{
+	auto& found = channel_pool.find(L"bgm");
+	if (found == channel_pool.end()) {
+#ifdef _DEBUG
+		wcout << "Error (CSoundSystem::stopBGM): no bgm channel " << endl;
+#endif
+		return;
+	}
+	(*found).second->stop();
 }

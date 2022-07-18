@@ -30,5 +30,6 @@ public:
 	~CSoundSystem();
 	void SetSound(const wstring& name, const string& file_name, const wstring& channel, bool loop = false);
 	void Play(const wstring& name);
+	void StopBGM();
 };
 
