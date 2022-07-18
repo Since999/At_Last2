@@ -53,6 +53,7 @@ void CSoundSystem::Play(const wstring& name)
 #ifdef _DEBUG
 		wcout << "Error (CSoundSystem::Play): no such sound: " << name << endl;
 #endif
+		return;
 	}
 	CSound& sound = (*found).second;
 	auto& found_channel = channel_pool.find(sound.channel);
