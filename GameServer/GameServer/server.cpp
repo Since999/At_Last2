@@ -2316,6 +2316,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
+		remain_zombie_num = ROAD_ZOMBIE_NUM;
+
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 43.0f;
@@ -2347,6 +2349,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			break;
 		}
+
+		remain_zombie_num = ROAD_ZOMBIE_NUM;
 
 		if (cl._type == PlayerType::COMMANDER)
 		{
@@ -2380,6 +2384,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
+		remain_zombie_num = ROAD_ZOMBIE_NUM;
+
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 634.0f;
@@ -2411,6 +2417,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			break;
 		}
+
+		remain_zombie_num = FIRST_CHECK_POINT_ZOMBIE_NUM;
 
 		if (cl._type == PlayerType::COMMANDER)
 		{
@@ -2444,6 +2452,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
+		remain_zombie_num = TWO_CHECK_POINT_ZOMBIE_NUM;
+
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 512.0f;
@@ -2475,6 +2485,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			break;
 		}
+
+		remain_zombie_num = THREE_CHECK_POINT_ZOMBIE_NUM;
 
 		if (cl._type == PlayerType::COMMANDER)
 		{
@@ -3066,17 +3078,6 @@ void Server::Send_zombie_all_kill_packet(int c_id, MapType m_type)
 
 void Server::ZombieAllKill(NPC& npc)
 {
-	if (npc.astar_check)
-	{
-		while (1)
-		{
-			if (npc.astar_check == false)
-			{
-				break;
-			}
-		}
-	}
-
 	npc._state = ZombieState::DEAD;
 	npc.zombie->astar.Delete();
 

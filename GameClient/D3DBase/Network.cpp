@@ -360,7 +360,9 @@ void Network::ProcessPacket(unsigned char* ptr)
 		break;
 	}
 	case (int)MsgType::SC_GAME_START_FAIL:
-	d
+	{
+		break;
+	}
 	case (int)MsgType::SC_PLAYER_ATTACK:
 	{
 		
