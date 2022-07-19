@@ -214,7 +214,7 @@ void CAnimationObject::ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandLis
 CZombie::CZombie(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature,
 	SkinModel* model) : CAnimationObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, NULL) {
 	if (model == NULL) {
-		SkinModel* nmodel = ModelManager::GetModel("Z1_Nomal_.fbx", L"Zombie.tga");
+		SkinModel* nmodel = ModelManager::GetModel("z1.fbx", L"Zombie.tga");
 		nmodel->GetAnimationList()[4].SetRepeat(false);
 		/*SkinModel* nmodel = ModelLoader::LoadModel("Resources/Model/Z1_Nomal_.fbx");
 
@@ -233,7 +233,7 @@ CZombie::CZombie(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 CZombie::CZombie() : CAnimationObject()
 {
 	if (model == NULL) {
-		SkinModel* nmodel = ModelManager::GetModel("Z1_Nomal_.fbx", L"Zombie.png");
+		SkinModel* nmodel = ModelManager::GetModel("z1.fbx", L"Zombie.png");
 
 		/*SkinModel* nmodel = ModelLoader::LoadModel("Resources/Model/Z1_Nomal_.fbx");
 
