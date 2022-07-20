@@ -1,8 +1,0 @@
-p1_sol :  00-40 idle / 40-80 walk_and_shoot / 80 - 100  attacked / 100-140 walk  / 140-180 walk_and_reload  / 180 - 220 side_walk_right / 220 - 260 back_walk / 260-280 side_walk_left 
-p2_eng : 00-40 idle / 40-80 walk_and_shoot / 80-100 attacked / 100-140 walk / 140-180 walk_and_reload / 180 - 220 side_walk_right / 220 - 260 back_walk / 260-280 side_walk_left 
-p3_pmc : 00-40 idle / 40-80 walk_and_shoot / 80-100 attacked / 100-140 walk / 140-180 walk_and_reload / 180 - 220 side_walk_right / 220 - 260 back_walk / 260-280 side_walk_left 
-
-z1_nomal : 00-40 walk / 40-70 attack / 90-110 attacked / 120-160 dead  / 170-200 spawn 
-z2_goul : 500-520 spawn / 100-170 walk / 220-290 attack / 470-490 attacked / 290-340 die / 350-460 idle 
-z3_orc :00-40 spawn / 40-80 walk / 80-120 attack / 120-140 attacked / 140-170 died
-z4_dog : 00-40 spawn / 40-70 walk / 80-120 attack / 120-140 attacked / 140-170 dead
