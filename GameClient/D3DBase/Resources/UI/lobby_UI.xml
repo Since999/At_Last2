@@ -23,10 +23,15 @@ image="Resources/UI/background.png"/>
 width ="800"
 height ="200"
 x = "960"
-y ="660z"
+y ="660"
 image="Resources/UI/HP_BAR.png"/>
 
-
+  <UI
+width ="800"
+height ="200"
+x = "960"
+y ="660"
+image="Resources/UI/At_Last....png"/>
 
 
   <UI
@@ -52,10 +57,16 @@ image="Resources/UI/background.png"/> -->
   <UI
 width ="70"
 height ="70"
-x = "1100"
+x = "1120"
 y ="240"
 image="Resources/UI/background.png"/>
-
+ 
+ <UI
+width ="70"
+height ="20"
+x = "1120"
+y ="240"
+image="Resources/UI/Login.png"/>
   <!-- <BAR
 width ="500"
 height ="10"

@@ -45,6 +45,12 @@ x = "990"
 y ="300"
 image="Resources/UI/HP_BAR.png"/>
 
+<UI
+width ="800"
+height ="100"
+x = "990"
+y ="300"
+image="Resources/UI/Character_Select.png"/>
   <!-- <UI
 width ="70"
 height ="70"
