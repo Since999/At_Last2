@@ -100,6 +100,7 @@ public:
 	void MakeDoor();
 	bool CheckBarricade(iPos pos, bool p);
 	void EditMap(iPos sp, iPos ep);
+	void MazeTypeInit(iPos* base, BarricadeType b_type, int num);
 };
 
 class AS_Map

@@ -8,6 +8,7 @@ struct BarricadePos {
 	float x;
 	float z;
 	DIR dir;
+	BarricadeType b_type;
 };
 
 enum class EVENT_TYPE : char

@@ -121,6 +121,7 @@ BarricadePos Network::Change_Client_Pos(iPos pos)
 	temp.x = (pos.x - 550.0f) * (-100.0f);
 	temp.z = (pos.z - 210.0f) * (-100.0f);
 	temp.dir = pos.dir;
+	temp.b_type = pos.b_type;
 	return temp;
 }
 

@@ -206,12 +206,13 @@ void Server::Send_barricade_packet(int c_id)
 {
 	sc_barricade_packet packet;
 	packet.id = c_id;
-	packet.size = sizeof(packet);
 	packet.type = MsgType::SC_BARRICADE_SEND;
 	memcpy(packet.one_base, map.one_base, sizeof(map.one_base));
 	memcpy(packet.two_base, map.two_base, sizeof(map.two_base));
 	memcpy(packet.three_base, map.three_base, sizeof(map.three_base));
 	memcpy(packet.three_base2, map.three_base2, sizeof(map.three_base2));
+	packet.size = sizeof(packet);
+
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 

@@ -235,21 +235,6 @@ enum class MapType : char
 	EXIT														// 탈출구
 };
 
-enum class TileType : char							// 있어야할까???? 맵에서 지정 가능할수도 있으므로 확실하지 않은 코드
-{
-	BULID_ENABLE,										// 설치 가능한 타일
-	BULID_DISABLE,										// 설치 불가능한 타일
-	SPAWN_ZOMBIE,									// 좀비 스폰 지역
-	SPAWN_PLAYER										// 플레이어 스폰 지역
-};
-
-enum class PlayerLife : char
-{
-	LIFE,														// 살아있는 상태
-	INFECTION,											// 감염되어 있는 상태
-	DEAD													// 죽어있는 상태
-};
-
 enum class MazeWall : char							// 벽 상태
 {
 	WALL = '0',											// 벽
@@ -265,6 +250,13 @@ enum class DIR : char									// 가로 , 세로
 	HEIGHT
 };
 
+enum class BarricadeType : char
+{
+	CAR,														// 1거점 폐차
+	TREE,													// 2거점 나무
+	BARRICADE											// 3거점 엔지니어 스킬, 바리게이트
+};
+
 struct VectorBox												// 객체의 바운딩 박스 표현하기 위해 사용하는 vector4 구조체 
 {
 	float MaxX;
@@ -277,7 +269,7 @@ struct iPos {
 	short x;
 	short z;
 	DIR dir;
-	// 어떤 구조물일지 Object
+	BarricadeType b_type;
 };
 
 #pragma pack(push, 1)

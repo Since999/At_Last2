@@ -456,6 +456,14 @@ void Map::EditMap(iPos sp, iPos ep)
 	}
 }
 
+void Map::MazeTypeInit(iPos* base, BarricadeType b_type, int num)
+{
+	for (int i = 0; i < num; ++i)
+	{
+		base[i].b_type = b_type;
+	}
+}
+
 void Map::Initialize()
 {
 	MakeDoor();
@@ -463,6 +471,11 @@ void Map::Initialize()
 	MakeMaze(TWO_Base_Pos, Two_Level, two_base, TWO_Base_End_Pos);
 	MakeMaze(THREE_Base_Pos, Three_Level, three_base, THREE_Base_End_Pos);
 	MakeMaze(THREE_Base_Pos2, Three_Level, three_base2, THREE_Base_End_Pos2);
+
+	MazeTypeInit(one_base, BarricadeType::CAR, One_Level);
+	MazeTypeInit(two_base, BarricadeType::TREE, Two_Level);
+	MazeTypeInit(three_base, BarricadeType::BARRICADE, Three_Level);
+	MazeTypeInit(three_base2, BarricadeType::BARRICADE, Three_Level);
 
 	EditMap(One_Base_Pos, One_Base_End_Pos);
 	EditMap(TWO_Base_Pos, TWO_Base_End_Pos);
