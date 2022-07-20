@@ -445,6 +445,7 @@
     <None Include="Header.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="Resources\Model\PlayerModel.xml" />
     <Xml Include="Resources\Particle\sample.xml" />
     <Xml Include="Resources\Sound\Sound.xml" />
     <Xml Include="Resources\UI\TestUI.xml" />

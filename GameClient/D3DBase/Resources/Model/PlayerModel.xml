@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PlayerModel>
+  
+  <Player
+    num="0"
+    name="None"
+    model="Resources/Model/test_sol_no_texture.fbx"
+    texture="Resources/Texture/demo_soldier_512.tga"/>
+  <Player
+    num="1"
+    name="commander"
+    model="Resources/Model/test_sol_no_texture.fbx"
+    texture="Resources/Texture/demo_soldier_512.tga"/>
+  <Player
+    num="2"
+    name="engineer"
+    model="Resources/Model/P_Eng.fbx"
+    texture="Resources/Texture/demo_soldier_512.tga"/>
+  <Player
+    num="3"
+  name="Mercenary"
+  model="Resources/Model/P_PMC.fbx"
+  texture="Resources/Texture/PMC.png"/>
+
+</PlayerModel>

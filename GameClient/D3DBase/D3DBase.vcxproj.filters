@@ -372,5 +372,8 @@
     <Xml Include="Resources\Sound\Sound.xml">
       <Filter>리소스 파일</Filter>
     </Xml>
+    <Xml Include="Resources\Model\PlayerModel.xml">
+      <Filter>리소스 파일</Filter>
+    </Xml>
   </ItemGroup>
 </Project>
