@@ -4,22 +4,22 @@
   <Player
     num="0"
     name="None"
-    model="Resources/Model/test_sol_no_texture.fbx"
+    model="Resources/Model/P1_sol.fbx"
     texture="Resources/Texture/demo_soldier_512.tga"/>
   <Player
     num="1"
     name="commander"
-    model="Resources/Model/test_sol_no_texture.fbx"
+    model="Resources/Model/P1_sol.fbx"
     texture="Resources/Texture/demo_soldier_512.tga"/>
   <Player
     num="2"
     name="engineer"
-    model="Resources/Model/P_Eng.fbx"
-    texture="Resources/Texture/demo_soldier_512.tga"/>
+    model="Resources/Model/P2_eng.fbx"
+    texture="Resources/Texture/Boduguard_02_D.tga"/>
   <Player
     num="3"
   name="Mercenary"
-  model="Resources/Model/P_PMC.fbx"
+  model="Resources/Model/P3_pmc.fbx"
   texture="Resources/Texture/PMC.png"/>
 
 </PlayerModel>
