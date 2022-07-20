@@ -7,7 +7,7 @@
 struct BarricadePos {
 	float x;
 	float z;
-	DIR dir;
+	float angle;
 	BarricadeType b_type;
 };
 
@@ -105,4 +105,5 @@ public:
 	static void Update(float time_elapsed);
 	static void ZombieMove(Zombie& zombie, float time_elapsed);
 	static void ZombieAngle(Zombie& zombie, float time_elapsed);
+	static void ChangeWall(iPos pos, ANGLE angle);
 };

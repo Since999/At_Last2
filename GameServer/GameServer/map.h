@@ -95,10 +95,10 @@ public:
 	void ReadMapFile();
 	void MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos);
 	void Initialize();
-	void ChangeWall(iPos pos, bool p);
+	void ChangeWall(iPos pos, ANGLE angle);
 	void InputDoor(float row, float col, float size_x, float size_z, DIR dir, int num);
 	void MakeDoor();
-	bool CheckBarricade(iPos pos, bool p);
+	bool CheckBarricade(iPos pos, ANGLE angle);
 	void EditMap(iPos sp, iPos ep);
 	void MazeTypeInit(iPos* base, BarricadeType b_type, int num);
 };

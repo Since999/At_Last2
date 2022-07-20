@@ -257,6 +257,34 @@ enum class BarricadeType : char
 	BARRICADE											// 3거점 엔지니어 스킬, 바리게이트
 };
 
+enum class ANGLE : char
+{
+	ZERO = 0,
+	FIFTEEN = 1,
+	THIRTY = 2,
+	FORTY_FIVE = 3,
+	SIXTY = 4,
+	SEVENTY_FIVE = 5,
+	NINETY = 6,
+	ONE_HUNDRED_FIVE = 7,
+	ONE_HUNDRED_TWENTY = 8,
+	ONE_HUNDRED_THIRTY_FIVE =9,
+	ONE_HUNDERED_FIFTY = 10,
+	ONE_HUNDRED_SIXTY_FIVE = 11,
+	ONE_HUNDRED_EIGHTY = 12,
+	ONE_HUNDRED_NINETY_FIVE = 13,
+	TWO_HUNDRED_TEN = 14,
+	TWO_HUNDRED_TWENTY_FIVE = 15,
+	TWO_HUNDRED_FORTY = 16,
+	TWO_HUNDRED_FIFTY_FIVE = 17,
+	TWO_HUNDRED_SEVENTY = 18,
+	TWO_HUNDRED_EIGHTY_FIVE = 19,
+	THREE_HUNDRED = 20,
+	THREE_HUNDRED_FIFTEEN = 21,
+	THREE_HUNDRED_THIRD = 22,
+	THREE_HUNDRED_FORTY_FIVE = 23
+};
+
 struct VectorBox												// 객체의 바운딩 박스 표현하기 위해 사용하는 vector4 구조체 
 {
 	float MaxX;
@@ -268,7 +296,7 @@ struct VectorBox												// 객체의 바운딩 박스 표현하기 위해 사용하는 vector4
 struct iPos {
 	short x;
 	short z;
-	DIR dir;
+	ANGLE angle;
 	BarricadeType b_type;
 };
 
@@ -722,7 +750,5 @@ struct	 Object
 
 struct MapInfo
 {
-	vector<Object> Wall;
-	vector<Object> Barricade;
 	vector<Object> Door;
 };
