@@ -1,10 +1,9 @@
-test_sol_no_texture.fbx
-demo_soldier_512.tga
-test_sol_no_texture.fbx
-demo_soldier_512.tga
-test_sol_no_texture.fbx
-demo_soldier_512.tga
-
+p2_eng.fbx
+Boduguard_02_D.tga
+p2_eng.fbx
+Boduguard_02_D.tga
+p3_pmc.fbx
+pmc.png
 
 P1_sol_idle.fbx
 P1_sol_back_walk.fbx
