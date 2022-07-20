@@ -20,41 +20,37 @@ y ="540"
 image="Resources/UI/background.png"/>
 
   <UI
+width ="300"
+height ="300"
+x = "330"
+y ="660"
+image="Resources/UI/HP_BAR.png"/>
+  <UI
+width ="300"
+height ="300"
+x = "980"
+y ="660"
+image="Resources/UI/HP_BAR.png"/>
+  <UI
+width ="300"
+height ="300"
+x = "1650"
+y ="660"
+image="Resources/UI/HP_BAR.png"/>
+
+<UI
 width ="800"
-height ="200"
-x = "960"
-y ="660z"
+height ="150"
+x = "990"
+y ="300"
 image="Resources/UI/HP_BAR.png"/>
-
-
-
-
-  <UI
-width ="460"
-height ="100"
-x = "960"
-y ="240"
-image="Resources/UI/HP_BAR.png"/>
-  <UI
-width ="260"
-height ="70"
-x = "900"
-y ="240"
-image="Resources/UI/background.png"/>
 
   <!-- <UI
-width ="260"
-height ="30"
-x = "900"
-y ="220"
-image="Resources/UI/background.png"/> -->
-
-  <UI
 width ="70"
 height ="70"
 x = "1100"
 y ="240"
-image="Resources/UI/background.png"/>
+image="Resources/UI/background.png"/> -->
 
   <!-- <BAR
 width ="500"
