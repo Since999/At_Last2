@@ -11,7 +11,8 @@ SkinModel* ModelLoader::LoadModel(CString path, SkinModel* model, UINT flag)
 	string				strPath	= CT2CA(path.operator LPCWSTR());
 	const aiScene*		pScene	= importer.ReadFile(strPath, flag);
 	
-	if (!pScene) return NULL;
+	if (!pScene)
+		return NULL;
 
 	//정보를 담을 공간
 	Vertex					vertices;

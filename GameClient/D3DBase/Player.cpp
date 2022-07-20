@@ -241,7 +241,7 @@ void CPlayer::OnPrepareRender()
 	m_xmf4x4World._31 = m_xmf3Look.x; m_xmf4x4World._32 = m_xmf3Look.y; m_xmf4x4World._33 = m_xmf3Look.z;
 	m_xmf4x4World._41 = m_xmf3Position.x; m_xmf4x4World._42 = m_xmf3Position.y; m_xmf4x4World._43 = m_xmf3Position.z;
 
-	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(0.0f, m_fYaw, 0.0f);
+	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(m_fPitch, m_fYaw, m_fRoll);
 	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
 
 	auto mtxScale = XMMatrixScaling(size, size, size);
