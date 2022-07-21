@@ -133,12 +133,7 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		static_object->SetMaterial(materials[0]);
 		static_object->SetPosition(bar_info.x, bottom, bar_info.z);
 		static_object->Scale(0.1f);
-		if (bar_info.dir == DIR::WIDTH) {
-			static_object->Rotate(0.0f, 0.0f, 0.0f);
-		}
-		else {
-			static_object->Rotate(0.0f, 90.0f, 0.0f);
-		}
+		static_object->Rotate(0.0f, bar_info.angle, 0.0f);
 		//pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		//pRotatingObject->SetRotationSpeed(10.0f * (i % 10));
 		static_object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * cb_size));
@@ -215,12 +210,13 @@ void CStaticObjectShader::AddBarricade(const BarricadePos& barricade)
 	static_object->SetPosition(barricade.x, bottom, barricade.z);
 	static_object->Scale(0.1f);
 
-	if (barricade.dir == DIR::WIDTH) {
-		static_object->Rotate(0.0f, 0.0f, 0.0f);
-	}
-	else {
-		static_object->Rotate(0.0f, 90.0f, 0.0f);
-	}
+	static_object->Rotate(0.0f, barricade.angle, 0.0f);
+	//if (barricade.dir == DIR::WIDTH) {
+	//	static_object->Rotate(0.0f, 0.0f, 0.0f);
+	//}
+	//else {
+	//	static_object->Rotate(0.0f, 90.0f, 0.0f);
+	//}
 
 	static_object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * cb_size));
 	objects.push_back(static_object);

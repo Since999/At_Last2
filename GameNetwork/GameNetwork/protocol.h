@@ -22,8 +22,8 @@
 using namespace std;
 
 const short SERVER_PORT = 4000;
-const char* const SERVER_IP = "220.94.221.236";
-//const char* const SERVER_IP = "127.0.0.1";	// 임시로 자기 IP 가르키고 있음
+//const char* const SERVER_IP = "220.94.221.236";
+const char* const SERVER_IP = "127.0.0.1";	// 임시로 자기 IP 가르키고 있음
 
 const int MAX_PLAYER = 3;							// 플레이어 수
 const int MAX_ZOMBIE_NPC = 100;				// 최대 좀비 수
@@ -126,6 +126,7 @@ enum class MsgType : char							// 서버에서 보내는 메세지 형식
 	SC_PLAYER_MOVE_FAIL,							// 플레이어 이동 실패
 	SC_PLAYER_ROTATE,								// 플레이어가 회전
 	SC_PLAYER_ATTACK,								// 플레이어 공격
+	SC_PLAYER_KILL_NUMBER,						// 플레이어 좀비 죽인 수
 	SC_PLAYER_RELOAD_REQUEST,				// 플레이어 재장전 요청
 	SC_PLAYER_RELOAD,								// 플레이어 재장전 완료
 	SC_PLAYER_BUILD,								// 플레이어 설치
@@ -149,12 +150,14 @@ enum class MsgType : char							// 서버에서 보내는 메세지 형식
 	SC_ZOMBIE_MOVE,									// 좀비 이동
 	SC_ZOMBIE_ARRIVE,								// 좀비 도착
 	SC_ZOMBIE_REMAIN,								// 좀비 문 열기 남아있음
+	SC_ZOMBIE_NUMBER,								// 좀비 남은 숫자
 	SC_ZOMBIE_ATTACK,								// 좀비 공격
 	SC_ZOMBIE_MAD,									// 좀비 광폭화
 	SC_ZOMBIE_SEARCH,								// 좀비가 플레이어를 발견
 	SC_ZOMBIE_VIEWLIST_PUT,						// 좀비 뷰리스트
 	SC_ZOMBIE_VIEWLIST_REMOVE,				// 좀비 뷰리스트 제거
 	SC_ZOMBIE_DEAD,									// 좀비 사망
+	SC_ZOMBIE_ALL_KILL,							// 좀비 모두 한번에 사망
 	SC_UPDATE_PLAYER_INFO,						// 플레이어 정보 업데이트
 	SC_UPDATE_ZOMBIE_INFO,						// 좀비 정보 업데이트
 	SC_UPDATE_OBJECT_INFO,						// 오브젝트 정보 업데이트
@@ -232,21 +235,6 @@ enum class MapType : char
 	EXIT														// 탈출구
 };
 
-enum class TileType : char							// 있어야할까???? 맵에서 지정 가능할수도 있으므로 확실하지 않은 코드
-{
-	BULID_ENABLE,										// 설치 가능한 타일
-	BULID_DISABLE,										// 설치 불가능한 타일
-	SPAWN_ZOMBIE,									// 좀비 스폰 지역
-	SPAWN_PLAYER										// 플레이어 스폰 지역
-};
-
-enum class PlayerLife : char
-{
-	LIFE,														// 살아있는 상태
-	INFECTION,											// 감염되어 있는 상태
-	DEAD													// 죽어있는 상태
-};
-
 enum class MazeWall : char							// 벽 상태
 {
 	WALL = '0',											// 벽
@@ -262,6 +250,41 @@ enum class DIR : char									// 가로 , 세로
 	HEIGHT
 };
 
+enum class BarricadeType : char
+{
+	CAR,														// 1거점 폐차
+	TREE,													// 2거점 나무
+	BARRICADE											// 3거점 엔지니어 스킬, 바리게이트
+};
+
+enum class ANGLE : char
+{
+	ZERO = 0,
+	FIFTEEN = 1,
+	THIRTY = 2,
+	FORTY_FIVE = 3,
+	SIXTY = 4,
+	SEVENTY_FIVE = 5,
+	NINETY = 6,
+	ONE_HUNDRED_FIVE = 7,
+	ONE_HUNDRED_TWENTY = 8,
+	ONE_HUNDRED_THIRTY_FIVE =9,
+	ONE_HUNDERED_FIFTY = 10,
+	ONE_HUNDRED_SIXTY_FIVE = 11,
+	ONE_HUNDRED_EIGHTY = 12,
+	ONE_HUNDRED_NINETY_FIVE = 13,
+	TWO_HUNDRED_TEN = 14,
+	TWO_HUNDRED_TWENTY_FIVE = 15,
+	TWO_HUNDRED_FORTY = 16,
+	TWO_HUNDRED_FIFTY_FIVE = 17,
+	TWO_HUNDRED_SEVENTY = 18,
+	TWO_HUNDRED_EIGHTY_FIVE = 19,
+	THREE_HUNDRED = 20,
+	THREE_HUNDRED_FIFTEEN = 21,
+	THREE_HUNDRED_THIRD = 22,
+	THREE_HUNDRED_FORTY_FIVE = 23
+};
+
 struct VectorBox												// 객체의 바운딩 박스 표현하기 위해 사용하는 vector4 구조체 
 {
 	float MaxX;
@@ -273,8 +296,8 @@ struct VectorBox												// 객체의 바운딩 박스 표현하기 위해 사용하는 vector4
 struct iPos {
 	short x;
 	short z;
-	DIR dir;
-	// 어떤 구조물일지 Object
+	ANGLE angle;
+	BarricadeType b_type;
 };
 
 #pragma pack(push, 1)
@@ -544,7 +567,15 @@ struct sc_player_hp_packet							// 서버에서 클라이언트에게 클라이언트 HP가 몇 �
 	unsigned short size;
 	MsgType type;										// 메시지 타입 UPDATE_PLAYER_INFO
 	char id;													// 해당 ID의 hp
-	short hp;													// 클라이언트의  hp양
+	short hp;												// 클라이언트의  hp양
+};
+
+struct sc_player_zombie_klil_packet				// 서버에서 클라에게 이 클라가 좀비 몇마리 죽였다고 알려주는 패킷
+{
+	unsigned short size;
+	MsgType type;										// 메시지 타입 ZOMBIE_KILL_NUM
+	char id;													// 누가?
+	short zom_num;										// 죽인 좀비 숫자.
 };
 
 struct sc_zombie_spawn_packet					// 서버에서 클라이언트에게 좀비의 종류와 스폰 위치를 알려주는 패킷
@@ -623,6 +654,20 @@ struct sc_zombie_dead_packet						// 서버에서 클라이언트에게 좀비가 죽었다고 전�
 	MsgType type;										// 메시지 타입 ZOMBIE_DEAD
 	unsigned char id;
 	MapType m_type;									// 어느 맵에서 죽었나
+};
+
+struct sc_zombie_num_packet						// 서버에서 남은 좀비가 몇마리인지 보내는 패킷
+{
+	unsigned short size;
+	MsgType type;										// 메시지 타입 ZOMBIE_NUM
+	unsigned char zombie_num;						// 남은 좀비 마릿수
+};
+
+struct sc_zombie_all_kill_packet					// 서버에서 좀비가 다 죽었다고 보내는 패킷
+{
+	unsigned short size;
+	MsgType type;										// 메시지 타입 ZOMBIE_ALL_KILL
+	MapType m_type;									// 죽은 맵 타입
 };
 
 struct sc_update_zombie_info_packet			// 서버에서 변한 좀비의 정보를 전달
@@ -705,7 +750,5 @@ struct	 Object
 
 struct MapInfo
 {
-	vector<Object> Wall;
-	vector<Object> Barricade;
 	vector<Object> Door;
 };

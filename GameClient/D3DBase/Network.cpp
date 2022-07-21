@@ -36,6 +36,7 @@ BarricadePos Network::three_barricade2[30];
 BarricadePos Network::skill_barricade[3];
 
 atomic_int Network::fps_rate;
+atomic_int Network::remain_zombie;
 
 //mutex Network::move_lock;
 mutex Network::id_lock;
@@ -82,6 +83,7 @@ void Network::Initialize()
 	key_down_state = false;
 	total_time = chrono::system_clock::now();
 	key_down_time = chrono::system_clock::now();
+	remain_zombie = 0;
 
 	other_client_id1 = -1;
 	other_client_id2 = -1;
@@ -118,7 +120,103 @@ BarricadePos Network::Change_Client_Pos(iPos pos)
 	BarricadePos temp;
 	temp.x = (pos.x - 550.0f) * (-100.0f);
 	temp.z = (pos.z - 210.0f) * (-100.0f);
-	temp.dir = pos.dir;
+	if (pos.angle == ANGLE::ZERO)
+	{
+		temp.angle = 0;
+	}
+	else if (pos.angle == ANGLE::FIFTEEN)
+	{
+		temp.angle = 15;
+	}
+	else if (pos.angle == ANGLE::THIRTY)
+	{
+		temp.angle = 30;
+	}
+	else if (pos.angle == ANGLE::FORTY_FIVE)
+	{
+		temp.angle = 45;
+	}
+	else if (pos.angle == ANGLE::SIXTY)
+	{
+		temp.angle = 60;
+	}
+	else if (pos.angle == ANGLE::SEVENTY_FIVE)
+	{
+		temp.angle = 75;
+	}
+	else if (pos.angle == ANGLE::NINETY)
+	{
+		temp.angle = 90;
+	}
+	else if (pos.angle == ANGLE::ONE_HUNDRED_FIVE)
+	{
+		temp.angle = 105;
+	}
+	else if (pos.angle == ANGLE::ONE_HUNDRED_TWENTY)
+	{
+		temp.angle = 120;
+	}
+	else if (pos.angle == ANGLE::ONE_HUNDRED_THIRTY_FIVE)
+	{
+		temp.angle = 135;
+	}
+	else if (pos.angle == ANGLE::ONE_HUNDERED_FIFTY)
+	{
+		temp.angle = 150;
+	}
+	else if (pos.angle == ANGLE::ONE_HUNDRED_SIXTY_FIVE)
+	{
+		temp.angle = 165;
+	}
+	else if (pos.angle == ANGLE::ONE_HUNDRED_EIGHTY)
+	{
+		temp.angle = 180;
+	}
+	else if (pos.angle == ANGLE::ONE_HUNDRED_NINETY_FIVE)
+	{
+		temp.angle = 195;
+	}
+	else if (pos.angle == ANGLE::TWO_HUNDRED_TEN)
+	{
+		temp.angle = 210;
+	}
+	else if (pos.angle == ANGLE::TWO_HUNDRED_TWENTY_FIVE)
+	{
+		temp.angle = 225;
+	}
+	else if (pos.angle == ANGLE::TWO_HUNDRED_FORTY)
+	{
+		temp.angle = 240;
+	}
+	else if (pos.angle == ANGLE::TWO_HUNDRED_FIFTY_FIVE)
+	{
+		temp.angle = 255;
+	}
+	else if (pos.angle == ANGLE::TWO_HUNDRED_SEVENTY)
+	{
+		temp.angle = 270;
+	}
+	else if (pos.angle == ANGLE::TWO_HUNDRED_EIGHTY_FIVE)
+	{
+		temp.angle = 285;
+	}
+	else if (pos.angle == ANGLE::THREE_HUNDRED)
+	{
+		temp.angle = 300;
+	}
+	else if (pos.angle == ANGLE::THREE_HUNDRED_FIFTEEN)
+	{
+		temp.angle = 315;
+	}
+	else if (pos.angle == ANGLE::THREE_HUNDRED_THIRD)
+	{
+		temp.angle = 330;
+	}
+	else if (pos.angle == ANGLE::THREE_HUNDRED_FORTY_FIVE)
+	{
+		temp.angle = 345;
+	}
+	temp.b_type = pos.b_type;
 	return temp;
 }
 
@@ -158,6 +256,272 @@ void Network::Send_commander_special_change_packet(int c_id)
 	packet.id = c_id;
 	packet.type = MsgType::CS_SPECIAL_SKILL_CHANGE;
 	_socket.do_send(sizeof(packet), &packet);
+}
+
+void Network::ChangeWall(iPos pos, ANGLE angle)
+{
+	if (angle == ANGLE::ZERO || angle == ANGLE::ONE_HUNDRED_EIGHTY)													// 0도 , 180도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				map[i][j] = (char)MazeWall::BARRICADE;
+			}
+		}
+	}
+	else if (angle == ANGLE::FIFTEEN || angle == ANGLE::ONE_HUNDRED_NINETY_FIVE)								// 15도, 195도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				map[i][j] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 3][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z - 3][pos.x] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x + 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+		map[pos.z + 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::THIRTY || angle == ANGLE::TWO_HUNDRED_TEN)												// 30도, 210도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				map[i][j] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x + 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::FORTY_FIVE || angle == ANGLE::TWO_HUNDRED_TWENTY_FIVE)						// 45도, 225도
+	{
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z + 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x - 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x - 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::SIXTY || angle == ANGLE::TWO_HUNDRED_FORTY)											// 60도, 240도
+	{
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z][pos.x - 3] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::SEVENTY_FIVE || angle == ANGLE::TWO_HUNDRED_FIFTY_FIVE)						// 75도, 255도
+	{
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
+		{
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				map[j][i] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 2][pos.x + 1] = (char)MazeWall::BARRICADE;
+		map[pos.z - 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x - 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 2][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::NINETY || angle == ANGLE::TWO_HUNDRED_SEVENTY)										// 90도, 270도
+	{
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
+		{
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				map[j][i] = (char)MazeWall::BARRICADE;
+			}
+		}
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_FIVE || angle == ANGLE::TWO_HUNDRED_EIGHTY_FIVE)			// 105도, 285도
+	{
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
+		{
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				map[j][i] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 2][pos.x - 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x - 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 2][pos.x + 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_TWENTY || angle == ANGLE::THREE_HUNDRED)						// 120도, 300도
+	{
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z][pos.x - 3] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_THIRTY_FIVE || angle == ANGLE::THREE_HUNDRED_FIFTEEN)	// 135도, 315도
+	{
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 3][pos.x - 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x - 3] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::ONE_HUNDERED_FIFTY || angle == ANGLE::THREE_HUNDRED_THIRD)				// 150도, 330도
+	{
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 3][pos.x] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_SIXTY_FIVE || angle == ANGLE::THREE_HUNDRED_FORTY_FIVE)	// 165도, 345도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				map[i][j] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 3][pos.x] = (char)MazeWall::BARRICADE;
+		map[pos.z - 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x - 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+	}
 }
 
 void Network::ProcessPacket(unsigned char* ptr)
@@ -232,26 +596,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		for (auto& bar : one_barricade)
 		{
 			bar = Change_Client_Pos(packet->one_base[i]);
-			if (packet->one_base[i].dir == DIR::HEIGHT)
-			{
-				for (int a = 0; a < 3; ++a)
-				{
-					for (int b = 0; b < 5; ++b)
-					{
-						map[packet->one_base[i].z - 2 + b][packet->one_base[i].x - 1 + a] = (char)MazeWall::BARRICADE;
-					}
-				}
-			}
-			else
-			{
-				for (int a = 0; a < 3; ++a)
-				{
-					for (int b = 0; b < 5; ++b)
-					{
-						map[packet->one_base[i].z - 1 + a][packet->one_base[i].x - 2 + b] = (char)MazeWall::BARRICADE;
-					}
-				}
-			}
+			ChangeWall(packet->one_base[i], packet->one_base[i].angle);
+			
 			i++;
 		}
 
@@ -259,26 +605,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		for (auto& bar : two_barricade)
 		{
 			bar = Change_Client_Pos(packet->two_base[i]);
-			if (packet->two_base[i].dir == DIR::HEIGHT)
-			{
-				for (int a = 0; a < 3; ++a)
-				{
-					for (int b = 0; b < 5; b++)
-					{
-						map[packet->two_base[i].z -2 + b][packet->two_base[i].x -1 +a] = (char)MazeWall::BARRICADE;
-					}
-				}
-			}
-			else
-			{
-				for (int a = 0; a < 3; ++a)
-				{
-					for (int b = 0; b < 5; b++)
-					{
-						map[packet->two_base[i].z - 1 + a][packet->two_base[i].x - 2 + b] = (char)MazeWall::BARRICADE;
-					}
-				}
-			}
+			ChangeWall(packet->two_base[i], packet->two_base[i].angle);
+			
 			i++;
 		}
 
@@ -286,26 +614,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		for (auto& bar : three_barricade)
 		{
 			bar = Change_Client_Pos(packet->three_base[i]);
-			if (packet->three_base[i].dir == DIR::HEIGHT)
-			{
-				for (int a = 0; a < 3; ++a)
-				{
-					for (int b = 0; b < 5; b++)
-					{
-						map[packet->three_base[i].z - 2 + b][packet->three_base[i].x - 1 + a] = (char)MazeWall::BARRICADE;
-					}
-				}
-			}
-			else
-			{
-				for (int a = 0; a < 3; ++a)
-				{
-					for (int b = 0; b < 5; b++)
-					{
-						map[packet->three_base[i].z - 1 + a][packet->three_base[i].x - 2 + b] = (char)MazeWall::BARRICADE;
-					}
-				}
-			}
+			ChangeWall(packet->three_base[i], packet->three_base[i].angle);
+			
 			i++;
 		}
 
@@ -313,32 +623,13 @@ void Network::ProcessPacket(unsigned char* ptr)
 		for (auto& bar : three_barricade2)
 		{
 			bar = Change_Client_Pos(packet->three_base2[i]);
-			if (packet->three_base2[i].dir == DIR::HEIGHT)
-			{
-				for (int a = 0; a < 3; ++a)
-				{
-					for (int b = 0; b < 5; b++)
-					{
-						map[packet->three_base2[i].z - 2 + b][packet->three_base2[i].x - 1 + a] = (char)MazeWall::BARRICADE;
-					}
-				}
-			}
-			else
-			{
-				for (int a = 0; a < 3; ++a)
-				{
-					for (int b = 0; b < 5; b++)
-					{
-						map[packet->three_base2[i].z - 1 + a][packet->three_base2[i].x - 2 + b] = (char)MazeWall::BARRICADE;
-					}
-				}
-			}
+			ChangeWall(packet->three_base2[i], packet->three_base2[i].angle);
+			
 			i++;
 		}
 
 		for (auto& bar : skill_barricade)
 		{
-			bar.dir = DIR::HEIGHT;
 			bar.x = 800;
 			bar.z = 800;
 		}
@@ -359,15 +650,20 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_GAME_START_FAIL:
 	{
-		// 버퍼링 또는 로딩중 표시.
-		// 게임 시작했는지에 대한 타이머 질문에 대한 서버에서 아직 안됬다고 대답
-
-		//cout << "게임을 시작하는데 실패하였습니다. \n";
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_ATTACK:
 	{
 		
+		break;
+	}
+	case (int)MsgType::SC_PLAYER_KILL_NUMBER:
+	{
+		sc_player_zombie_klil_packet* packet = reinterpret_cast<sc_player_zombie_klil_packet*>(ptr);
+
+		g_client[packet->id].zombie_kill_num = packet->zom_num;
+		cout << packet->id << "가 " << packet->zom_num << "만큼 죽여 " << g_client[packet->id].zombie_kill_num << "를 죽였습니다. \n";
+
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_ROTATE:
@@ -564,7 +860,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		BarricadePos temp;
 		temp.x = packet->x;
 		temp.z = packet->z;
-		temp.dir = packet->dir;
+		
 		skill_barricade[3 - g_client[packet->id].special_skill] = temp;
 
 		if (packet->dir == DIR::HEIGHT)
@@ -1016,6 +1312,15 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 		break;
 	}
+	case (int)MsgType::SC_ZOMBIE_NUMBER:
+	{
+		sc_zombie_num_packet* packet = reinterpret_cast<sc_zombie_num_packet*>(ptr);
+
+		remain_zombie = packet->zombie_num;
+		cout << "remain_zombie : " << remain_zombie << "\n";
+
+		break;
+	}
 	case (int)MsgType::SC_ZOMBIE_VIEWLIST_PUT:
 	{
 		sc_zombie_viewlist_packet* packet = reinterpret_cast<sc_zombie_viewlist_packet*>(ptr);
@@ -1228,6 +1533,82 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		}
 
+		break;
+	}
+	case (int)MsgType::SC_ZOMBIE_ALL_KILL:
+	{
+		sc_zombie_all_kill_packet* packet = reinterpret_cast<sc_zombie_all_kill_packet*>(ptr);
+
+		switch (packet->m_type)
+		{
+		case MapType::FIRST_PATH:
+		{
+			for (auto& zom : r_zombie1)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "1길 좀비 모두 사망 \n";
+			break;
+		}
+		case MapType::SECOND_PATH:
+		{
+			for (auto& zom : r_zombie2)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "2길 좀비 모두 사망 \n";
+			break;
+		}
+		case MapType::FINAL_PATH:
+		{
+			for (auto& zom : r_zombie3)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+				cout << "3길 좀비 모두 사망 \n";
+			break;
+		}
+		case MapType::CHECK_POINT_ONE:
+		{
+			for (auto& zom : b_zombie1)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "1거점 좀비 모두 사망 \n";
+
+			break;
+		}
+		case MapType::CHECK_POINT_TWO:
+		{
+			for (auto& zom : b_zombie2)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "2거점 좀비 모두 사망 \n";
+			break;
+		}
+		case MapType::CHECK_POINT_FINAL:
+		{
+			for (auto& zom : b_zombie3)
+			{
+				zom._state = ZombieState::DEAD;
+				zom._animation = ZombieAnimationState::DEAD;
+			}
+
+			cout << "3거점 좀비 모두 사망 \n";
+			break;
+		}
+		}
 		break;
 	}
 	case (int)MsgType::SC_ZOMBIE_DEAD:

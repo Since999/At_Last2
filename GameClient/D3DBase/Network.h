@@ -7,7 +7,8 @@
 struct BarricadePos {
 	float x;
 	float z;
-	DIR dir;
+	float angle;
+	BarricadeType b_type;
 };
 
 enum class EVENT_TYPE : char
@@ -64,7 +65,8 @@ public:
 	static chrono::system_clock::time_point mouse_time;
 	static chrono::system_clock::time_point total_time;
 	static chrono::system_clock::time_point attack_time;
-
+	
+	static atomic_int remain_zombie;
 	static atomic_int fps_rate;
 
 	//static mutex move_lock;
@@ -103,4 +105,5 @@ public:
 	static void Update(float time_elapsed);
 	static void ZombieMove(Zombie& zombie, float time_elapsed);
 	static void ZombieAngle(Zombie& zombie, float time_elapsed);
+	static void ChangeWall(iPos pos, ANGLE angle);
 };

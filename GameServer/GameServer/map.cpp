@@ -160,54 +160,462 @@ void Map::ReadMapFile()
 	in.close();
 }
 
-void Map::ChangeWall(iPos pos, bool p)
+void Map::ChangeWall(iPos pos, ANGLE angle)
 {
-	Object obj;
-	if (p)
-	{
-		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
-		{
-			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
-			{
-				map[j][i] = (char)MazeWall::BARRICADE;
-
-				obj.row = i;
-				obj.col = pos.z;
-				obj.size_x = 1;
-				obj.size_z = 1;
-				obj.state = ObjectState::NORMAL;
-				obj.type = ObjectType::BARRICADE;
-				obj.x = (float)i;
-				obj.z = pos.z;
-				map_info.Barricade.emplace_back(obj);
-			}
-		}
-	}
-	else
+	if (angle == ANGLE::ZERO || angle == ANGLE::ONE_HUNDRED_EIGHTY)													// 0도 , 180도
 	{
 		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
 		{
 			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
 			{
 				map[i][j] = (char)MazeWall::BARRICADE;
-
-				obj.row = pos.x;
-				obj.col = i;
-				obj.size_x = 1;
-				obj.size_z = 1;
-				obj.state = ObjectState::NORMAL;
-				obj.type = ObjectType::BARRICADE;
-				obj.x = pos.x;
-				obj.z = (float)i;
-				map_info.Barricade.emplace_back(obj);
 			}
 		}
 	}
+	else if (angle == ANGLE::FIFTEEN || angle == ANGLE::ONE_HUNDRED_NINETY_FIVE)								// 15도, 195도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				map[i][j] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 3][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z - 3][pos.x] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x + 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+		map[pos.z + 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::THIRTY || angle == ANGLE::TWO_HUNDRED_TEN)												// 30도, 210도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				map[i][j] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x + 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::FORTY_FIVE || angle == ANGLE::TWO_HUNDRED_TWENTY_FIVE)						// 45도, 225도
+	{
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z + 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x - 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x - 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::SIXTY || angle == ANGLE::TWO_HUNDRED_FORTY)											// 60도, 240도
+	{
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+		
+		map[pos.z][pos.x - 3] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::SEVENTY_FIVE || angle == ANGLE::TWO_HUNDRED_FIFTY_FIVE)						// 75도, 255도
+	{
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
+		{
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				map[j][i] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 2][pos.x + 1] = (char)MazeWall::BARRICADE;
+		map[pos.z - 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x - 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 2][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::NINETY || angle == ANGLE::TWO_HUNDRED_SEVENTY)										// 90도, 270도
+	{
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
+		{
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				map[j][i] = (char)MazeWall::BARRICADE;
+			}
+		}
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_FIVE || angle == ANGLE::TWO_HUNDRED_EIGHTY_FIVE)			// 105도, 285도
+	{
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
+		{
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				map[j][i] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 2][pos.x - 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x - 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 2][pos.x + 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_TWENTY || angle == ANGLE::THREE_HUNDRED)						// 120도, 300도
+	{
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z][pos.x - 3] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_THIRTY_FIVE || angle == ANGLE::THREE_HUNDRED_FIFTEEN)	// 135도, 315도
+	{
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 3][pos.x - 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x - 3] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x + 3] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::ONE_HUNDERED_FIFTY || angle == ANGLE::THREE_HUNDRED_THIRD)				// 150도, 330도
+	{
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				map[z][x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 3][pos.x] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 1][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 1][pos.x - 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_SIXTY_FIVE || angle == ANGLE::THREE_HUNDRED_FORTY_FIVE)	// 165도, 345도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				map[i][j] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map[pos.z - 3][pos.x] = (char)MazeWall::BARRICADE;
+		map[pos.z - 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+
+		map[pos.z - 2][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x - 2] = (char)MazeWall::BARRICADE;
+		map[pos.z][pos.x - 2] = (char)MazeWall::BARRICADE;
+		
+		map[pos.z][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 1][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z + 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+
+		map[pos.z + 3][pos.x - 1] = (char)MazeWall::BARRICADE;
+		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+	}
 }
 
-bool Map::CheckBarricade(iPos pos, bool p)
+bool Map::CheckBarricade(iPos pos, ANGLE angle)
 {
-	if (p)
+	if (angle == ANGLE::ZERO || angle == ANGLE::ONE_HUNDRED_EIGHTY)													// 0도 , 180도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				if (map[i][j] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[i][j] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+	}
+	else if (angle == ANGLE::FIFTEEN || angle == ANGLE::ONE_HUNDRED_NINETY_FIVE)								// 15도, 195도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				if (map[i][j] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[i][j] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		if(map[pos.z - 3][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z - 3][pos.x - 1] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z - 3][pos.x] == (char)MazeWall::BARRICADE || map[pos.z - 3][pos.x] == (char)MazeWall::WALL)
+			return true;
+		
+		if(map[pos.z - 2][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z - 2][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z - 1][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+		
+		if(map[pos.z][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z + 1][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z + 2][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z + 2][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+		
+		if(map[pos.z + 3][pos.x] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z + 3][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+	}
+	else if (angle == ANGLE::THIRTY || angle == ANGLE::TWO_HUNDRED_TEN)												// 30도, 210도
+	{
+		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
+		{
+			for (int i = pos.z - 2; i <= pos.z + 2; ++i)
+			{
+				if (map[i][j] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[i][j] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		if (map[pos.z + 3][pos.x] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x] == (char)MazeWall::WALL)
+			return true;
+
+		if(map[pos.z + 2][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z + 2][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z + 1][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+
+		if (map[pos.z][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z + 1][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z + 2][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z + 2][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+
+		if (map[pos.z + 3][pos.x] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x] == (char)MazeWall::WALL)
+			return true;
+	}
+	else if (angle == ANGLE::FORTY_FIVE || angle == ANGLE::TWO_HUNDRED_TWENTY_FIVE)						// 45도, 225도
+	{
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x; x <= pos.z + 2; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		if(map[pos.z + 3][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x + 1] == map[pos.z + 3][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+																																															  
+		if (map[pos.z - 1][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x - 1] == map[pos.z - 1][pos.x - 1] ==(char)MazeWall::WALL )
+			return true;
+		if (map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x + 3] == map[pos.z - 1][pos.x + 3] ==(char)MazeWall::WALL )
+			return true;
+																																															  
+		if (map[pos.z + 1][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 1] == map[pos.z + 1][pos.x + 1] ==(char)MazeWall::WALL )
+			return true;
+		if (map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 3] == map[pos.z + 1][pos.x - 3] ==(char)MazeWall::WALL )
+			return true;
+																																															  
+		if (map[pos.z + 3][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x - 1] == map[pos.z + 3][pos.x - 1] ==(char)MazeWall::WALL )
+			return true;
+	}
+	else if (angle == ANGLE::SIXTY || angle == ANGLE::TWO_HUNDRED_FORTY)											// 60도, 240도
+	{
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		if (map[pos.z - 1][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x - 1] == (char)MazeWall::WALL)
+			return true;
+		
+		if (map[pos.z][pos.x - 3] == (char)MazeWall::BARRICADE || map[pos.z][pos.x - 3] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z][pos.x + 3] == (char)MazeWall::BARRICADE || map[pos.z][pos.x + 3] == (char)MazeWall::WALL)
+			return true;
+		
+		if (map[pos.z + 1][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+	}
+	else if (angle == ANGLE::SEVENTY_FIVE || angle == ANGLE::TWO_HUNDRED_FIFTY_FIVE)						// 75도, 255도
+	{
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
+		{
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				if (map[j][i] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[j][i] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		if(map[pos.z - 2][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z - 2][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z - 2][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z - 2][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+																																										  
+		if (map[pos.z - 1][pos.x - 3] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x - 3] == (char)MazeWall::WALL)
+			return true;
+																																										  
+		if (map[pos.z + 1][pos.x + 3] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 3] == (char)MazeWall::WALL)
+			return true;
+																																										  
+		if (map[pos.z + 2][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 2][pos.x - 1] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z + 2][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z + 2][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+	}
+	else if (angle == ANGLE::NINETY || angle == ANGLE::TWO_HUNDRED_SEVENTY)										// 90도, 270도
 	{
 		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
 		{
@@ -220,7 +628,147 @@ bool Map::CheckBarricade(iPos pos, bool p)
 			}
 		}
 	}
-	else
+	else if (angle == ANGLE::ONE_HUNDRED_FIVE || angle == ANGLE::TWO_HUNDRED_EIGHTY_FIVE)			// 105도, 285도
+	{
+		for (int j = pos.z - 1; j <= pos.z + 1; ++j)
+		{
+			for (int i = pos.x - 2; i <= pos.x + 2; ++i)
+			{
+				if (map[j][i] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[j][i] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		if(map[pos.z - 2][pos.x - 2] == (char)MazeWall::BARRICADE ==  map[pos.z - 2][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z - 2][pos.x - 1] == (char)MazeWall::BARRICADE ==  map[pos.z - 2][pos.x - 1] == (char)MazeWall::WALL)
+			return true;
+																																										  
+		if(map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE ==  map[pos.z - 1][pos.x + 3] == (char)MazeWall::WALL)
+			return true;
+																																										 
+		if(map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE ==  map[pos.z + 1][pos.x - 3] == (char)MazeWall::WALL)
+			return true;
+																																									
+		if(map[pos.z + 2][pos.x + 1] == (char)MazeWall::BARRICADE ==  map[pos.z + 2][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z + 2][pos.x + 2] == (char)MazeWall::BARRICADE ==  map[pos.z + 2][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_TWENTY || angle == ANGLE::THREE_HUNDRED)						// 120도, 300도
+	{
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		if (map[pos.z - 1][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+
+		if (map[pos.z][pos.x - 3] == (char)MazeWall::BARRICADE || map[pos.z][pos.x - 3] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z][pos.x + 3] == (char)MazeWall::BARRICADE || map[pos.z][pos.x + 3] == (char)MazeWall::WALL)
+			return true;
+
+		if (map[pos.z + 1][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 1] == (char)MazeWall::WALL)
+			return true;
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_THIRTY_FIVE || angle == ANGLE::THREE_HUNDRED_FIFTEEN)	// 135도, 315도
+	{
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		if(map[pos.z - 3][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z - 3][pos.x - 1] == (char)MazeWall::WALL)
+			return true;
+
+		if(map[pos.z - 1][pos.x - 3] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x - 3] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z - 1][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+
+		if(map[pos.z + 1][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 1] == (char)MazeWall::WALL)
+			return true;
+		if(map[pos.z + 1][pos.x + 3] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 3] == (char)MazeWall::WALL)
+			return true;
+
+		if(map[pos.z + 3][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+	}
+	else if (angle == ANGLE::ONE_HUNDERED_FIFTY || angle == ANGLE::THREE_HUNDRED_THIRD)				// 150도, 330도
+	{
+		for (int z = pos.z - 2; z <= pos.z; ++z)
+		{
+			for (int x = pos.x - 2; x <= pos.x; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		for (int z = pos.z; z <= pos.z + 2; ++z)
+		{
+			for (int x = pos.x; x <= pos.x + 2; ++x)
+			{
+				if (map[z][x] == (char)MazeWall::BARRICADE)
+					return true;
+				if (map[z][x] == (char)MazeWall::WALL)
+					return true;
+			}
+		}
+
+		if (map[pos.z - 3][pos.x] == (char)MazeWall::BARRICADE || map[pos.z - 3][pos.x] == (char)MazeWall::WALL)
+			return true;
+
+		if (map[pos.z - 1][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+
+		if (map[pos.z + 1][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 1] == (char)MazeWall::WALL)
+			return true;
+
+		if (map[pos.z + 3][pos.x] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x] == (char)MazeWall::WALL)
+			return true;
+	}
+	else if (angle == ANGLE::ONE_HUNDRED_SIXTY_FIVE || angle == ANGLE::THREE_HUNDRED_FORTY_FIVE)	// 165도, 345도
 	{
 		for (int j = pos.x - 1; j <= pos.x + 1; ++j)
 		{
@@ -232,6 +780,30 @@ bool Map::CheckBarricade(iPos pos, bool p)
 					return true;
 			}
 		}
+
+		if (map[pos.z - 3][pos.x] == (char)MazeWall::BARRICADE || map[pos.z - 3][pos.x] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z - 3][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z - 3][pos.x + 1] == (char)MazeWall::WALL)
+			return true;
+		
+		if (map[pos.z - 2][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z - 2][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z - 1][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z][pos.x - 2] == (char)MazeWall::BARRICADE || map[pos.z][pos.x - 2] == (char)MazeWall::WALL)
+			return true;
+		
+		if (map[pos.z][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z + 1][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z + 2][pos.x + 2] == (char)MazeWall::BARRICADE || map[pos.z + 2][pos.x + 2] == (char)MazeWall::WALL)
+			return true;
+		
+		if (map[pos.z + 3][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x - 1] == (char)MazeWall::WALL)
+			return true;
+		if (map[pos.z + 3][pos.x] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x] == (char)MazeWall::WALL)
+			return true;
 	}
 
 	return false;
@@ -304,7 +876,7 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 	random_device rd;
 	default_random_engine dre{ rd() };
 	uniform_int_distribution<> random{ 0, size };
-
+	uniform_int_distribution<> random_angle{ 0, 23 };
 	vector<int> v;
 	int random_pos;
 	bool same;
@@ -339,7 +911,9 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 		rPos.z = barricade_pos[p].z + pos.z;
 
 		if (p % 2 == 0) {
-			if (CheckBarricade(rPos, false)) {
+			base[t].angle = (ANGLE)random_angle(dre);
+			
+			if (CheckBarricade(rPos, base[t].angle)) {
 				while (1) {
 					random_pos = random(dre);
 
@@ -359,20 +933,22 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 					rPos.x = barricade_pos[random_pos].x + pos.x;
 					rPos.z = barricade_pos[random_pos].z + pos.z;
 
-					if (CheckBarricade(rPos, false))
+					if (CheckBarricade(rPos, base[t].angle))
 						continue;
 
 					break;
 				}
 			}
-			ChangeWall(rPos, false);
+			ChangeWall(rPos, base[t].angle);
 			base[t].x = rPos.x;
 			base[t].z = rPos.z;
-			base[t].dir = DIR::HEIGHT;
+			
 			t++;
 		}
 		else {
-			if (CheckBarricade(rPos, true)) {
+			base[t].angle = (ANGLE)random_angle(dre);
+
+			if (CheckBarricade(rPos, base[t].angle)) {
 				while (1) {
 					random_pos = random(dre);
 
@@ -392,16 +968,17 @@ void Map::MakeMaze(iPos pos, int barricade, iPos* base, iPos end_pos)
 					rPos.x = barricade_pos[random_pos].x + pos.x;
 					rPos.z = barricade_pos[random_pos].z + pos.z;
 
-					if (CheckBarricade(rPos, false))
+					if (CheckBarricade(rPos, base[t].angle))
 						continue;
 
 					break;
 				}
 			}
-			ChangeWall(rPos, true);
+			
+			ChangeWall(rPos, base[t].angle);
 			base[t].x = rPos.x;
 			base[t].z = rPos.z;
-			base[t].dir = DIR::WIDTH;
+			
 			t++;
 		}
 	}
@@ -456,6 +1033,14 @@ void Map::EditMap(iPos sp, iPos ep)
 	}
 }
 
+void Map::MazeTypeInit(iPos* base, BarricadeType b_type, int num)
+{
+	for (int i = 0; i < num; ++i)
+	{
+		base[i].b_type = b_type;
+	}
+}
+
 void Map::Initialize()
 {
 	MakeDoor();
@@ -463,6 +1048,11 @@ void Map::Initialize()
 	MakeMaze(TWO_Base_Pos, Two_Level, two_base, TWO_Base_End_Pos);
 	MakeMaze(THREE_Base_Pos, Three_Level, three_base, THREE_Base_End_Pos);
 	MakeMaze(THREE_Base_Pos2, Three_Level, three_base2, THREE_Base_End_Pos2);
+
+	MazeTypeInit(one_base, BarricadeType::CAR, One_Level);
+	MazeTypeInit(two_base, BarricadeType::TREE, Two_Level);
+	MazeTypeInit(three_base, BarricadeType::BARRICADE, Three_Level);
+	MazeTypeInit(three_base2, BarricadeType::BARRICADE, Three_Level);
 
 	EditMap(One_Base_Pos, One_Base_End_Pos);
 	EditMap(TWO_Base_Pos, TWO_Base_End_Pos);

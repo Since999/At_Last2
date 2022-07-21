@@ -32,6 +32,7 @@ float Server::z_speed;
 bool Server::zombie_send;
 int Server::door_num;
 bool Server::game_start;
+int Server::remain_zombie_num;
 
 Server::Server()
 {
@@ -62,6 +63,7 @@ void Server::Initialize()
 
 	zombie_send = false;
 	game_start = false;
+	remain_zombie_num = 0;
 
 	// 맵 파일을 읽어서 충돌체크용 맵 파일 제작
 	map.ReadMapFile();
@@ -204,12 +206,13 @@ void Server::Send_barricade_packet(int c_id)
 {
 	sc_barricade_packet packet;
 	packet.id = c_id;
-	packet.size = sizeof(packet);
 	packet.type = MsgType::SC_BARRICADE_SEND;
 	memcpy(packet.one_base, map.one_base, sizeof(map.one_base));
 	memcpy(packet.two_base, map.two_base, sizeof(map.two_base));
 	memcpy(packet.three_base, map.three_base, sizeof(map.three_base));
 	memcpy(packet.three_base2, map.three_base2, sizeof(map.three_base2));
+	packet.size = sizeof(packet);
+
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -222,25 +225,28 @@ void Server::Send_game_start_packet(int c_id)
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
+void Server::Send_zombie_number_packet(int c_id, int z_num)
+{
+	sc_zombie_num_packet packet;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_ZOMBIE_NUMBER;
+	packet.zombie_num = z_num;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
 bool Server::MapCheck(MapType map_type)
 {
 	for (auto& cl : g_clients)
 	{
-		//cl.state_lock.lock();
 		if (cl._state != ClientState::INGAME)
 		{
-			//cl.state_lock.unlock();
 			continue;
 		}
-		//cl.state_lock.unlock();
 
-		//cl.map_lock.lock();
 		if (cl.map_type != map_type)
 		{
-			//cl.map_lock.unlock();
 			return false;
 		}
-		//cl.map_lock.unlock();
 	}
 
 	return true;
@@ -515,31 +521,61 @@ void Server::ChangeMapType(Client& cl)
 	{
 		change = MapType::FIRST_PATH;
 		cl.map_type = MapType::FIRST_PATH;
+		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
+		if (MapCheck(MapType::FIRST_PATH))
+		{
+			remain_zombie_num = ROAD_ZOMBIE_NUM;
+		}
 	}
 	else if ((cl.map_type != MapType::CHECK_POINT_ONE) && ((One_Base_Pos.x <= cl.player->x && cl.player->x <= One_Base_End_Pos.x) && (One_Base_Pos.z <= cl.player->z && cl.player->z <= One_Base_End_Pos.z)))
 	{
 		change = MapType::CHECK_POINT_ONE;
 		cl.map_type = MapType::CHECK_POINT_ONE;
+		Send_zombie_number_packet(cl._id, FIRST_CHECK_POINT_ZOMBIE_NUM);
+		if (MapCheck(MapType::FIRST_PATH))
+		{
+			remain_zombie_num = FIRST_CHECK_POINT_ZOMBIE_NUM;
+		}
 	}
 	else if ((cl.map_type != MapType::CHECK_POINT_TWO) && ((TWO_Base_Pos.x <= cl.player->x && cl.player->x <= TWO_Base_End_Pos.x) && (TWO_Base_Pos.z <= cl.player->z && cl.player->z <= TWO_Base_End_Pos.z)))
 	{
 		change = MapType::CHECK_POINT_TWO;
 		cl.map_type = MapType::CHECK_POINT_TWO;
+		Send_zombie_number_packet(cl._id, TWO_CHECK_POINT_ZOMBIE_NUM);
+		if (MapCheck(MapType::FIRST_PATH))
+		{
+			remain_zombie_num = TWO_CHECK_POINT_ZOMBIE_NUM;
+		}
 	}
 	else if ((cl.map_type != MapType::CHECK_POINT_FINAL) && ((THREE_Base_Pos.x <= cl.player->x && cl.player->x <= THREE_Base_End_Pos2.x) && (THREE_Base_Pos.z <= cl.player->z && cl.player->z <= THREE_Base_End_Pos.z)))
 	{
 		change = MapType::CHECK_POINT_FINAL;
 		cl.map_type = MapType::CHECK_POINT_FINAL;
+		Send_zombie_number_packet(cl._id, THREE_CHECK_POINT_ZOMBIE_NUM);
+		if (MapCheck(MapType::FIRST_PATH))
+		{
+			remain_zombie_num = THREE_CHECK_POINT_ZOMBIE_NUM;
+		}
 	}
 	else if((cl.map_type != MapType::SECOND_PATH) && ((Two_Road_Pos.x <= cl.player->x&& cl.player->x <= TWO_Base_Pos.x) && (Two_Road_Pos.z <= cl.player->z&& cl.player->z <= Two_Road_Pos.z + ROAD_SIZE)))
 	{
 		change = MapType::SECOND_PATH;
 		cl.map_type = MapType::SECOND_PATH;
+		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
+		if (MapCheck(MapType::FIRST_PATH))
+		{
+			remain_zombie_num = ROAD_ZOMBIE_NUM;
+		}
 	}
 	else if ((cl.map_type != MapType::FINAL_PATH) && ((Three_Road_Pos.x <= cl.player->x && cl.player->x <= THREE_Base_Pos.x) && (Three_Road_Pos.z <= cl.player->z && cl.player->z <= Three_Road_Pos.z + ROAD_SIZE)))
 	{
 		change = MapType::FINAL_PATH;
 		cl.map_type = MapType::FINAL_PATH;
+		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
+		if (MapCheck(MapType::FIRST_PATH))
+		{
+			remain_zombie_num = ROAD_ZOMBIE_NUM;
+		}
 	}
 	else if ((cl.map_type != MapType::EXIT) && ((Exit_Pos.x <= cl.player->x && cl.player->x <= Exit_End_Pos.x) && (Exit_Pos.z <= cl.player->z && cl.player->z <= Exit_End_Pos.z)))
 	{
@@ -563,10 +599,10 @@ void Server::ChangeMapType(Client& cl)
 		zombie_send = true;
 	}
 		
-	if (MapCheck(cl.map_type)) 
+	if (MapCheck(change)) 
 	{
 		//cout << "좀비를 스폰시킵니다 \n";
-		switch (map_type)
+		switch (change)
 		{
 			case MapType::SECOND_PATH:
 			{
@@ -574,8 +610,15 @@ void Server::ChangeMapType(Client& cl)
 				{
 					if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 					{
-						ZombieDead(zom, MapType::CHECK_POINT_ONE);
+						ZombieAllKill(zom);
 					}
+				}
+
+				for (auto& s_cl : g_clients)
+				{
+					if (s_cl._state != ClientState::INGAME) continue;
+
+					Send_zombie_all_kill_packet(s_cl._id, MapType::CHECK_POINT_ONE);
 				}
 
 				break;
@@ -586,8 +629,15 @@ void Server::ChangeMapType(Client& cl)
 				{
 					if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 					{
-						ZombieDead(zom, MapType::CHECK_POINT_TWO);
+						ZombieAllKill(zom);
 					}
+				}
+
+				for (auto& s_cl : g_clients)
+				{
+					if (s_cl._state != ClientState::INGAME) continue;
+
+					Send_zombie_all_kill_packet(s_cl._id, MapType::CHECK_POINT_TWO);
 				}
 
 				break;
@@ -598,8 +648,15 @@ void Server::ChangeMapType(Client& cl)
 				{
 					if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 					{
-						ZombieDead(zom, MapType::FIRST_PATH);
+						ZombieAllKill(zom);
 					}
+				}
+
+				for (auto& s_cl : g_clients)
+				{
+					if (s_cl._state != ClientState::INGAME) continue;
+
+					Send_zombie_all_kill_packet(s_cl._id, MapType::FIRST_PATH);
 				}
 
 				break;
@@ -610,8 +667,15 @@ void Server::ChangeMapType(Client& cl)
 				{
 					if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 					{
-						ZombieDead(zom, MapType::SECOND_PATH);
+						ZombieAllKill(zom);
 					}
+				}
+
+				for (auto& s_cl : g_clients)
+				{
+					if (s_cl._state != ClientState::INGAME) continue;
+
+					Send_zombie_all_kill_packet(s_cl._id, MapType::SECOND_PATH);
 				}
 
 				break;
@@ -622,8 +686,15 @@ void Server::ChangeMapType(Client& cl)
 				{
 					if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 					{
-						ZombieDead(zom, MapType::FINAL_PATH);
+						ZombieAllKill(zom);
 					}
+				}
+
+				for (auto& s_cl : g_clients)
+				{
+					if (s_cl._state != ClientState::INGAME) continue;
+
+					Send_zombie_all_kill_packet(s_cl._id, MapType::FINAL_PATH);
 				}
 
 				break;
@@ -791,6 +862,16 @@ void Server::Send_player_rotate_packet(int c_id, int s_id, float m_x, float m_z)
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
+void Server::Send_player_zombie_kill_num_packet(int c_id, int s_id, int z_num)
+{
+	sc_player_zombie_klil_packet packet;
+	packet.id = s_id;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_PLAYER_KILL_NUMBER;
+	packet.zom_num = z_num;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
 void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float p_z)
 {
 	bool collied_zombie = cl.player->PlayerAttack(p_x, p_z, npc.zombie->GetX(), npc.zombie->GetZ());
@@ -834,6 +915,13 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 			AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_DEAD, 0);
 			
 			//ZombieDead(npc, m_type);
+			cl.player->kill_zombie += 1;
+			for (auto& other : g_clients)
+			{
+				if (other._state != ClientState::INGAME) continue;
+
+				Send_player_zombie_kill_num_packet(other._id, cl._id, cl.player->kill_zombie);
+			}
 		}
 
 		//zom.zombie->z_attack_lock.unlock();
@@ -2229,6 +2317,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
+		remain_zombie_num = ROAD_ZOMBIE_NUM;
+
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 43.0f;
@@ -2260,6 +2350,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			break;
 		}
+
+		remain_zombie_num = ROAD_ZOMBIE_NUM;
 
 		if (cl._type == PlayerType::COMMANDER)
 		{
@@ -2293,6 +2385,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
+		remain_zombie_num = ROAD_ZOMBIE_NUM;
+
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 634.0f;
@@ -2324,6 +2418,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			break;
 		}
+
+		remain_zombie_num = FIRST_CHECK_POINT_ZOMBIE_NUM;
 
 		if (cl._type == PlayerType::COMMANDER)
 		{
@@ -2357,6 +2453,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
+		remain_zombie_num = TWO_CHECK_POINT_ZOMBIE_NUM;
+
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 512.0f;
@@ -2388,6 +2486,8 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			break;
 		}
+
+		remain_zombie_num = THREE_CHECK_POINT_ZOMBIE_NUM;
 
 		if (cl._type == PlayerType::COMMANDER)
 		{
@@ -2429,8 +2529,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			{
 				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 				{
-					ZombieDead(zom, MapType::FIRST_PATH);
+					ZombieAllKill(zom);
 				}
+			}
+
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME) continue;
+
+				Send_zombie_all_kill_packet(s_cl._id, MapType::FIRST_PATH);
 			}
 
 			break;
@@ -2441,8 +2548,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			{
 				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 				{
-					ZombieDead(zom, MapType::SECOND_PATH);
+					ZombieAllKill(zom);
 				}
+			}
+
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME) continue;
+
+				Send_zombie_all_kill_packet(s_cl._id, MapType::SECOND_PATH);
 			}
 
 			break;
@@ -2453,8 +2567,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			{
 				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 				{
-					ZombieDead(zom, MapType::FINAL_PATH);
+					ZombieAllKill(zom);
 				}
+			}
+
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME) continue;
+
+				Send_zombie_all_kill_packet(s_cl._id, MapType::FINAL_PATH);
 			}
 
 			break;
@@ -2465,8 +2586,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			{
 				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 				{
-					ZombieDead(zom, MapType::CHECK_POINT_ONE);
+					ZombieAllKill(zom);
 				}
+			}
+
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME) continue;
+
+				Send_zombie_all_kill_packet(s_cl._id, MapType::CHECK_POINT_ONE);
 			}
 
 			break;
@@ -2477,8 +2605,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			{
 				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 				{
-					ZombieDead(zom, MapType::CHECK_POINT_TWO);
+					ZombieAllKill(zom);
 				}
+			}
+
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME) continue;
+
+				Send_zombie_all_kill_packet(s_cl._id, MapType::CHECK_POINT_TWO);
 			}
 
 			break;
@@ -2489,8 +2624,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			{
 				if (zom._state == ZombieState::SLEEP || zom._state == ZombieState::SPAWN)
 				{
-					ZombieDead(zom, MapType::CHECK_POINT_FINAL);
+					ZombieAllKill(zom);
 				}
+			}
+
+			for (auto& s_cl : g_clients)
+			{
+				if (s_cl._state != ClientState::INGAME) continue;
+
+				Send_zombie_all_kill_packet(s_cl._id, MapType::CHECK_POINT_FINAL);
 			}
 
 			break;
@@ -2717,7 +2859,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 			}
 			else
 			{
-				cout << "이미 스폰되어 있거나 죽어 있습니다.(그럴 수 없는데?) \n";
 			}
 		}
 
@@ -2927,10 +3068,49 @@ void Server::Send_zombie_dead_packet(int c_id, int z_id, MapType m_type)
 	}
 }
 
+void Server::Send_zombie_all_kill_packet(int c_id, MapType m_type)
+{
+	sc_zombie_all_kill_packet packet;
+	packet.m_type = m_type;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_ZOMBIE_ALL_KILL;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void Server::ZombieAllKill(NPC& npc)
+{
+	npc._state = ZombieState::DEAD;
+	npc.zombie->astar.Delete();
+
+	delete npc.zombie;
+	npc.zombie = nullptr;
+
+	for (auto& cl : g_clients)
+	{
+		//cl.state_lock.lock();
+		if (cl._state != ClientState::INGAME)
+		{
+			//cl.state_lock.unlock();
+			continue;
+		}
+		//cl.state_lock.unlock();
+
+		if (cl.zombie_list.count(npc._id) != 0)
+		{
+			cl.list_lock.lock();
+			cl.zombie_list.erase(npc._id);
+			cl.list_lock.unlock();
+
+			Send_viewlist_remove_packet(cl._id, npc._id, map_type);
+		}
+	}
+}
+
 void Server::ZombieDead(NPC& npc, MapType m_type)
 {
 	npc._state = ZombieState::DEAD;
 	npc.zombie->astar.Delete();
+	remain_zombie_num--;
 
 	delete npc.zombie;
 	npc.zombie = nullptr;
@@ -2955,7 +3135,7 @@ void Server::ZombieDead(NPC& npc, MapType m_type)
 
 			Send_viewlist_remove_packet(cl._id, npc._id, map_type);
 		}
-
+		Send_zombie_number_packet(cl._id, remain_zombie_num);
 		Send_zombie_dead_packet(cl._id, npc._id, m_type);
 	}
 }
@@ -3232,6 +3412,9 @@ void Server::Send_zombie_attack_packet(int c_id, int z_id, MapType m_type)
 
 void Server::ZombiePlayerAttack(NPC& npc, MapType m_type)
 {
+	if (npc._state != ZombieState::SPAWN)
+		return;
+
 	// 각 클라이언트에게 좀비가 공격 모션 하라고 전달
 	for (auto& cl : g_clients)
 	{
@@ -3826,8 +4009,8 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 
 	if (npc.zombie->root.size() == 1)
 	{
-		npc.astar_check = false;
 		npc.zombie->astar.Delete();
+		npc.astar_check = false;
 	}
 
 	if (npc.astar_check)

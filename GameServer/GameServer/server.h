@@ -58,11 +58,6 @@ public:
 	static mutex spawn_lock;
 	static mutex map_lock;
 
-	//static chrono::system_clock::time_point start_time;
-	//static chrono::system_clock::time_point end_time;
-	//static chrono::system_clock::time_point zombie_start_time;
-	//static chrono::system_clock::time_point zombie_end_time;
-
 	static float s_speed;
 	static float z_speed;
 	static chrono::milliseconds sec;
@@ -70,6 +65,7 @@ public:
 	static bool zombie_send;
 	static bool game_start;
 	static int door_num;
+	static int remain_zombie_num;
 
 	static CGameTimer game_timer;
 public:
@@ -95,6 +91,7 @@ public:
 	static void Send_player_reload_packet(int c_id, int s_id, int bullet);
 	static void Send_player_rotate_packet(int c_id, int s_id, float m_x, float m_z);
 	static void Send_player_idle_packet(int c_id, int s_id);
+	static void Send_player_zombie_kill_num_packet(int c_id, int s_id, int z_num);
 	static void Send_commander_skill_packet(int c_id, int s_id);
 	static void Send_commander_skill_check_packet(int c_id, int s_id);
 	static void Send_engineer_skill_packet(int c_id,int s_id, int t_x, int t_z);
@@ -111,6 +108,8 @@ public:
 	static void Send_zombie_search_packet(int c_id, int s_id, int z_id, MapType m_type);
 	static void Send_zombie_attack_packet(int c_id, int z_id, MapType m_type);
 	static void Send_zombie_arrive_packet(int c_id, int z_id, MapType m_type, Direction dir);
+	static void Send_zombie_number_packet(int c_id, int z_num);
+	static void Send_zombie_all_kill_packet(int c_id, MapType m_type);
 	static void Send_gm_change_map_packet(int c_id, int s_id, int x, int z);
 	static void Send_gm_hp_packet(int c_id, int s_id);
 	static void AddTimer(int z_id, EVENT_TYPE type, int duration);
@@ -134,6 +133,7 @@ public:
 	static void ZombieMove(int z_id);
 	static void ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_pos);
 	static void ZombieDead(NPC& npc, MapType m_type);
+	static void ZombieAllKill(NPC& npc);
 	static void ZombieAttack(int z_id);
 	static void ZombiePlayerAttack(NPC& npc, MapType m_type);
 	static bool ZombieAttackRangeCheck(Direction dir, float att_range, float x, float z, float c_x, float c_z);

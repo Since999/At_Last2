@@ -15,6 +15,7 @@ public:
 	float speed;
 	DIR special_dir;
 	Direction dir;
+	int kill_zombie;
 
 public:
 	Player();

@@ -13,6 +13,7 @@ Client::Client()
 	special_id = -1;
 	special_skill = 0;
 	left_bullet = 30;
+	zombie_kill_num = 0;
 }
 
 Client::~Client()
