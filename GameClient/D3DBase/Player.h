@@ -76,6 +76,8 @@ public:
 	float GetRoll() const { return(m_fRoll); }
 
 	void SetYaw(float yaw) { m_fYaw = yaw; }
+	void SetRoll(float roll) { m_fRoll = roll; }
+	void SetPitch(float pitch) { m_fPitch = pitch; }
 
 	CCamera* GetCamera() { return(m_pCamera); }
 	void SetCamera(CCamera* pCamera) { m_pCamera = pCamera; }

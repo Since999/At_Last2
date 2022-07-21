@@ -504,15 +504,21 @@ void CGameFramework::BuildObjects()
 	ui_system = new UISystem(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
 	particle_system = ParticleSystem::InitInstance(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
 
-	m_pScene->m_pPlayer = m_pPlayer = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10, 
-		CConfiguration::player_models[0], CConfiguration::player_textures[0].c_str());
-	m_pScene->m_pPlayer2 = m_pPlayer2 = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10, 
-		CConfiguration::player_models[1], CConfiguration::player_textures[1].c_str());
-	m_pScene->m_pPlayer3 = m_pPlayer3 = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10, 
-		CConfiguration::player_models[2], CConfiguration::player_textures[2].c_str());
+
 
 	bottom = -580.0;
 #ifdef ENABLE_NETWORK
+	unsigned int model_index;
+	model_index = (int)(network.g_client[network.my_id]._type);
+	m_pScene->m_pPlayer = m_pPlayer = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10,
+		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+	model_index = (int)(network.g_client[network.other_client_id1]._type);
+	m_pScene->m_pPlayer2 = m_pPlayer2 = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10,
+		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+	model_index = (int)(network.g_client[network.other_client_id2]._type);
+	m_pScene->m_pPlayer3 = m_pPlayer3 = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10,
+		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+
 	m_pPlayer->SetPosition({ (network.g_client[network.my_id].Get_Client_X() - 550.0f)*(-100.0f), 00.0f, (network.g_client[network.my_id].Get_Client_Z() - 210.0f)*(-100.0f)});
 
 	m_pPlayer->SetPosition({ 50500.0f, bottom, 14000.0f });
@@ -521,6 +527,16 @@ void CGameFramework::BuildObjects()
 	
 	client_player = m_pPlayer;
 #else
+	unsigned int model_index = 3;
+	m_pScene->m_pPlayer = m_pPlayer = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10,
+		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+	model_index--;
+	m_pScene->m_pPlayer2 = m_pPlayer2 = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10,
+		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+	model_index--;
+	m_pScene->m_pPlayer3 = m_pPlayer3 = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10,
+		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+
 	m_pPlayer->SetPosition({ 50500.0f, bottom, 14000.0f });
 	m_pPlayer2->SetPosition({ 50500.0f, bottom, 14000.0f });
 	m_pPlayer3->SetPosition({ 50500.0f, bottom, 14000.0f });
