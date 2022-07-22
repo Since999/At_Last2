@@ -230,10 +230,10 @@ CZombie::CZombie(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	state_machine = new CZombieStateMachine(this);
 }
 
-CZombie::CZombie() : CAnimationObject()
+CZombie::CZombie(const string& model_name, const wstring& tex_name) : CAnimationObject()
 {
 	if (model == NULL) {
-		SkinModel* nmodel = ModelManager::GetModel("Z1.fbx", L"Zombie.png");
+		SkinModel* nmodel = ModelManager::GetModel(model_name, tex_name);
 
 		/*SkinModel* nmodel = ModelLoader::LoadModel("Resources/Model/Z1_Nomal_.fbx");
 
@@ -248,7 +248,7 @@ CZombie::CZombie() : CAnimationObject()
 	}
 	state_machine = new CZombieStateMachine(this);
 	SetPitch(90.f);
-	size = 0.5f;
+	size = 0.4f;
 }
 
 void CZombie::Animate(float fTimeElapsed) 
