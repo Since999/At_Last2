@@ -59,7 +59,8 @@ public:
 
 	CCamera* GetCamera() const { return m_pCamera; }
 
-	CPlayer* GetPlayer() const { return client_player; }
+	void ChangeScene(CScene* scene);
+	void ChangeUI(UISystem* ui_sys);
 
 	void StartEvent();
 private:
@@ -103,7 +104,6 @@ private:
 	ID3D12Resource* cb_shadow_map = NULL;
 
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mNullSrv;
-	CSunLight* sun_light = NULL;
 
 
 #if defined(_DEBUG)
@@ -112,16 +112,15 @@ private:
 
 	CGameTimer					m_GameTimer;
 
-	CScene* m_pScene = NULL;
-	CPlayer* m_pPlayer = NULL;
-	CPlayer* m_pPlayer2 = NULL;
-	CPlayer* m_pPlayer3 = NULL;
-	CPlayer* client_player = NULL;
-	CCamera* m_pCamera = NULL;
+
 
 	POINT						m_ptOldCursorPos;
 
 	_TCHAR						m_pszFrameRate[50];
+public:
+
+	CScene* m_pScene = NULL;
+	CCamera* m_pCamera = NULL;
 
 	UISystem* ui_system = NULL;
 	ParticleSystem* particle_system = NULL;

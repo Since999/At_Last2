@@ -61,12 +61,13 @@ x = "1120"
 y ="240"
 image="Resources/UI/background.png"/>
  
- <UI
+ <Button
 width ="70"
 height ="20"
 x = "1120"
 y ="240"
-image="Resources/UI/Login.png"/>
+image="Resources/UI/Login.png"
+action="login"/>
   <!-- <BAR
 width ="500"
 height ="10"

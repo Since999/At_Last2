@@ -372,5 +372,11 @@
     <Xml Include="Resources\Sound\Sound.xml">
       <Filter>리소스 파일</Filter>
     </Xml>
+    <Xml Include="Resources\UI\lobby_UI.xml">
+      <Filter>리소스 파일\UI</Filter>
+    </Xml>
+    <Xml Include="Resources\UI\lobby_UI_2.xml">
+      <Filter>리소스 파일\UI</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

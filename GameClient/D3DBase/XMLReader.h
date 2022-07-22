@@ -14,7 +14,10 @@ public:
 	static void LoadSound(const wstring& file_name, CSoundSystem* sys);
 private:
 	static void GetNumberUI(CMarkup& xml, UISystem* ui);
-	static const map<wstring, int*>&  GetVariable_map();
+	static void GetButtonUI(CMarkup& xml, UISystem* ui);
+	static const map<wstring, int*>&  GetVariableMap();
+	static const map<wstring, function<void()>>& GetFunctionMap();
 	static map<wstring, int*> variable_map;
+	static map<wstring, function<void()>> function_map;
 };
 

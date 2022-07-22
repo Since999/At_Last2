@@ -9,6 +9,8 @@
 #include "Object.h"
 #include "Configuration.h"
 #include "Bullet.h"
+#include "SoundSystem.h"
+#include "2DShader.h"
 
 DebugObject dd;
 
@@ -53,7 +55,6 @@ CGameFramework::CGameFramework()
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
 
 	m_pScene = NULL;
-	m_pPlayer = NULL;
 
 	_tcscpy_s(m_pszFrameRate, _T("At Last... ("));
 }
@@ -391,9 +392,22 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	switch (nMessageID)
 	{
 	case WM_LBUTTONDOWN:
-	case WM_RBUTTONDOWN:
+	{
 		::SetCapture(hWnd);
 		::GetCursorPos(&m_ptOldCursorPos);
+		ScreenToClient(hWnd, &m_ptOldCursorPos);
+
+		RECT rect;
+		GetClientRect(m_hWnd, &rect);
+		float width = rect.right - rect.left;
+		float height = rect.bottom - rect.top;
+		float x = (float)(m_ptOldCursorPos.x) / width;
+		float y = (float)(m_ptOldCursorPos.y) / height;
+		y = 1 - y;
+		ui_system->CheckMouseCollision(x, y);
+	}
+		break;
+	case WM_RBUTTONDOWN:
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
@@ -492,50 +506,24 @@ void CGameFramework::OnDestroy()
 	if (m_pd3dDevice) m_pd3dDevice->Release();
 	if (m_pdxgiFactory) m_pdxgiFactory->Release();
 }
-#include "2DShader.h"
+
 void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
 	CConfiguration::Init();
+	CSoundSystem::GetInstance();
 
-	m_pScene = new CScene();
-	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
-	ui_system = new UISystem(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
+	/*CMainGameScene* scene = new CMainGameScene();
+	m_pScene = scene;
+	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	*/
+	auto lobby = new CLobbyScene();
+	lobby->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	m_pScene = lobby;
+
 	particle_system = ParticleSystem::InitInstance(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
 
-	m_pScene->m_pPlayer = m_pPlayer = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10, 
-		CConfiguration::player_models[0], CConfiguration::player_textures[0].c_str());
-	m_pScene->m_pPlayer2 = m_pPlayer2 = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10, 
-		CConfiguration::player_models[1], CConfiguration::player_textures[1].c_str());
-	m_pScene->m_pPlayer3 = m_pPlayer3 = new CMainGamePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 10, 
-		CConfiguration::player_models[2], CConfiguration::player_textures[2].c_str());
-
-	bottom = -580.0;
-#ifdef ENABLE_NETWORK
-	m_pPlayer->SetPosition({ (network.g_client[network.my_id].Get_Client_X() - 550.0f)*(-100.0f), 00.0f, (network.g_client[network.my_id].Get_Client_Z() - 210.0f)*(-100.0f)});
-
-	m_pPlayer->SetPosition({ 50500.0f, bottom, 14000.0f });
-	m_pPlayer2->SetPosition({ (network.g_client[network.other_client_id1].Get_Client_X() - 550.0f)* (-100.0f), 00.0f, (network.g_client[network.other_client_id1].Get_Client_Z() - 210.0f)* (-100.0f) });
-	m_pPlayer3->SetPosition({ (network.g_client[network.other_client_id2].Get_Client_X() - 550.0f) * (-100.0f), 00.0f, (network.g_client[network.other_client_id2].Get_Client_Z() - 210.0f) * (-100.0f) });
-	
-	client_player = m_pPlayer;
-#else
-	m_pPlayer->SetPosition({ 50500.0f, bottom, 14000.0f });
-	m_pPlayer2->SetPosition({ 50500.0f, bottom, 14000.0f });
-	m_pPlayer3->SetPosition({ 50500.0f, bottom, 14000.0f });
-	client_player = m_pPlayer;
-#endif
-	((CMainGamePlayer*)m_pPlayer)->SetPlayerInfo(&network.g_client[network.my_id]);
-	((CMainGamePlayer*)m_pPlayer2)->SetPlayerInfo(&network.g_client[network.other_client_id1]);
-	((CMainGamePlayer*)m_pPlayer3)->SetPlayerInfo(&network.g_client[network.other_client_id2]);
-
-	client_player->ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
-	m_pCamera = client_player->GetCamera();
-
-	m_pCamera->CreateShaderVariables(m_pd3dDevice, m_pd3dCommandList);
-
-	sun_light = new CSunLight(m_pPlayer);
 #ifdef SHADOW_TEXTURE_RENDER
 	vector<DebugVertex> dv;
 	DebugVertex tmp;
@@ -582,12 +570,6 @@ void CGameFramework::BuildObjects()
 
 void CGameFramework::ReleaseObjects()
 {
-	if (m_pPlayer) delete m_pPlayer;
-	if (m_pPlayer2) delete m_pPlayer2;
-	if (m_pPlayer3) delete m_pPlayer3;
-
-	if (sun_light) delete sun_light;
-
 	if (m_pScene) m_pScene->ReleaseObjects();
 	if (m_pScene) delete m_pScene;
 }
@@ -595,174 +577,9 @@ void CGameFramework::ReleaseObjects()
 void CGameFramework::ProcessInput()
 {
 	static UCHAR pKeysBuffer[256];
-	bool bProcessedByScene = false;
-	if (GetKeyboardState(pKeysBuffer) && m_pScene) bProcessedByScene = m_pScene->ProcessInput(pKeysBuffer);
-	if (!bProcessedByScene)
-	{
-		DWORD dwDirection = 0;
-
-		if ((pKeysBuffer['W'] & 0xF0)) dwDirection |= DIR_FORWARD;
-		if ((pKeysBuffer['S'] & 0xF0)) dwDirection |= DIR_BACKWARD;
-		if ((pKeysBuffer['A'] & 0xF0)) dwDirection |= DIR_LEFT;
-		if ((pKeysBuffer['D'] & 0xF0)) dwDirection |= DIR_RIGHT;
-		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
-		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-#ifdef _DEBUG
-		if (pKeysBuffer[VK_OEM_PLUS] & 0xF0 || pKeysBuffer[VK_ADD] & 0xF0) {
-			if (m_pCamera) m_pCamera->AddDistance(50.0f);
-		}
-		if (pKeysBuffer[VK_OEM_MINUS] & 0xF0 || pKeysBuffer[VK_SUBTRACT] & 0xF0) {
-			if (m_pCamera) m_pCamera->AddDistance(-50.0f);
-		}
-#endif
-#ifdef ENABLE_NETWORK
-		if ((pKeysBuffer['E'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_PLAYER_INTERATION);
-		}
-		// 채팅용 키 엔터 또는 등등을 만들어야 할 수도 있음 현재는 만들지 않음
-
-		if ((pKeysBuffer['R'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
-		}
-
-		if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false && network.g_client[network.my_id].special_skill > 0)
-		{
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_PLAYER_SPECIAL);
-		}
-
-		if ((pKeysBuffer['C'] & 0xF0) && network.g_client[network.my_id].special_skill_key == true)
-		{
-			network.g_client[network.my_id].special_skill_key = false;
-			network.Send_commander_special_req_packet(network.g_client[network.my_id].special_id);
-		}
-
-		if ((pKeysBuffer['V'] & 0xF0) && network.g_client[network.my_id].special_skill_key == true)
-		{
-			network.g_client[network.my_id].special_skill_key = false;
-			network.Send_commander_special_req_packet(network.g_client[network.my_id].special_id);
-		}
-
-		if ((pKeysBuffer['I'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_ROAD_ONE);
-		}
-
-		if ((pKeysBuffer['O'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_ROAD_TWO);
-		}
-
-		if ((pKeysBuffer['P'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_ROAD_THREE);
-		}
-
-		if ((pKeysBuffer['J'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_ONE);
-		}
-
-		if ((pKeysBuffer['K'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_TWO);
-		}
-
-		if ((pKeysBuffer['L'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_THREE);
-		}
-
-		if ((pKeysBuffer['N'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_ZOMBIE_ALL_KILL);
-		}
-
-		if ((pKeysBuffer['M'] & 0xF0) && network.key_down_state == false) {
-			network.key_down_state = true;
-			network.Send_request_packet(MsgType::CS_GM_PLAYER_HP_UP);
-		}
-#endif
-
-		float cxDelta = 0.0f, cyDelta = 0.0f;
-		POINT ptCursorPos;
-		//if (GetCapture() == m_hWnd)
-		{
-			//SetCursor(NULL);
-			GetCursorPos(&ptCursorPos);
-			ScreenToClient(m_hWnd, &ptCursorPos);
-			//cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
-			//cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
-			//SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
-			RECT rect;
-			GetClientRect(m_hWnd, &rect);
-			int width = rect.right - rect.left;
-			int height = rect.bottom - rect.top;
-			XMVECTOR cursor_direction = { ptCursorPos.x - (width / 2), ptCursorPos.y - (height / 2) };
-			cursor_direction = XMVector2Normalize(cursor_direction);
-			network.g_client[network.my_id].mx = cursor_direction.m128_f32[0];
-			network.g_client[network.my_id].mz = cursor_direction.m128_f32[1];
-			if (GetCapture() == m_hWnd)
-			{
-				((CMainGamePlayer*)client_player)->StartFire();
-			}
-			else {
-				((CMainGamePlayer*)client_player)->StopFire();
-			}
-		}
-
-#ifdef ENABLE_NETWORK
-		if (network.mouse_state == false)
-		{
-			network.mouse_state = true;
-			network.Send_rotate_packet(network.g_client[network.my_id].mx, network.g_client[network.my_id].mz);
-		}
-
-		if (GetCapture() == m_hWnd && network.attack_state == false)
-		{
-			network.attack_state = true;
-			int m_x = ptCursorPos.x - 640;
-			int m_z = ptCursorPos.y - 360;
-			network.Send_attack_packet(m_x, m_z);
-		}
-#endif
-		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
-		{
-			if (cxDelta || cyDelta)
-			{
-				//if (pKeysBuffer[VK_RBUTTON] & 0xF0)
-					//m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-				//else
-					//m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
-			}
-			if (dwDirection) client_player->Move(dwDirection, 200.0f * m_GameTimer.GetTimeElapsed(), true);
-		}
-		//direction
-
-		//if (dwDirection)
-		{
-			XMVECTOR direction = {0.0f, 0.0f};
-		
-			if (dwDirection & DIR_FORWARD) direction += {1.0f, 0.0f};
-			if (dwDirection & DIR_BACKWARD) direction += {-1.0f, 0.0f};
-			if (dwDirection & DIR_RIGHT) direction += {0.0f, -1.0f};
-			if (dwDirection & DIR_LEFT) direction += {0.0f, 1.0f};
-			direction = XMVector2Normalize(direction);
-
-			XMFLOAT2 dest;
-			XMStoreFloat2(&dest, direction);
-			network.g_client[network.my_id].ProcessInput(dest.x, dest.y);
-			/*network.g_client[network.my_id].t_x = dest.x;
-			network.g_client[network.my_id].t_z = dest.y;*/
-		}
-		//else {
-			/*network.g_client[network.my_id].t_x = 0;
-			network.g_client[network.my_id].t_z = 0;*/
-		//}
+	if (GetKeyboardState(pKeysBuffer) && m_pScene) {
+		m_pScene->ProcessInput(pKeysBuffer, m_hWnd);
 	}
-	
 }
 
 void CGameFramework::AnimateObjects()
@@ -773,12 +590,6 @@ void CGameFramework::AnimateObjects()
 
 	if (m_pScene) m_pScene->AnimateObjects(TIMEMANAGER.GetTimeElapsed());
 
-	m_pPlayer2->Update(m_GameTimer.GetTimeElapsed());
-	m_pPlayer3->Update(m_GameTimer.GetTimeElapsed());
-	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
-
-	sun_light->Update(XMFLOAT3(), m_GameTimer.GetTimeElapsed());
-
 	particle_system->AnimateObjects(m_GameTimer.GetTimeElapsed());
 	ui_system->AnimateObjects(m_GameTimer.GetTimeElapsed());
 }
@@ -786,9 +597,6 @@ void CGameFramework::AnimateObjects()
 void CGameFramework::UpdateShaderVariables()
 {
 	if (m_pScene) m_pScene->UpdateShaderVariables(m_pd3dCommandList);
-	m_pPlayer2->UpdateShaderVariables(m_pd3dCommandList);
-	m_pPlayer3->UpdateShaderVariables(m_pd3dCommandList);
-	m_pPlayer->UpdateShaderVariables(m_pd3dCommandList);
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -861,11 +669,6 @@ void CGameFramework::FrameAdvance()
 #endif
 #endif
 
-	renderTime += m_GameTimer.GetTimeElapsed();
-	if (renderTime >= PRINT_RATE) {
-		DirectX::Image a;	
-	}
-
 	//	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
 	MoveToNextFrame();
 
@@ -887,13 +690,8 @@ void CGameFramework::ShadowMapRender()
 	m_pd3dCommandList->RSSetViewports(1, &m_ShadowMap->Viewport());
 	m_pd3dCommandList->RSSetScissorRects(1, &m_ShadowMap->ScissorRect());
 
-	sun_light->UpdateShaderVariables(m_pd3dCommandList);
-
 	//Render
 	m_pScene->ShadowMapRender(m_pd3dCommandList);
-	m_pPlayer->ShadowMapRender(m_pd3dCommandList);
-	m_pPlayer2->ShadowMapRender(m_pd3dCommandList);
-	m_pPlayer3->ShadowMapRender(m_pd3dCommandList);
 
 	m_pd3dCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_ShadowMap->Resource(),
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ ));
@@ -931,13 +729,6 @@ void CGameFramework::Render()
 	
 	m_pScene->Render(m_pd3dCommandList, m_pCamera);
 
-#ifdef _WITH_PLAYER_TOP
-	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-#endif
-	m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
-	m_pPlayer2->Render(m_pd3dCommandList, m_pCamera);
-	m_pPlayer3->Render(m_pd3dCommandList, m_pCamera);
-
 	particle_system->Render(m_pd3dCommandList, m_pCamera);
 
 #ifdef SHADOW_TEXTURE_RENDER
@@ -952,4 +743,31 @@ void CGameFramework::Render()
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	m_pd3dCommandList->ResourceBarrier(1, &d3dResourceBarrier);
 
+}
+
+void CGameFramework::ChangeScene(CScene* scene)
+{
+	if (m_pScene) {
+		delete m_pScene;
+	}
+	m_pScene = scene;
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+
+	m_pd3dCommandList->Close();
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+
+	WaitForGpuComplete();
+	if (m_pScene) m_pScene->ReleaseUploadBuffers();
+
+	m_GameTimer.Reset();
+}
+
+void CGameFramework::ChangeUI(UISystem* ui_sys)
+{
+	if (ui_system) {
+		delete ui_system;
+	}
+	ui_system = ui_sys;
 }

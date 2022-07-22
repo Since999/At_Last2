@@ -3,15 +3,33 @@
 #include "XMLReader.h"
 #include "2DObject.h"
 #include "SoundSystem.h"
+#include "GameFramework.h"
 map<wstring, int*> CXMLReader::variable_map;
+map<wstring, function<void()>> CXMLReader::function_map;
 
-const map<wstring, int*>& CXMLReader::GetVariable_map()
+const map<wstring, int*>& CXMLReader::GetVariableMap()
 {
     if (!variable_map.empty()) return variable_map;
     variable_map.emplace(L"skill", &(Network::g_client[Network::my_id].special_skill));
     variable_map.emplace(L"left bullet", &(Network::g_client[Network::my_id].left_bullet));
     
     return variable_map;
+}
+const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
+{
+    if (!function_map.empty()) return function_map;
+    function_map.emplace(L"login", []() {
+        auto framework = CGameFramework::GetInstance();
+        auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
+        framework->ChangeScene(new CSelectScene(sig));
+    });
+    function_map.emplace(L"game start", []() {
+        auto framework = CGameFramework::GetInstance();
+        auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
+        framework->ChangeScene(new CMainGameScene(sig));
+    });
+
+    return function_map;
 }
 
 bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
@@ -46,13 +64,14 @@ bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
         ui->AddProgressBar(width, height, x, y, image_file_name);
     }
     GetNumberUI(xml, ui);
+    GetButtonUI(xml, ui);
     
     return true;
 }
 
 void CXMLReader::GetNumberUI(CMarkup& xml, UISystem* ui)
 {
-    const auto& map = GetVariable_map();
+    const auto& map = GetVariableMap();
     while (xml.FindElem(L"Number")) {
         float width = _wtof(xml.GetAttrib(L"width"));
         float height = _wtof(xml.GetAttrib(L"height"));
@@ -61,15 +80,43 @@ void CXMLReader::GetNumberUI(CMarkup& xml, UISystem* ui)
         int digit = _wtoi(xml.GetAttrib(L"digit"));
         wstring variable_name = std::wstring(xml.GetAttrib(L"variable").operator LPCWSTR());
         auto& found = map.find(variable_name);
-        if (found != map.end()) {
-            ui->AddNumberUI(width, height, x, y, digit, (*found).second);
-        }
+        if (found == map.end()) {
 #ifdef _DEBUG
-        else {
-            cout << "Error (GetNumberUI): no such variable in map." << endl;
-            wcout << "\tstring: " << variable_name << endl;
-        }
+        cout << "Error (GetNumberUI): no such variable in map." << endl;
+        wcout << "\tstring: " << variable_name << endl;
 #endif
+            continue; 
+        }
+        ui->AddNumberUI(width, height, x, y, digit, (*found).second);
+
+    }
+}
+
+void CXMLReader::GetButtonUI(CMarkup& xml, UISystem* ui)
+{
+    auto& func_map = GetFunctionMap();
+    float width;
+    float height;
+    float x;
+    float y;
+    wstring image_file_name;
+    wstring func_name;
+    while (xml.FindElem(L"Button")) {
+        width = _wtof(xml.GetAttrib(L"width"));
+        height = _wtof(xml.GetAttrib(L"height"));
+        x = _wtof(xml.GetAttrib(L"x"));
+        y = _wtof(xml.GetAttrib(L"y"));
+        image_file_name = std::wstring(xml.GetAttrib(L"image").operator LPCWSTR());
+        func_name = std::wstring(xml.GetAttrib(L"action").operator LPCWSTR());
+        auto& found = func_map.find(func_name);
+        if (found == func_map.end()) {
+#ifdef _DEBUG
+            cout << "Error (GetButtonUI): no such function in map." << endl;
+            wcout << "\tstring: " << func_name << endl;
+#endif
+            continue;
+        }
+        ui->AddButtonUI(width, height, x, y, image_file_name, (*found).second);
     }
 }
 

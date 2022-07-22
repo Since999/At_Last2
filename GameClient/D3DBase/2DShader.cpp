@@ -159,11 +159,11 @@ void C2DShaderSample::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 //////////////////////////////////////////////////////////////////////////////////////////////
 //UISystem
 
-UISystem::UISystem(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig)
+UISystem::UISystem(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig, const string& file_name)
 	: C2DShader()
 {
 	CreateShader(device, root_sig);
-	BuildObjects(device, cmdlist);
+	BuildObjects(device, cmdlist, file_name);
 	camera = new UICamera();
 	camera->CreateShaderVariables(device, cmdlist);
 	root_signagture = root_sig;
@@ -191,7 +191,7 @@ void UISystem::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 	}
 }
 
-void UISystem::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+void UISystem::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const string& xml_file_name)
 {
 	max_object = MAX_UI;
 
@@ -208,7 +208,7 @@ void UISystem::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	}
 	CNumberUIComponent::SetTextures(textures);
 
-	CXMLReader::GetUISetting("Resources/UI/TestUI.xml", this);
+	CXMLReader::GetUISetting(xml_file_name, this);
 }
 
 void UISystem::AddUI(float width, float height, float x, float y, const wstring& image_file_name)
@@ -236,6 +236,27 @@ void UISystem::AddProgressBar(float width, float height, float x, float y, const
 	CGameObject* object = new CProgressBar(width, height, x, y, material, 100, &(Network::g_client[Network::my_id].hp));
 	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
 	AddObject(object);
+}
+
+void UISystem::AddButtonUI(float width, float height, float x, float y, const wstring& image_file_name, function<void()> func)
+{
+	CTexture* texture = GetTexture(image_file_name);
+	CMaterial* material = new CMaterial();
+	material->SetTexture(texture);
+	CGameObject* object = new CButtonUI(width, height, x, y, func, material);
+	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
+	AddObject(object);
+}
+
+void UISystem::CheckMouseCollision(float x, float y)
+{
+	x = x * UI_SCREEN_WIDTH;
+	y = y * UI_SCREEN_HEIGHT;
+	for (CGameObject* object : object_list) {
+		if (((CUIObject*)object)->CheckMouseCollision(x, y)) {
+			return;
+		}
+	}
 }
 
 void UISystem::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -282,7 +303,7 @@ void ParticleSystem::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	if(pCamera) auto cameraPos = pCamera->GetPosition();
 	else {
 #ifdef _DEBUG
-		cout << "no Camera" << endl;
+		//cout << "no Camera" << endl;
 #endif
 	}
 	object_list.sort([cameraPos](CGameObject* a, CGameObject* b) {
