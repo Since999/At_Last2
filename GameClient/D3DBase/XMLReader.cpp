@@ -125,6 +125,7 @@ void CXMLReader::GetButtonUI(CMarkup& xml, UISystem* ui)
             cout << "Error (GetButtonUI): no such function in map." << endl;
             wcout << "\tstring: " << func_name << endl;
 #endif
+            ui->AddButtonUI(width, height, x, y, image_file_name, []() {});
             continue;
         }
         ui->AddButtonUI(width, height, x, y, image_file_name, (*found).second);
