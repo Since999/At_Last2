@@ -57,6 +57,9 @@ bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
         image_file_name = std::wstring(xml.GetAttrib(L"image").operator LPCWSTR());
         ui->AddUI(width, height, x, y, image_file_name);
     }
+    xml.ResetPos();
+    xml.FindElem(L"UISystem");
+    xml.IntoElem();
     while (xml.FindElem(L"BAR")) {
         width = _wtof(xml.GetAttrib(L"width"));
         height = _wtof(xml.GetAttrib(L"height"));
@@ -73,6 +76,9 @@ bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
 
 void CXMLReader::GetNumberUI(CMarkup& xml, UISystem* ui)
 {
+    xml.ResetPos();
+    xml.FindElem(L"UISystem");
+    xml.IntoElem();
     const auto& map = GetVariableMap();
     while (xml.FindElem(L"Number")) {
         float width = _wtof(xml.GetAttrib(L"width"));
@@ -103,6 +109,9 @@ void CXMLReader::GetButtonUI(CMarkup& xml, UISystem* ui)
     float y;
     wstring image_file_name;
     wstring func_name;
+    xml.ResetPos();
+    xml.FindElem(L"UISystem");
+    xml.IntoElem();
     while (xml.FindElem(L"Button")) {
         width = _wtof(xml.GetAttrib(L"width"));
         height = _wtof(xml.GetAttrib(L"height"));
