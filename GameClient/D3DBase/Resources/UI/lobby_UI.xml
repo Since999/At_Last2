@@ -60,13 +60,14 @@ height ="80"
 x = "960"
 y ="240"
 image="Resources/UI/B_back.png"/> -->
- 
- <UI
+  <Button
 width ="440"
 height ="80"
 x = "960"
 y ="240"
-image="Resources/UI/Login.png"/>
+image="Resources/UI/Login.png"
+action="login"/>
+
   <!-- <BAR
 width ="500"
 height ="10"

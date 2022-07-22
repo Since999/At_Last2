@@ -385,7 +385,7 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 	//UpdateBoneTransforms(fTimeElapsed);
 	//animation_time += fTimeElapsed * 30.0f;
 	CPlayer::Update(fTimeElapsed);
-	
+#ifndef ENABLE_NETWORK
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Gravity, fTimeElapsed, false));
 	float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 	float fMaxVelocityXZ = m_fMaxVelocityXZ * fTimeElapsed;
@@ -400,6 +400,11 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 
 	Move(m_xmf3Velocity, false);
 
+	fLength = Vector3::Length(m_xmf3Velocity);
+	float fDeceleration = (m_fFriction * fTimeElapsed);
+	if (fDeceleration > fLength) fDeceleration = fLength;
+	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
+#endif
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
 
 	if (m_pCamera) {
@@ -409,11 +414,6 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 		if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
 		m_pCamera->RegenerateViewMatrix();
 	}
-
-	fLength = Vector3::Length(m_xmf3Velocity);
-	float fDeceleration = (m_fFriction * fTimeElapsed);
-	if (fDeceleration > fLength) fDeceleration = fLength;
-	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
 
 #ifdef ENABLE_NETWORK
 	//server sync
@@ -476,6 +476,9 @@ void CMainGamePlayer::Fire()
 		new CBullet(pos, dir));
 
 	CSoundSystem::GetInstance()->Play(L"gun fire");
+	//Test
+	ParticleSystem::GetInstance()->AddModelParticle(GetPosition(), L"lightning");
+	//Test
 #ifdef ENABLE_NETWORK
 	Network::Send_attack_packet(server_player_info->mx, server_player_info->mz);
 #endif

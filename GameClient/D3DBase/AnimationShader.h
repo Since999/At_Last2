@@ -28,10 +28,15 @@ public:
 class CAnimationObjectShader : public CAnimationShader
 {
 public:
+	static CAnimationObjectShader* GetInstance() { return singleton; }
+private:
+	static CAnimationObjectShader* singleton;
+public:
 	CAnimationObjectShader(ID3D12Device* device, ID3D12GraphicsCommandList* com_list, ID3D12RootSignature* root_sig);
 	~CAnimationObjectShader();
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	virtual void AnimateObjects(float fTimeElapsed);
+	void RemoveObjects();
 	virtual void ReleaseObjects();
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
@@ -48,22 +53,23 @@ public:
 	virtual void ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void AddZombie(Zombie*);
-	virtual void DeleteZombie(int num);
+	virtual void DeleteZombie(CGameObject* object);
 
 	virtual void AddZombieInNetwork();
 	template<class Arr>
 	void CheckZombies(Arr arr);
 
-public:
-	static CAnimationObjectShader* GetInstance() { return singleton; }
-private:
-	static CAnimationObjectShader* singleton;
 protected:
-	std::map<int, CAnimationObject*> objects;
+	std::list<CAnimationObject*> objects;
+	vector<CGameObject*> remove_list;
+
 	unsigned int max_object_num = 400;
 
 	ID3D12Resource* m_pd3dcbGameObjects = NULL;
 	CB_ANIMATION_OBJECT_INFO* m_pcbMappedGameObjects = NULL;
 
 	CShadowShader* shadow_shader = NULL;
+	map<ZombieType, pair<string, wstring>> zombie_model_map;
+
+	const map<ZombieType, pair<string, wstring>>& GetModelMap();
 };

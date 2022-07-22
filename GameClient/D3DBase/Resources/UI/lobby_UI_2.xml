@@ -17,33 +17,59 @@ width ="2000"
 height ="1080"
 x = "980"
 y ="540"
-image="Resources/UI/background.png"/>
+image="Resources/UI/lobby.jpg"/>
 
+  <Button
+width ="300"
+height ="300"
+x = "330"
+y ="660"
+image="Resources/UI/B_back.png"
+action="login"/>
   <UI
 width ="300"
 height ="300"
 x = "330"
 y ="660"
-image="Resources/UI/HP_BAR.png"/>
+image="Resources/UI/sol.png"/>
+
+
+
+  <Button
+width ="300"
+height ="300"
+x = "980"
+y ="660"
+image="Resources/UI/B_back.png"
+action="game start"/>
   <UI
 width ="300"
 height ="300"
 x = "980"
 y ="660"
-image="Resources/UI/HP_BAR.png"/>
+image="Resources/UI/eng.png"/>
+
+  <Button
+width ="300"
+height ="300"
+x = "1650"
+y ="660"
+image="Resources/UI/B_back.png"
+action="game start"/>
   <UI
 width ="300"
 height ="300"
 x = "1650"
 y ="660"
-image="Resources/UI/HP_BAR.png"/>
+image="Resources/UI/pmc.png"/>
 
-<UI
+
+<!-- <UI
 width ="800"
 height ="150"
 x = "990"
 y ="300"
-image="Resources/UI/HP_BAR.png"/>
+image="Resources/UI/HP_BAR.png"/> -->
 
 <UI
 width ="800"

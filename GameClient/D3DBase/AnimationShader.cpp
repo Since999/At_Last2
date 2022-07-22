@@ -103,7 +103,7 @@ void CAnimationObjectShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd
 	m_pd3dcbGameObjects->Map(0, NULL, (void**)&m_pcbMappedGameObjects);
 	UINT ncbElementBytes = ((sizeof(CB_ANIMATION_OBJECT_INFO) + 255) & ~255);
 	int i = 0;
-	for (auto& [key, object] : objects) {
+	for (auto& object : objects) {
 		CB_ANIMATION_OBJECT_INFO* pbMappedcbGameObject = (CB_ANIMATION_OBJECT_INFO*)((UINT8*)m_pcbMappedGameObjects + (i * ncbElementBytes));
 		object->UpdateShaderVariables(pd3dCommandList, pbMappedcbGameObject);
 		++i;
@@ -140,13 +140,14 @@ void CAnimationObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphi
 			if(n <= FIRST_CHECK_POINT_ZOMBIE_NUM) zom = &Network::b_zombie1[n];
 		}
 		zom->_id = i;
+		zom->_type = (ZombieType)(((int)zom->_type + i) % 5);
 		AddZombie(zom);
 	}
 }
 
 void CAnimationObjectShader::ReleaseObjects()
 {
-	for (auto& [key, object] : objects) {
+	for (auto& object : objects) {
 		delete object;
 	}
 }
@@ -154,14 +155,28 @@ void CAnimationObjectShader::ReleaseObjects()
 void CAnimationObjectShader::AnimateObjects(float fTimeElapsed)
 {
 	AddZombieInNetwork();
-	for (auto& [key, object] : objects) {
+	for (auto& object : objects) {
 		object->Animate(fTimeElapsed);
 	}
+	RemoveObjects();
+}
+
+void CAnimationObjectShader::RemoveObjects()
+{
+	for (auto& object : remove_list) {
+		auto& found = find(objects.begin(), objects.end(), object);
+		if (found != objects.end())
+		{
+			delete (*found);
+			objects.erase(found);
+		}
+	}
+	remove_list.clear();
 }
 
 void CAnimationObjectShader::ReleaseUploadBuffers()
 {
-	for (auto& [key, object] : objects) {
+	for (auto& object : objects) {
 		object->ReleaseUploadBuffers();
 	}
 }
@@ -178,7 +193,7 @@ void CAnimationObjectShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, 
 {
 	CAnimationShader::Render(pd3dCommandList, pCamera);
 	int i = 0;
-	for (auto& [key, object] : objects) {
+	for (auto& object : objects) {
 		object->Render(pd3dCommandList, m_pd3dCbvSrvDescriptorHeap, m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i), pCamera);
 		++i;
 	}
@@ -188,16 +203,41 @@ void CAnimationObjectShader::ShadowMapRender(ID3D12GraphicsCommandList* pd3dComm
 	shadow_shader->Render(pd3dCommandList, NULL);
 	pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 	int i = 0;
-	for (auto& [key, object] : objects) {
+	for (auto& object : objects) {
 		object->ShadowMapRender(pd3dCommandList, m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		++i;
 	}
 }
+/*
+z1 - zombie
+z2 zomie_goul_nomal
+z3 - pumpkinHulk_diffuse
+*/
+const map<ZombieType, pair<string, wstring>>& CAnimationObjectShader::GetModelMap()
+{
+	if (!zombie_model_map.empty()) return zombie_model_map;
+	zombie_model_map.emplace(ZombieType::NORMAL, make_pair(string("Z1.fbx"), wstring(L"Zombie.png")));
+	//Test
+	//zombie_model_map.emplace(ZombieType::SOLIDEIR, make_pair(string("Z2.fbx"), wstring(L"zombie_goul_nomal.png")));
+	//Test
+	zombie_model_map.emplace(ZombieType::TANKER, make_pair(string("Z3.fbx"), wstring(L"pumpkinHulk_diffuse.png")));
+	zombie_model_map.emplace(ZombieType::DOG, make_pair(string("z4_dog.fbx"), wstring(L"Zombie.png")));
+	return zombie_model_map;
+}
+
 #include "Configuration.h"
 void CAnimationObjectShader::AddZombie(Zombie* zombie)
 {
-	zombie->_id;
-	CZombie* object = new CZombie();
+	auto& model_map = GetModelMap();
+	CZombie* object;
+	auto& found = model_map.find(zombie->_type);
+	if (found == model_map.end()) {
+		object = new CZombie();
+	}
+	else {
+		auto& name = (*found).second;
+		object = new CZombie(name.first, name.second);
+	}
 #ifdef ENABLE_NETWORK
 	XMFLOAT3 pos = XMFLOAT3{ 100500.0f, CConfiguration::bottom, 14000.0f };
 #else
@@ -207,17 +247,12 @@ void CAnimationObjectShader::AddZombie(Zombie* zombie)
 	
 	object->SetZombie(zombie);
 	
-	objects.try_emplace(zombie->_id, object);
+	objects.push_back(object);
 }
 
-void CAnimationObjectShader::DeleteZombie(int num)
+void CAnimationObjectShader::DeleteZombie(CGameObject* object)
 {
-	auto& found = objects.find(num);
-	if (found != objects.end())
-	{
-		delete (*found).second;
-		objects.erase(num);
-	}
+	remove_list.push_back(object);
 }
 
 void CAnimationObjectShader::AddZombieInNetwork()

@@ -61,7 +61,7 @@ public:
         const string& model, const wchar_t* texture);
     CZombie(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature,
         SkinModel* model);
-    CZombie();
+    CZombie(const string& model_name = "Z1.fbx", const wstring& tex_name = L"Zombie.png");
     //~CZombie();
 
 public:
