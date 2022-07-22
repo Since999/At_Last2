@@ -335,6 +335,28 @@ void ParticleSystem::AddParticle(const XMFLOAT3& position, const wstring& name)
 	AddObject((*found).second.Build(position));
 }
 
+void ParticleSystem::AddModelParticle(const XMFLOAT3& position, const wstring& name)
+{
+	XMFLOAT3 pos = position;
+	pos.y += 500;
+	AddParticle(pos, name);
+}
+
+void ParticleSystem::AddModelParticle(float x, float y, float z, const wstring& name)
+{
+	XMFLOAT3 position{x,y,z};
+	AddModelParticle(position, name);
+}
+
+void ParticleSystem::AddParticleFromNetwork(float x, float z, const wstring& name)
+{
+	XMFLOAT3 position;
+	position.x = (x - 500.0f) * -100.f;
+	position.y = CConfiguration::bottom;
+	position.z = (z - 210.0f) * -100.f;
+	AddModelParticle(position, name);
+}
+
 void ParticleSystem::AddTrail(const XMFLOAT3& position, const wstring& name)
 {
 	auto found = particle_pool.find(name);
