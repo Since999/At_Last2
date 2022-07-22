@@ -4,6 +4,8 @@
 #include "2DObject.h"
 #include "SoundSystem.h"
 #include "GameFramework.h"
+#include "Configuration.h"
+
 map<wstring, int*> CXMLReader::variable_map;
 map<wstring, function<void()>> CXMLReader::function_map;
 
@@ -177,6 +179,31 @@ void CXMLReader::LoadSound(const wstring& file_name, CSoundSystem* sys)
         loop = xml.GetAttrib(L"loop") == string_true;
         channel = xml.GetAttrib(L"channel");
         sys->SetSound(name, sound_file_name, channel, loop);
+    }
+    return;
+}
+
+void CXMLReader::LoadPlayerModelName(const wstring& file_name)
+{
+    CMarkup xml;
+    CString strFileName = file_name.c_str();
+    if (!xml.Load(strFileName))
+    {
+        return;
+    }
+    xml.FindElem(L"PlayerModel");
+    xml.IntoElem();
+    while (xml.FindElem(L"Player")) {
+        wstring name;
+        string sound_file_name;
+        bool loop;
+        wstring channel;
+        name = wstring{ xml.GetAttrib(L"name") };
+        string model = string{ CT2CA(xml.GetAttrib(L"model")) };
+        wstring texture = wstring{ xml.GetAttrib(L"texture") };
+
+        channel = xml.GetAttrib(L"channel");
+        CConfiguration::SetModel(model, texture);
     }
     return;
 }

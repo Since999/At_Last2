@@ -373,12 +373,17 @@ void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandLis
 
 	framework->ChangeUI(new UISystem(device, list, GetGraphicsRootSignature(), "Resources/UI/TestUI.xml"));
 
+	unsigned int model_index;
+	model_index = (int)(network.g_client[network.my_id]._type);
 	m_pPlayer = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
-		CConfiguration::player_models[0], CConfiguration::player_textures[0].c_str());
+		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+	model_index = (int)(network.g_client[network.other_client_id1]._type);
 	m_pPlayer2 = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
-		CConfiguration::player_models[1], CConfiguration::player_textures[1].c_str());
+		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+	model_index = (int)(network.g_client[network.other_client_id2]._type);
 	m_pPlayer3 = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
-		CConfiguration::player_models[2], CConfiguration::player_textures[2].c_str());
+		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+
 
 	float bottom = -580.0;
 #ifdef ENABLE_NETWORK
