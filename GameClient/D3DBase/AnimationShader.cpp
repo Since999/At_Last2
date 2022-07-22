@@ -218,7 +218,7 @@ const map<ZombieType, pair<string, wstring>>& CAnimationObjectShader::GetModelMa
 	if (!zombie_model_map.empty()) return zombie_model_map;
 	zombie_model_map.emplace(ZombieType::NORMAL, make_pair(string("Z1.fbx"), wstring(L"Zombie.png")));
 	//Test
-	//zombie_model_map.emplace(ZombieType::SOLIDEIR, make_pair(string("Z2.fbx"), wstring(L"zombie_goul_nomal.png")));
+	zombie_model_map.emplace(ZombieType::SOLIDEIR, make_pair(string("Z2.fbx"), wstring(L"zombie_goul_nomal.png")));
 	//Test
 	zombie_model_map.emplace(ZombieType::TANKER, make_pair(string("Z3.fbx"), wstring(L"pumpkinHulk_diffuse.png")));
 	zombie_model_map.emplace(ZombieType::DOG, make_pair(string("z4_dog.fbx"), wstring(L"Zombie.png")));

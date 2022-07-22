@@ -87,14 +87,15 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		BarricadePos pos;
 		pos.x = 50500.0f;
 		pos.z = 14000.0f + 1000.0f * i;
-		pos.dir = DIR::WIDTH;
+		//pos.dir = DIR::WIDTH;
+		pos.angle = 0;
 		barricade.push_back(pos);
 	}
 	for (int i = 0; i < 10; ++i) {
 		BarricadePos pos;
 		pos.x = 50500.0f + 5000.0f * i;
 		pos.z = 14000.0f;
-		pos.dir = DIR::WIDTH;
+		pos.angle = 0;
 		barricade.push_back(pos);
 	}
 #endif
