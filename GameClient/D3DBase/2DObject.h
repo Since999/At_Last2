@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "Object.h"
 
 class UISystem;
@@ -22,9 +23,11 @@ public:
 
 
 class CUIObject : public C2DObject {
+private:
 public:
     CUIObject(float width, float height, float x, float y, CMaterial* material = NULL);
     virtual void Animate(float fTimeElapsed);
+    virtual bool CheckMouseCollision(float x, float y) { return false; }
 };
 
 class CParticleObject : public C2DObject {
@@ -108,4 +111,15 @@ public:
     virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList) {}
     virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL) {}
     virtual void ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL) {}
+};
+
+class CButtonUI : public CUIObject {
+private:
+    CCollisionRect collision_rect;
+    function<void()> button_func;
+public:
+    CButtonUI(float width, float height, float x, float y, function<void()> func, CMaterial* material = NULL);
+    ~CButtonUI();
+
+    virtual bool CheckMouseCollision(float x, float y);
 };

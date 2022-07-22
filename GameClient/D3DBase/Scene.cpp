@@ -14,52 +14,23 @@
 #include "AnimationShader.h"
 #include "2DShader.h"
 #include "SoundSystem.h"
-CScene::CScene()
+#include "GameFramework.h"
+#include "CLight.h"
+CScene::CScene(ID3D12RootSignature* root_sig) : m_pd3dGraphicsRootSignature(root_sig)
 {
 }
 
 CScene::~CScene()
 {
+	ReleaseObjects();
+	StopEvent();
 }
 
 void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
-
-	m_nShaders = 4;
-	m_ppShaders = new CShader * [m_nShaders];
-
-	CTerrainShader* pObjectShader = new CTerrainShader();
-	pObjectShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	pObjectShader->BuildObjects(pd3dDevice, pd3dCommandList, NULL);
-	m_ppShaders[0] = pObjectShader;
-
-	CAnimationObjectShader* ani_shader = new CAnimationObjectShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
-	m_ppShaders[1] = ani_shader;
-
-	
-	m_ppShaders[2] = CStaticObjectShader::InitInstance(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
-
-	C2DShader* particle_shader = new C2DShader(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
-	m_ppShaders[3] = particle_shader;
-
-	CSoundSystem::GetInstance();
-	/*for(int i = 0; i< ROAD_ZOMBIE_NUM + FIRST_CHECK_POINT_ZOMBIE_NUM; ++i)
-	
-	{
-		CZombie* object = new CZombie(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature,
-			NULL);
-
-		XMFLOAT3 pos = XMFLOAT3{ 50500.0f - 500.0f * i, CConfiguration::bottom, 14000.0f };
-		object->SetPosition(pos);
-		;
-		if(i < ROAD_ZOMBIE_NUM) ((CZombie*)object)->SetZombie(&Network::r_zombie1[i]);
-		else {
-			int n = i - ROAD_ZOMBIE_NUM;
-			if(n <= FIRST_CHECK_POINT_ZOMBIE_NUM) ((CZombie*)object)->SetZombie(&Network::b_zombie1[n]);
-		}
-		objects.push_back(object);
-	}*/
+	if (!m_pd3dGraphicsRootSignature) { 
+		m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice); 
+	}
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -253,7 +224,7 @@ bool CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 	return(false);
 }
 
-bool CScene::ProcessInput(UCHAR* pKeysBuffer)
+bool CScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 {
 	return(false);
 }
@@ -282,10 +253,10 @@ void CScene::AnimateObjects(float fTimeElapsed)
 void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
-
-	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
-	pCamera->UpdateShaderVariables(pd3dCommandList);
-
+	if (pCamera) {
+		pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+		pCamera->UpdateShaderVariables(pd3dCommandList);
+	}
 	//UpdateShaderVariables(pd3dCommandList);
 
 	for (int i = 0; i < m_nShaders; i++)
@@ -337,12 +308,332 @@ void CScene::RemoveObjects()
 	remove_list.clear();
 }
 
-void CScene::StartEvent()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//CLobbyScene
+
+CLobbyScene::CLobbyScene(ID3D12RootSignature* root_sig) : CScene(root_sig)
 {
-	CSoundSystem::GetInstance()->Play(L"main game bgm");
+
 }
 
-void CScene::StopEvent()
+CLobbyScene::~CLobbyScene()
+{
+
+}
+
+void CLobbyScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CScene::BuildObjects(pd3dDevice, pd3dCommandList);
+	CGameFramework::GetInstance()->ChangeUI(new UISystem(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), "Resources/UI/lobby_UI.xml"));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//CLobbyScene
+
+CSelectScene::CSelectScene(ID3D12RootSignature* root_sig): CScene(root_sig)
+{
+
+}
+
+void CSelectScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CScene::BuildObjects(pd3dDevice, pd3dCommandList);
+	CGameFramework::GetInstance()->ChangeUI(new UISystem(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), "Resources/UI/lobby_UI_2.xml"));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//MainGameScene
+
+CMainGameScene::CMainGameScene(ID3D12RootSignature* root_sig) : CScene(root_sig)
+{	
+}
+
+void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandList* list)
+{
+	CScene::BuildObjects(device, list);
+
+	CGameFramework* framework = CGameFramework::GetInstance();
+
+	m_nShaders = 4;
+	m_ppShaders = new CShader * [m_nShaders];
+
+	CTerrainShader* pObjectShader = new CTerrainShader();
+	pObjectShader->CreateShader(device, m_pd3dGraphicsRootSignature);
+	pObjectShader->BuildObjects(device, list, NULL);
+	m_ppShaders[0] = pObjectShader;
+
+	CAnimationObjectShader* ani_shader = new CAnimationObjectShader(device, list, m_pd3dGraphicsRootSignature);
+	m_ppShaders[1] = ani_shader;
+
+
+	m_ppShaders[2] = CStaticObjectShader::InitInstance(device, list, m_pd3dGraphicsRootSignature);
+
+	C2DShader* particle_shader = new C2DShader(device, list, m_pd3dGraphicsRootSignature);
+	m_ppShaders[3] = particle_shader;
+
+	framework->ChangeUI(new UISystem(device, list, GetGraphicsRootSignature(), "Resources/UI/TestUI.xml"));
+
+	m_pPlayer = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
+		CConfiguration::player_models[0], CConfiguration::player_textures[0].c_str());
+	m_pPlayer2 = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
+		CConfiguration::player_models[1], CConfiguration::player_textures[1].c_str());
+	m_pPlayer3 = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
+		CConfiguration::player_models[2], CConfiguration::player_textures[2].c_str());
+
+	float bottom = -580.0;
+#ifdef ENABLE_NETWORK
+	m_pPlayer->SetPosition({ (network.g_client[network.my_id].Get_Client_X() - 550.0f) * (-100.0f), 00.0f, (network.g_client[network.my_id].Get_Client_Z() - 210.0f) * (-100.0f) });
+
+	m_pPlayer->SetPosition({ 50500.0f, bottom, 14000.0f });
+	m_pPlayer2->SetPosition({ (network.g_client[network.other_client_id1].Get_Client_X() - 550.0f) * (-100.0f), 00.0f, (network.g_client[network.other_client_id1].Get_Client_Z() - 210.0f) * (-100.0f) });
+	m_pPlayer3->SetPosition({ (network.g_client[network.other_client_id2].Get_Client_X() - 550.0f) * (-100.0f), 00.0f, (network.g_client[network.other_client_id2].Get_Client_Z() - 210.0f) * (-100.0f) });
+
+	framework->client_player = m_pPlayer;
+#else
+	m_pPlayer->SetPosition({ 50500.0f, bottom, 14000.0f });
+	m_pPlayer2->SetPosition({ 50500.0f, bottom, 14000.0f });
+	m_pPlayer3->SetPosition({ 50500.0f, bottom, 14000.0f });
+	client_player = m_pPlayer;
+#endif
+	((CMainGamePlayer*)m_pPlayer)->SetPlayerInfo(&network.g_client[network.my_id]);
+	((CMainGamePlayer*)m_pPlayer2)->SetPlayerInfo(&network.g_client[network.other_client_id1]);
+	((CMainGamePlayer*)m_pPlayer3)->SetPlayerInfo(&network.g_client[network.other_client_id2]);
+
+	client_player->ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
+	framework->m_pCamera = client_player->GetCamera();
+
+	framework->m_pCamera->CreateShaderVariables(device, list);
+
+	sun_light = new CSunLight(m_pPlayer);
+}
+
+CMainGameScene::~CMainGameScene()
+{
+	ReleaseObjects();
+}
+
+void CMainGameScene::ReleaseObjects()
+{
+	CScene::ReleaseObjects();
+	ReleaseShaderVariables();
+
+	if (m_pPlayer) delete m_pPlayer;
+	if (m_pPlayer2) delete m_pPlayer2;
+	if (m_pPlayer3) delete m_pPlayer3;
+}
+
+void CMainGameScene::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CScene::CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
+
+void CMainGameScene::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CScene::UpdateShaderVariables(pd3dCommandList);
+	m_pPlayer2->UpdateShaderVariables(pd3dCommandList);
+	m_pPlayer3->UpdateShaderVariables(pd3dCommandList);
+	m_pPlayer->UpdateShaderVariables(pd3dCommandList);
+}
+
+void CMainGameScene::ReleaseShaderVariables()
+{
+	CScene::ReleaseShaderVariables();
+	m_pPlayer2->ReleaseShaderVariables();
+	m_pPlayer3->ReleaseShaderVariables();
+	m_pPlayer->ReleaseShaderVariables();
+}
+
+void CMainGameScene::AnimateObjects(float fTimeElapsed)
+{
+	CScene::AnimateObjects(fTimeElapsed);
+	m_pPlayer2->Update(fTimeElapsed);
+	m_pPlayer3->Update(fTimeElapsed);
+	m_pPlayer->Update(fTimeElapsed);
+
+	sun_light->Update(XMFLOAT3(), fTimeElapsed);
+}
+
+//#define _WITH_PLAYER_TOP
+
+void CMainGameScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	CScene::Render(pd3dCommandList, pCamera);
+#ifdef _WITH_PLAYER_TOP
+	pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
+#endif
+	m_pPlayer->Render(pd3dCommandList, pCamera);
+	m_pPlayer2->Render(pd3dCommandList, pCamera);
+	m_pPlayer3->Render(pd3dCommandList, pCamera);
+
+}
+void CMainGameScene::ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	sun_light->UpdateShaderVariables(pd3dCommandList);
+
+	//Render
+	CScene::ShadowMapRender(pd3dCommandList);
+	m_pPlayer->ShadowMapRender(pd3dCommandList);
+	m_pPlayer2->ShadowMapRender(pd3dCommandList);
+	m_pPlayer3->ShadowMapRender(pd3dCommandList);
+}
+
+bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
+{
+	DWORD dwDirection = 0;
+
+	if ((pKeysBuffer['W'] & 0xF0)) dwDirection |= DIR_FORWARD;
+	if ((pKeysBuffer['S'] & 0xF0)) dwDirection |= DIR_BACKWARD;
+	if ((pKeysBuffer['A'] & 0xF0)) dwDirection |= DIR_LEFT;
+	if ((pKeysBuffer['D'] & 0xF0)) dwDirection |= DIR_RIGHT;
+	if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
+	if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+#ifdef _DEBUG
+	auto camera = CGameFramework::GetInstance()->GetCamera();
+	if (pKeysBuffer[VK_OEM_PLUS] & 0xF0 || pKeysBuffer[VK_ADD] & 0xF0) {
+		if (camera) camera->AddDistance(50.0f);
+	}
+	if (pKeysBuffer[VK_OEM_MINUS] & 0xF0 || pKeysBuffer[VK_SUBTRACT] & 0xF0) {
+		if (camera) camera->AddDistance(-50.0f);
+	}
+#endif
+#ifdef ENABLE_NETWORK
+	if ((pKeysBuffer['E'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_PLAYER_INTERATION);
+	}
+	// 채팅용 키 엔터 또는 등등을 만들어야 할 수도 있음 현재는 만들지 않음
+
+	if ((pKeysBuffer['R'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
+	}
+
+	if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false && network.g_client[network.my_id].special_skill > 0)
+	{
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_PLAYER_SPECIAL);
+	}
+
+	if ((pKeysBuffer['C'] & 0xF0) && network.g_client[network.my_id].special_skill_key == true)
+	{
+		network.g_client[network.my_id].special_skill_key = false;
+		network.Send_commander_special_req_packet(network.g_client[network.my_id].special_id);
+	}
+
+	if ((pKeysBuffer['V'] & 0xF0) && network.g_client[network.my_id].special_skill_key == true)
+	{
+		network.g_client[network.my_id].special_skill_key = false;
+		network.Send_commander_special_req_packet(network.g_client[network.my_id].special_id);
+	}
+
+	if ((pKeysBuffer['I'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_ROAD_ONE);
+	}
+
+	if ((pKeysBuffer['O'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_ROAD_TWO);
+	}
+
+	if ((pKeysBuffer['P'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_ROAD_THREE);
+	}
+
+	if ((pKeysBuffer['J'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_ONE);
+	}
+
+	if ((pKeysBuffer['K'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_TWO);
+	}
+
+	if ((pKeysBuffer['L'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_GM_MAP_CHANGE_BASE_THREE);
+	}
+
+	if ((pKeysBuffer['N'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_GM_ZOMBIE_ALL_KILL);
+	}
+
+	if ((pKeysBuffer['M'] & 0xF0) && network.key_down_state == false) {
+		network.key_down_state = true;
+		network.Send_request_packet(MsgType::CS_GM_PLAYER_HP_UP);
+	}
+#endif
+
+	float cxDelta = 0.0f, cyDelta = 0.0f;
+	POINT ptCursorPos;
+	//if (GetCapture() == m_hWnd)
+	{
+		GetCursorPos(&ptCursorPos);
+		ScreenToClient(hwnd, &ptCursorPos);
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+		int width = rect.right - rect.left;
+		int height = rect.bottom - rect.top;
+		XMVECTOR cursor_direction = { ptCursorPos.x - (width / 2), ptCursorPos.y - (height / 2) };
+		cursor_direction = XMVector2Normalize(cursor_direction);
+		network.g_client[network.my_id].mx = cursor_direction.m128_f32[0];
+		network.g_client[network.my_id].mz = cursor_direction.m128_f32[1];
+		if (GetCapture() == hwnd)
+		{
+			((CMainGamePlayer*)client_player)->StartFire();
+		}
+		else {
+			((CMainGamePlayer*)client_player)->StopFire();
+		}
+	}
+
+#ifdef ENABLE_NETWORK
+	if (network.mouse_state == false)
+	{
+		network.mouse_state = true;
+		network.Send_rotate_packet(network.g_client[network.my_id].mx, network.g_client[network.my_id].mz);
+	}
+
+	if (GetCapture() == m_hWnd && network.attack_state == false)
+	{
+		network.attack_state = true;
+		int m_x = ptCursorPos.x - 640;
+		int m_z = ptCursorPos.y - 360;
+		network.Send_attack_packet(m_x, m_z);
+	}
+#endif
+	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
+	{
+		if (cxDelta || cyDelta)
+		{
+		}
+		if (dwDirection) client_player->Move(dwDirection, 200.0f * TIMEMANAGER.GetTimeElapsed(), true);
+	}
+	{
+		XMVECTOR direction = { 0.0f, 0.0f };
+
+		if (dwDirection & DIR_FORWARD) direction += {1.0f, 0.0f};
+		if (dwDirection & DIR_BACKWARD) direction += {-1.0f, 0.0f};
+		if (dwDirection & DIR_RIGHT) direction += {0.0f, -1.0f};
+		if (dwDirection & DIR_LEFT) direction += {0.0f, 1.0f};
+		direction = XMVector2Normalize(direction);
+
+		XMFLOAT2 dest;
+		XMStoreFloat2(&dest, direction);
+		network.g_client[network.my_id].ProcessInput(dest.x, dest.y);
+	}
+	return(false);
+}
+
+void CMainGameScene::StartEvent()
+{
+	CSoundSystem::GetInstance()->PlayBGM(L"main game bgm");
+}
+
+void CMainGameScene::StopEvent()
 {
 	CSoundSystem::GetInstance()->StopBGM();
 }

@@ -214,6 +214,31 @@ void CMaterial::ReleaseUploadBuffers()
 {
 	if (m_pTexture) m_pTexture->ReleaseUploadBuffers();
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+CCollisionRect::CCollisionRect() { SetRect(0, 0, 0, 0); }
+
+CCollisionRect::CCollisionRect(float left, float up, float right, float down) : left(left), up(up), right(right), down(down)
+{
+
+}
+
+void CCollisionRect::SetRect(float left, float up, float right, float down)
+{
+	this->left = left;
+	this->up = up;
+	this->right = right;
+	this->down = down;
+}
+
+bool CCollisionRect::CheckCollision(float x, float y)
+{
+	if (x < left) return false;
+	if (x > right) return false;
+	if (y < down) return false;
+	if (y > up) return false;
+	return true;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

@@ -448,6 +448,8 @@
     <Xml Include="Resources\Model\PlayerModel.xml" />
     <Xml Include="Resources\Particle\sample.xml" />
     <Xml Include="Resources\Sound\Sound.xml" />
+    <Xml Include="Resources\UI\lobby_UI.xml" />
+    <Xml Include="Resources\UI\lobby_UI_2.xml" />
     <Xml Include="Resources\UI\TestUI.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

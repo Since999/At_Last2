@@ -57,9 +57,19 @@ void CSoundSystem::Play(const wstring& name)
 	}
 	CSound& sound = (*found).second;
 	auto& found_channel = channel_pool.find(sound.channel);
-
+	if (found_channel == channel_pool.end()) {
+#ifdef _DEBUG
+		wcout << "Error (CSoundSystem::Play): no such channel: " << sound.channel << endl;
+#endif
+		return;
+	}
 	system->playSound(sound.sound, 0, false, &(*found_channel).second);
-	
+}
+
+void CSoundSystem::PlayBGM(const wstring& name)
+{
+	StopBGM();
+	Play(name);
 }
 
 void CSoundSystem::StopBGM()

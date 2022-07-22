@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UISystem>
+  
+
+<!-- <UI
+  width ="180"
+  height ="180"
+  x ="150"
+  y ="950"
+  image="Resources/UI/UV_Grid.jpg"/> -->
+
+
+
+
+  <UI
+width ="2000"
+height ="1080"
+x = "980"
+y ="540"
+image="Resources/UI/background.png"/>
+
+  <UI
+width ="800"
+height ="200"
+x = "960"
+y ="660"
+image="Resources/UI/HP_BAR.png"/>
+
+  <UI
+width ="800"
+height ="200"
+x = "960"
+y ="660"
+image="Resources/UI/At_Last....png"/>
+
+
+  <UI
+width ="460"
+height ="100"
+x = "960"
+y ="240"
+image="Resources/UI/HP_BAR.png"/>
+  <UI
+width ="260"
+height ="70"
+x = "900"
+y ="240"
+image="Resources/UI/background.png"/>
+
+  <!-- <UI
+width ="260"
+height ="30"
+x = "900"
+y ="220"
+image="Resources/UI/background.png"/> -->
+
+  <UI
+width ="70"
+height ="70"
+x = "1120"
+y ="240"
+image="Resources/UI/background.png"/>
+ 
+ <Button
+width ="70"
+height ="20"
+x = "1120"
+y ="240"
+image="Resources/UI/Login.png"
+action="login"/>
+  <!-- <BAR
+width ="500"
+height ="10"
+x = "1000"
+y ="200"
+image="Resources/UI/HP_BAR.png"/> -->
+
+  <!-- <Number
+width ="50"
+height ="50"
+x = "1900"
+y ="50"
+digit ="3"
+variable ="left bullet"/> -->
+      <!-- <UI
+    width ="50"
+    height ="50"
+    x ="1750"
+    y ="300"
+    image="Resources/UI/close.png"/> -->
+
+</UISystem>

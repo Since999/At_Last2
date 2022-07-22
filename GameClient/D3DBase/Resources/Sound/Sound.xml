@@ -7,12 +7,52 @@
   sound = "Resources/Sound/gun fire.mp3"
   loop = "false"
   channel = "effect"/>
-  
+  <Sound
+  name = "P_Attacked"
+  sound = "Resources/Sound/male-scream-5.wav"
+  loop = "false"
+  channel = "effect"/>
+    <Sound
+  name = "P_Death"
+  sound = "Resources/Sound/male-death-02.wav"
+  loop = "false"
+  channel = "effect"/>
+    <Sound
+  name = "zombie-spawn"
+  sound = "Resources/Sound/zombie-spawn.wav"
+  loop = "false"
+  channel = "effect"/>
+    <Sound
+  name = "zombie-hit"
+  sound = "Resources/Sound/zombie-hit.wav"
+  loop = "false"
+  channel = "effect"/>
+    <Sound
+  name = "zombie-death-2"
+  sound = "Resources/Sound/zombie-death-2.wav"
+  loop = "false"
+  channel = "effect"/>
+
+
+
+
   <Sound
     name = "test bgm"
     sound = "Resources/Sound/scifi.mp3"
     loop = "true"
     channel = "bgm"/>
   
+  <Sound
+    name = "in game bgm"
+    sound = "Resources/Sound/deepblue.mp3"
+    loop = "true"
+    channel = "bgm"/>
+
+  <Sound
+    name = "wavw"
+    sound = "Resources/Sound/instinct.mp3"
+    loop = "true"
+    channel = "bgm"/>
+
 
 </SoundSystem>

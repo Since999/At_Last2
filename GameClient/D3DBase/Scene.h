@@ -7,17 +7,19 @@
 #include "Shader.h"
 
 class CObject;
+class CGameFramework;
+class CSunLight;
 
 class CScene
 {
 public:
-	CScene();
+	CScene(ID3D12RootSignature* root_sig = NULL);
 	~CScene();
 
-	bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
-	bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
+	virtual bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
+	virtual bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
-	void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void ReleaseObjects();
 
 	ID3D12RootSignature* CreateGraphicsRootSignature(ID3D12Device* pd3dDevice);
@@ -28,22 +30,18 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void ReleaseShaderVariables();
 
-	bool ProcessInput(UCHAR* pKeysBuffer);
-	void AnimateObjects(float fTimeElapsed);
-	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
-	void ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual bool ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd);
+	virtual void AnimateObjects(float fTimeElapsed);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+	virtual void ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void ReleaseUploadBuffers();
 
 	virtual void AddObject(CGameObject* object);
 	virtual void RemoveObject(CGameObject* object);
 
-	CPlayer* m_pPlayer = NULL;
-	CPlayer* m_pPlayer2 = NULL;
-	CPlayer* m_pPlayer3 = NULL;
-
-	void StartEvent();
-	void StopEvent();
+	virtual void StartEvent(){}
+	virtual void StopEvent(){}
 private:
 	std::vector<CGameObject*> remove_list;
 	std::list<CGameObject*> object_list;
@@ -54,4 +52,48 @@ protected:
 	int							m_nShaders = 0;
 
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
+};
+
+class CLobbyScene : public CScene {
+public:
+	CLobbyScene(ID3D12RootSignature* root_sig = NULL);
+	~CLobbyScene();
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+};
+
+class CSelectScene : public CScene {
+public:
+	CSelectScene(ID3D12RootSignature* root_sig = NULL);
+	~CSelectScene(){}
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+};
+
+class CMainGameScene : public CScene {
+public:
+	CMainGameScene(ID3D12RootSignature* root_sig = NULL);
+	~CMainGameScene();
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ReleaseObjects();
+
+	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ReleaseShaderVariables();
+
+	virtual bool ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd);
+	virtual void AnimateObjects(float fTimeElapsed);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+	virtual void ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList);
+
+	virtual void StartEvent();
+	virtual void StopEvent();
+
+private:
+	CPlayer* m_pPlayer = NULL;
+	CPlayer* m_pPlayer2 = NULL;
+	CPlayer* m_pPlayer3 = NULL;
+	CPlayer* client_player = NULL;
+	CSunLight* sun_light = NULL;
 };

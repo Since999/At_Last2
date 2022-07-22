@@ -47,15 +47,18 @@ public:
 
 class UISystem : public C2DShader {
 public:
-	UISystem(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig);
+	UISystem(ID3D12Device* device, ID3D12GraphicsCommandList* cmdlist, ID3D12RootSignature* root_sig, const string& file_name);
 	~UISystem();
 
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 
-	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const string& file_name);
 	void AddUI(float width, float height, float x, float y, const wstring& image_file_name);
 	void AddProgressBar(float width, float height, float x, float y, const wstring& image_file_name);
 	void AddNumberUI(float width, float height, float x, float y, int digit, int* value_ptr = NULL);
+	void AddButtonUI(float width, float height, float x, float y, const wstring& image_file_name, function<void()> func);
+
+	void CheckMouseCollision(float x, float y);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 

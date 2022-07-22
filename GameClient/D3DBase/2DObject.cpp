@@ -375,3 +375,24 @@ void CNumberUI::Animate(float fTimeElapsed)
 		component[i]->SetValue(0);
 	}
 }
+CButtonUI::CButtonUI(float width, float height, float x, float y, function<void()> func, CMaterial* material)
+	: CUIObject(width, height, x, y, material), button_func(func)
+{
+	float half_wid = width / 2;
+	float half_height = height / 2;
+	collision_rect.SetRect(x - half_wid, y + half_height, x + half_wid, y - half_height);
+}
+
+CButtonUI::~CButtonUI()
+{
+
+}
+
+bool CButtonUI::CheckMouseCollision(float x, float y)
+{
+	if (collision_rect.CheckCollision(x, y)) {
+		button_func();
+		return true;
+	}
+	return false;
+}
