@@ -17,14 +17,14 @@ width ="2000"
 height ="1080"
 x = "980"
 y ="540"
-image="Resources/UI/background.png"/>
+image="Resources/UI/lobby.jpg"/>
 
-  <UI
+  <!-- <UI
 width ="800"
 height ="200"
 x = "960"
 y ="660"
-image="Resources/UI/HP_BAR.png"/>
+image="Resources/UI/HP_BAR.png"/> -->
 
   <UI
 width ="800"
@@ -39,13 +39,13 @@ width ="460"
 height ="100"
 x = "960"
 y ="240"
-image="Resources/UI/HP_BAR.png"/>
-  <UI
+image="Resources/UI/B_back.png"/>
+  <!-- <UI
 width ="260"
 height ="70"
 x = "900"
 y ="240"
-image="Resources/UI/background.png"/>
+image="Resources/UI/background.png"/> -->
 
   <!-- <UI
 width ="260"
@@ -54,17 +54,17 @@ x = "900"
 y ="220"
 image="Resources/UI/background.png"/> -->
 
-  <UI
-width ="70"
-height ="70"
-x = "1120"
+  <!-- <UI
+width ="440"
+height ="80"
+x = "960"
 y ="240"
-image="Resources/UI/background.png"/>
+image="Resources/UI/B_back.png"/> -->
  
  <UI
-width ="70"
-height ="20"
-x = "1120"
+width ="440"
+height ="80"
+x = "960"
 y ="240"
 image="Resources/UI/Login.png"/>
   <!-- <BAR
