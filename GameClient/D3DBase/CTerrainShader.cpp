@@ -69,7 +69,7 @@ void CTerrainShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 {
 	OldModelLoader model_loader;
 	std::vector<CMesh*> tmp;
-	model_loader.LoadModelWithTranslation(pd3dDevice, pd3dCommandList, std::string("Resources/Model/MAP.fbx"), tmp);
+	model_loader.LoadModelWithTranslation(pd3dDevice, pd3dCommandList, std::string("Resources/Model/TEST5.fbx"), tmp);
 	std::vector<CTexture*> textures;
 	auto texture_pool = CTexturePool::GetInstance();
 	for (int i = 0; i < tmp.size(); ++i) {

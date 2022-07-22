@@ -720,6 +720,8 @@ void CGameFramework::ProcessInput()
 			cursor_direction = XMVector2Normalize(cursor_direction);
 			network.g_client[network.my_id].mx = cursor_direction.m128_f32[0];
 			network.g_client[network.my_id].mz = cursor_direction.m128_f32[1];
+			network.g_client[network.my_id].attack_x = ptCursorPos.x - 640;
+			network.g_client[network.my_id].attack_z = ptCursorPos.y - 360;
 			if (GetCapture() == m_hWnd)
 			{
 				((CMainGamePlayer*)client_player)->StartFire();
@@ -736,13 +738,13 @@ void CGameFramework::ProcessInput()
 			network.Send_rotate_packet(network.g_client[network.my_id].mx, network.g_client[network.my_id].mz);
 		}
 
-		if (GetCapture() == m_hWnd && network.attack_state == false)
-		{
-			network.attack_state = true;
-			int m_x = ptCursorPos.x - 640;
-			int m_z = ptCursorPos.y - 360;
-			network.Send_attack_packet(m_x, m_z);
-		}
+		//if (GetCapture() == m_hWnd && network.attack_state == false)
+		//{
+		//	network.attack_state = true;
+		//	int m_x = ptCursorPos.x - 640;
+		//	int m_z = ptCursorPos.y - 360;
+		//	network.Send_attack_packet(m_x, m_z);
+		//}
 #endif
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{

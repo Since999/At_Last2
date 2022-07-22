@@ -3479,7 +3479,6 @@ void Server::ZombiePlayerAttack(NPC& npc, MapType m_type)
 			if (h_cl._state != ClientState::INGAME)	continue;
 
 			Send_player_info_packet(h_cl._id, cl._id, cl.player->hp);
-			this_thread::sleep_for(1ms);
 		}
 	}
 
@@ -3529,7 +3528,7 @@ void Server::ZombieAttack(int z_id)
 	}
 	}
 
-	AddTimer(z_id, EVENT_TYPE::EVENT_NPC_MOVE, 800);
+	AddTimer(z_id, EVENT_TYPE::EVENT_NPC_MOVE, 2000);
 }
 
 void Server::ZombieSend()

@@ -93,7 +93,9 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 	}
 	else
 	{
+		cout << root.top()->Get_X() << ", " << root.top()->Get_Y() << "¿¡¼­";
 		root.pop();
+		cout << root.top()->Get_X() << ", " << root.top()->Get_Y() << "·Î º¯°æµÇ¾ú´Ù. \n";
 		return MoveResult::MOVE;
 	}
 
@@ -133,12 +135,12 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		if (col_result >= 0.5f)
 			col += 1;
 
-		for (int i = (int)z; i <= row; ++i)
+		for (int i = root_z; i <= row; ++i)
 		{
 			collied = IsCollied(i, col, map);
 			if (collied)
 			{
-				z = float(i - 1);
+				z = root_z;
 				break;
 			}
 		}
@@ -169,19 +171,22 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 
 		if (true == IsCollied(root_z + 1, root_x, map))
 		{
+			cout << "UP_RIGHT Áß UP ÀÌ ¸·Èû \n";
+			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
 
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
 
 			z_move_lock.lock();
-			add_node = root.top();
+			add_node = *root.top();
 			z_move_lock.unlock();
 
-			add_node->Set_X(temp_x);
-			add_node->Set_Y(temp_z - 1);
+			add_node.Set_X(root_x + 1);
+			add_node.Set_Y(root_z);
 
 			z_move_lock.lock();
-			root.push(add_node);
+			root.push(&add_node);
+			root.push(&add_node);
 			z_move_lock.unlock();
 
 			node = root.top();
@@ -190,18 +195,22 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		if (true == IsCollied(root_z, root_x + 1, map))
 		{
+			cout << "UP_RIGHT Áß RIGHT ÀÌ ¸·Èû \n";
+			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
 
 			z_move_lock.lock();
-			add_node = root.top();
+			add_node = *root.top();
 			z_move_lock.unlock();
 
-			add_node->Set_X(temp_x - 1);
-			add_node->Set_Y(temp_z);
+			add_node.Set_X(root_x);
+			add_node.Set_Y(root_z + 1);
 
 			z_move_lock.lock();
-			root.push(add_node);
+			root.push(&add_node);
+			root.push(&add_node);
 			z_move_lock.unlock();
 
 			node = root.top();
@@ -336,18 +345,22 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 
 		if (true == IsCollied(root_z + 1, root_x, map))
 		{
+			cout << "UP_LEFT Áß UP ÀÌ ¸·Èû \n";
+			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
 
 			z_move_lock.lock();
-			add_node = root.top();
+			add_node = *root.top();
 			z_move_lock.unlock();
 
-			add_node->Set_X(temp_x);
-			add_node->Set_Y(temp_z -1);
+			add_node.Set_X(root_x - 1);
+			add_node.Set_Y(root_z);
 
 			z_move_lock.lock();
-			root.push(add_node);
+			root.push(&add_node);
+			root.push(&add_node);
 			z_move_lock.unlock();
 
 			node = root.top();
@@ -355,18 +368,22 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		if (true == IsCollied(root_z, root_x - 1, map))
 		{
+			cout << "UP_LEFT Áß LEFT ÀÌ ¸·Èû \n";
+			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
 
 			z_move_lock.lock();
-			add_node = root.top();
+			add_node = *root.top();
 			z_move_lock.unlock();
 
-			add_node->Set_X(temp_x+1);
-			add_node->Set_Y(temp_z);
+			add_node.Set_X(root_x);
+			add_node.Set_Y(root_z + 1);
 
 			z_move_lock.lock();
-			root.push(add_node);
+			root.push(&add_node);
+			root.push(&add_node);
 			z_move_lock.unlock();
 
 			node = root.top();
@@ -595,18 +612,22 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 
 		if (true == IsCollied(root_z - 1, root_x, map))
 		{
+			cout << "DOWN_LEFT Áß DOWN ÀÌ ¸·Èû \n";
+			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
 
 			z_move_lock.lock();
-			add_node = root.top();
+			add_node = *root.top();
 			z_move_lock.unlock();
 
-			add_node->Set_X(temp_x);
-			add_node->Set_Y(temp_z + 1);
+			add_node.Set_X(root_x - 1);
+			add_node.Set_Y(root_z);
 
 			z_move_lock.lock();
-			root.push(add_node);
+			root.push(&add_node);
+			root.push(&add_node);
 			z_move_lock.unlock();
 
 			node = root.top();
@@ -614,18 +635,22 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		if (true == IsCollied(root_z, root_x - 1, map))
 		{
+			cout << "DOWN_LEFT Áß LEFT ÀÌ ¸·Èû \n";
+			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
 
 			z_move_lock.lock();
-			add_node = root.top();
+			add_node = *root.top();
 			z_move_lock.unlock();
 
-			add_node->Set_X(temp_x+1);
-			add_node->Set_Y(temp_z);
+			add_node.Set_X(root_x);
+			add_node.Set_Y(root_z - 1);
 
 			z_move_lock.lock();
-			root.push(add_node);
+			root.push(&add_node);
+			root.push(&add_node);
 			z_move_lock.unlock();
 
 			node = root.top();
@@ -751,18 +776,22 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 
 		if (true == IsCollied(root_z - 1, root_x, map))
 		{
+			cout << "DOWN_RIGHT Áß DOWN ÀÌ ¸·Èû \n";
+			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
 
 			z_move_lock.lock();
-			add_node = root.top();
+			add_node = *root.top();
 			z_move_lock.unlock();
 
-			add_node->Set_X(temp_x);
-			add_node->Set_Y(temp_z + 1);
+			add_node.Set_X(root_x + 1);
+			add_node.Set_Y(root_z);
 
 			z_move_lock.lock();
-			root.push(add_node);
+			root.push(&add_node);
+			root.push(&add_node);
 			z_move_lock.unlock();
 
 			node = root.top();
@@ -770,18 +799,22 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		if (true == IsCollied(root_z, root_x + 1, map))
 		{
+			cout << "DOWN_RIGHT Áß RIGHT ÀÌ ¸·Èû \n";
+			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
 
 			z_move_lock.lock();
-			add_node = root.top();
+			add_node = *root.top();
 			z_move_lock.unlock();
 
-			add_node->Set_X(temp_x - 1);
-			add_node->Set_Y(temp_z);
+			add_node.Set_X(root_x);
+			add_node.Set_Y(root_z - 1);
 
 			z_move_lock.lock();
-			root.push(add_node);
+			root.push(&add_node);
+			root.push(&add_node);
 			z_move_lock.unlock();
 
 			node = root.top();
@@ -920,7 +953,7 @@ NormalZombie::NormalZombie()
 	speed = 4.5f;
 	infection = 1.0f;
 	_type = ZombieType::NORMAL;
-	attack_timer = chrono::milliseconds(4000);
+	attack_timer = chrono::milliseconds(2000);
 	searchRange = 10.0f;
 	angle = 0.0f;
 }
@@ -937,7 +970,7 @@ SoldierZombie::SoldierZombie()
 	speed = 5.0f;
 	infection = 3.0f;
 	_type = ZombieType::SOLIDEIR;
-	attack_timer = chrono::milliseconds(4000);
+	attack_timer = chrono::milliseconds(2000);
 	searchRange = 10.0f;
 	angle = 0.0f;
 }
@@ -954,7 +987,7 @@ TankerZombie::TankerZombie()
 	speed = 4.0f;
 	infection = 2.0f;
 	_type = ZombieType::TANKER;
-	attack_timer = chrono::milliseconds(4000);
+	attack_timer = chrono::milliseconds(2000);
 	searchRange = 10.0f;
 	angle = 0.0f;
 }
@@ -971,7 +1004,7 @@ DogZombie::DogZombie()
 	speed = 7.2f;
 	infection = 2.0f;
 	_type = ZombieType::DOG;
-	attack_timer = chrono::milliseconds(4000);
+	attack_timer = chrono::milliseconds(2000);
 	searchRange = 10.0f;
 	angle = 0.0f;
 }

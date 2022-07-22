@@ -23,6 +23,7 @@ public:
 	bool is_input = false;
 	float rotation_angle = 0.0f;
 	float mx, mz;		// 마우스 클릭 위치
+	float attack_x, attack_z;
 	atomic <ClientState> _state;
 	atomic <ClientAnimationState> _animation;
 

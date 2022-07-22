@@ -701,7 +701,7 @@ Commander::~Commander()
 Engineer::Engineer()
 {
 	//hp = 75, maxhp = 75;
-	hp = 1000, maxhp = 1000;
+	hp = 100, maxhp = 100;
 	attack = 3;
 	interaction = 15;
 	x = 65.0f, z = 55.0f;

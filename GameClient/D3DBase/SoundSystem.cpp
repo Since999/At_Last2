@@ -58,7 +58,7 @@ void CSoundSystem::Play(const wstring& name)
 	CSound& sound = (*found).second;
 	auto& found_channel = channel_pool.find(sound.channel);
 
-	system->playSound(sound.sound, 0, false, &(*found_channel).second);
+	//system->playSound(sound.sound, 0, false, &(*found_channel).second);
 	
 }
 
