@@ -89,6 +89,7 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		pos.z = 14000.0f + 1000.0f * i;
 		//pos.dir = DIR::WIDTH;
 		pos.angle = 0;
+		pos.b_type = (BarricadeType)(i % 3);
 		barricade.push_back(pos);
 	}
 	for (int i = 0; i < 10; ++i) {
@@ -96,13 +97,19 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		pos.x = 50500.0f + 5000.0f * i;
 		pos.z = 14000.0f;
 		pos.angle = 0;
+		pos.b_type = (BarricadeType)(i % 3);
 		barricade.push_back(pos);
 	}
 #endif
 	object_num = barricade.size() + MAX_ADDITIONAL_OBJECT;
 	vector<CTexture*> textures;
-	auto tex = CTexturePool::GetInstance()->GetTexture(L"no_texture.png");
+	auto tex = CTexturePool::GetInstance()->GetTexture(L"car1.png");
 	textures.push_back(tex);
+	tex = CTexturePool::GetInstance()->GetTexture(L"UVmap.jpg");
+	textures.push_back(tex);
+	tex = CTexturePool::GetInstance()->GetTexture(L"no_texture.png");
+	textures.push_back(tex);
+	
 
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, object_num, 0);
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
@@ -117,6 +124,9 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	}
 
 	OldModelLoader model_loader;
+
+	model_loader.LoadModelWithTranslation(pd3dDevice, pd3dCommandList, std::string("Resources/Model/car.fbx"), mesh);
+	model_loader.LoadModelWithTranslation(pd3dDevice, pd3dCommandList, std::string("Resources/Model/tree.fbx"), mesh);
 	model_loader.LoadModelWithTranslation(pd3dDevice, pd3dCommandList, std::string("Resources/Model/Barricada Concreto.fbx"), mesh);
 
 	CStaticObject* static_object = NULL;
@@ -124,14 +134,16 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	float bottom = -500.0f;
 	
 	for(auto& bar_info : barricade){
-		static_object = new CStaticObject(mesh.size());
+		/*static_object = new CStaticObject(mesh.size());
 		static_object->SetNumberOfMeshes(mesh.size());
 		for (int j = 0; j < mesh.size(); ++j) {
 			static_object->SetMesh(j, mesh[j]);
-		}
+		}*/
+		static_object = new CStaticObject(1);
+		static_object->SetMesh(0, mesh[(unsigned int)bar_info.b_type]);
 		
 		//pRotatingObject->SetMesh(0, pCubeMesh);
-		static_object->SetMaterial(materials[0]);
+		static_object->SetMaterial(materials[(unsigned int)bar_info.b_type]);
 		static_object->SetPosition(bar_info.x, bottom, bar_info.z);
 		static_object->Scale(0.1f);
 		static_object->Rotate(0.0f, bar_info.angle, 0.0f);
