@@ -378,5 +378,9 @@
     <Xml Include="Resources\UI\lobby_UI_2.xml">
       <Filter>리소스 파일\UI</Filter>
     </Xml>
+    <Xml Include="Resources\Model\PlayerModel.xml" />
+    <Xml Include="Resources\Model\PlayerModel.xml">
+      <Filter>리소스 파일</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

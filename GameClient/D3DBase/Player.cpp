@@ -446,6 +446,16 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 	pre_location = curr_location;
 
 	fire_time -= fTimeElapsed;
+
+	//reload
+	if (is_reloading) {
+		reload_time -= fTimeElapsed;
+		if (reload_time <= 0.f) {
+			server_player_info->left_bullet += 30;
+			server_player_info->left_bullet = clamp(server_player_info->left_bullet, 0, server_player_info->max_bullet);
+			is_reloading = false;
+		}
+	}
 }
 
 void CMainGamePlayer::StartFire()
@@ -462,12 +472,21 @@ void CMainGamePlayer::StopFire()
 	fire_time = 0.f;*/
 }
 
+void CMainGamePlayer::Reload()
+{
+	if (server_player_info->left_bullet >= server_player_info->max_bullet || is_reloading) return;
+	is_reloading = true;
+	reload_time = reload_duration;
+	((CPlayerStateMachine*)state_machine)->PlayReloadAnim();
+}
+
 #include "CStaticObjectShader.h"
 void CMainGamePlayer::Fire()
 {
 	if (server_player_info->left_bullet <= 0) {
 		return;
 	}
+	is_reloading = false;
 	server_player_info->left_bullet -= 1;
 	XMFLOAT3 dir = XMFLOAT3(-server_player_info->mx, 0.0f, server_player_info->mz);
 	dir = Vector3::Normalize(dir);

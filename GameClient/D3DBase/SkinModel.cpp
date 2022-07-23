@@ -49,14 +49,15 @@ array<XMMATRIX, 96>& SkinModel::GetBoneMat()
 	if (_meshList.empty()) 	return calcBoneList;
 
 	int index = 0;
-	for (const auto& mesh : _meshList) {
+	const auto& mesh = _meshList[0];
+	//for (const auto& mesh : _meshList) {
 		//본 정보 셋팅
 		if (!mesh->boneList.empty()) {
 			for (const auto& boneInfo : mesh->boneList) {
 				calcBoneList[index++] = XMMatrixTranspose(boneInfo.matOffset * boneInfo.linkNode->worldTM);
 			}
 		}
-	}
+	//}
 	return calcBoneList;
 }
 

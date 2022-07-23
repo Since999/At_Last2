@@ -374,6 +374,9 @@ void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandLis
 	framework->ChangeUI(new UISystem(device, list, GetGraphicsRootSignature(), "Resources/UI/TestUI.xml"));
 
 	unsigned int model_index;
+#ifndef ENABLE_NETWORK
+	network.g_client[network.my_id]._type = PlayerType::MERCENARY;
+#endif
 	model_index = (int)(network.g_client[network.my_id]._type);
 	m_pPlayer = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
 		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
@@ -480,6 +483,27 @@ void CMainGameScene::ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPlayer->ShadowMapRender(pd3dCommandList);
 	m_pPlayer2->ShadowMapRender(pd3dCommandList);
 	m_pPlayer3->ShadowMapRender(pd3dCommandList);
+}
+
+bool CMainGameScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+{
+	switch (nMessageID)
+	{
+		
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case 'R':
+			((CMainGamePlayer*)client_player)->Reload();
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+	return(false);
 }
 
 bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)

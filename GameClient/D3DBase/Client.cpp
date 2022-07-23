@@ -12,7 +12,7 @@ Client::Client()
 	special_skill_key = false;
 	special_id = -1;
 	special_skill = 0;
-	left_bullet = 30;
+	left_bullet = max_bullet;
 	zombie_kill_num = 0;
 }
 
