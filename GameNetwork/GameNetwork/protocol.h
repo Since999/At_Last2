@@ -143,7 +143,6 @@ enum class MsgType : char							// 서버에서 보내는 메세지 형식
 	SC_PLAYER_SPECIAL_NUM_ZERO,			// 플레이어 특수 능력 사용량 제로 이면
 	SC_PLAYER_DEAD,									// 플레이어 사망
 	SC_PLAYER_SEARCH,								// 플레이어 주변 사물 접근 확인
-	SC_PLAYER_BULLET_INFO,						// 플레이어 총알 개수 변동량 전송
 	SC_PLAYER_IDLE,									// 플레이어 멈춰있는 상태
 	//SC_PLAYER_SEARCH_FAIL,					// 플레이어 주변 사물 확인 실패
 	SC_ZOMBIE_SPAWN,								// 좀비 스폰시 장소 지정, 좀비 지정
@@ -481,7 +480,6 @@ struct sc_player_reload_packet						// 서버에서 재장전 했을 때 보내줌
 	unsigned short size;
 	MsgType type;										// 메시지 타입 PlayerReload
 	char id;
-	char bullet;												// 총알 개수
 };
 
 struct sc_player_interation_packet					// 서버에서 클라이언트에게 플레이어 상호작용 패킷
@@ -545,14 +543,6 @@ struct sc_player_attack_packet						// 서버에서 클라이언트에게 누가 공격하고 있�
 	unsigned short size;
 	MsgType type;										// 메시지 타입 PLAYER_ATTACK
 	char id;
-};
-
-struct sc_player_bullet_info_packet				// 서버에서 클라이언트에게 총알의 정보를 보내기
-{
-	unsigned short size;
-	MsgType type;
-	char id;													// 메시지 타입 PLAYER_BULLET_INFO
-	char bullet;												// 보유 총알 수
 };
 
 struct sc_player_dead_packet						// 서버에서 클라이언트에게 클라이언트가 죽었다고 보내기

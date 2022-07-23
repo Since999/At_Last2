@@ -526,7 +526,7 @@ bool Map::CheckBarricade(iPos pos, ANGLE angle)
 
 		for (int z = pos.z - 2; z <= pos.z; ++z)
 		{
-			for (int x = pos.x; x <= pos.z + 2; ++x)
+			for (int x = pos.x; x <= pos.x + 2; ++x)
 			{
 				if (map[z][x] == (char)MazeWall::BARRICADE)
 					return true;
@@ -535,20 +535,20 @@ bool Map::CheckBarricade(iPos pos, ANGLE angle)
 			}
 		}
 
-		if(map[pos.z + 3][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x + 1] == map[pos.z + 3][pos.x + 1] == (char)MazeWall::WALL)
+		if(map[pos.z + 3][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x + 1] == (char)MazeWall::WALL)
 			return true;
 																																															  
-		if (map[pos.z - 1][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x - 1] == map[pos.z - 1][pos.x - 1] ==(char)MazeWall::WALL )
+		if (map[pos.z - 1][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x - 1] == (char)MazeWall::WALL )
 			return true;
-		if (map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x + 3] == map[pos.z - 1][pos.x + 3] ==(char)MazeWall::WALL )
-			return true;
-																																															  
-		if (map[pos.z + 1][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 1] == map[pos.z + 1][pos.x + 1] ==(char)MazeWall::WALL )
-			return true;
-		if (map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 3] == map[pos.z + 1][pos.x - 3] ==(char)MazeWall::WALL )
+		if (map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x + 3] == (char)MazeWall::WALL )
 			return true;
 																																															  
-		if (map[pos.z + 3][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x - 1] == map[pos.z + 3][pos.x - 1] ==(char)MazeWall::WALL )
+		if (map[pos.z + 1][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 1] == (char)MazeWall::WALL )
+			return true;
+		if (map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 3] == (char)MazeWall::WALL )
+			return true;
+																																															  
+		if (map[pos.z + 3][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x - 1] == (char)MazeWall::WALL )
 			return true;
 	}
 	else if (angle == ANGLE::SIXTY || angle == ANGLE::TWO_HUNDRED_FORTY)											// 60도, 240도
@@ -641,20 +641,20 @@ bool Map::CheckBarricade(iPos pos, ANGLE angle)
 			}
 		}
 
-		if(map[pos.z - 2][pos.x - 2] == (char)MazeWall::BARRICADE ==  map[pos.z - 2][pos.x - 2] == (char)MazeWall::WALL)
+		if(map[pos.z - 2][pos.x - 2] == (char)MazeWall::BARRICADE ||  map[pos.z - 2][pos.x - 2] == (char)MazeWall::WALL)
 			return true;
-		if(map[pos.z - 2][pos.x - 1] == (char)MazeWall::BARRICADE ==  map[pos.z - 2][pos.x - 1] == (char)MazeWall::WALL)
+		if(map[pos.z - 2][pos.x - 1] == (char)MazeWall::BARRICADE ||  map[pos.z - 2][pos.x - 1] == (char)MazeWall::WALL)
 			return true;
 																																										  
-		if(map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE ==  map[pos.z - 1][pos.x + 3] == (char)MazeWall::WALL)
+		if(map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE ||  map[pos.z - 1][pos.x + 3] == (char)MazeWall::WALL)
 			return true;
 																																										 
-		if(map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE ==  map[pos.z + 1][pos.x - 3] == (char)MazeWall::WALL)
+		if(map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE ||  map[pos.z + 1][pos.x - 3] == (char)MazeWall::WALL)
 			return true;
 																																									
-		if(map[pos.z + 2][pos.x + 1] == (char)MazeWall::BARRICADE ==  map[pos.z + 2][pos.x + 1] == (char)MazeWall::WALL)
+		if(map[pos.z + 2][pos.x + 1] == (char)MazeWall::BARRICADE ||  map[pos.z + 2][pos.x + 1] == (char)MazeWall::WALL)
 			return true;
-		if(map[pos.z + 2][pos.x + 2] == (char)MazeWall::BARRICADE ==  map[pos.z + 2][pos.x + 2] == (char)MazeWall::WALL)
+		if(map[pos.z + 2][pos.x + 2] == (char)MazeWall::BARRICADE ||  map[pos.z + 2][pos.x + 2] == (char)MazeWall::WALL)
 			return true;
 	}
 	else if (angle == ANGLE::ONE_HUNDRED_TWENTY || angle == ANGLE::THREE_HUNDRED)						// 120도, 300도

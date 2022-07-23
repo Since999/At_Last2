@@ -690,19 +690,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_player_reload_packet* packet = reinterpret_cast<sc_player_reload_packet*>(ptr);
 
-		g_client[packet->id].bullet = packet->bullet;
-
-		break;
-	}
-	case (int)MsgType::SC_PLAYER_BULLET_INFO:
-	{
-		sc_player_bullet_info_packet* packet = reinterpret_cast<sc_player_bullet_info_packet*>(ptr);
-
-		cout << (int)packet->id << "의 총알이 " << (int)packet->bullet << "개 있습니다 \n";
-
-		//bullet_lock.lock();
-		g_client[packet->id].bullet = packet->bullet;
-		//bullet_lock.unlock();
 
 		break;
 	}
@@ -834,6 +821,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			}
 		}
 
+		g_client[packet->id]._state = ClientState::INGAME;
 		g_client[packet->id].hp = packet->hp;
 		g_client[packet->id].bullet = packet->bullet;
 

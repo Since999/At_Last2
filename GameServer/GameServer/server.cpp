@@ -147,7 +147,7 @@ void Server::Send_select_packet(int c_id, int s_id)
 	packet.maxhp = g_clients[c_id].player->maxhp;
 	packet.x = g_clients[c_id].player->x;
 	packet.z = g_clients[c_id].player->z;
-	packet.bullet = g_clients[c_id].player->bullet;
+	packet.bullet = 30;
 	packet.speed = g_clients[c_id].player->speed;
 	g_clients[s_id].do_send(sizeof(packet), &packet);
 }
@@ -719,16 +719,6 @@ void Server::Send_player_attack_packet(int c_id, int a_id)
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
-void Server::Send_player_bullet_info_packet(int c_id, int bullet)
-{
-	sc_player_bullet_info_packet packet;
-	packet.bullet = bullet;
-	packet.id = c_id;
-	packet.size = sizeof(packet);
-	packet.type = MsgType::SC_PLAYER_BULLET_INFO;
-	g_clients[c_id].do_send(sizeof(packet), &packet);
-}
-
 bool Server::ZombieSendInsert(int c_id, void* packet, int size)
 {
 	if (g_clients[c_id]._zombie_prev_size + size > 1800)
@@ -792,12 +782,11 @@ void Server::Send_zombie_info_packet(int c_id, int z_id, int hp, MapType m_type)
 	}
 }
 
-void Server::Send_player_reload_packet(int c_id, int s_id, int bullet)
+void Server::Send_player_reload_packet(int c_id, int s_id)
 {
 	sc_player_reload_packet packet;
 	packet.size = sizeof(packet);
 	packet.type = MsgType::SC_PLAYER_RELOAD;
-	packet.bullet = bullet;
 	packet.id = s_id;
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
@@ -936,7 +925,7 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 void Server::Send_commander_skill_packet(int c_id, int s_id)
 {
 	sc_commander_special_packet packet;
-	packet.bullet = g_clients[s_id].player->bullet;
+	packet.bullet = 30;
 	packet.hp = g_clients[s_id].player->hp;
 	packet.id = s_id;
 	packet.size = sizeof(packet);
@@ -949,11 +938,92 @@ void Server::ResurrectionPlayer(Client& cl)
 	cl._state = ClientState::INGAME;
 	int max_hp = cl.player->maxhp;
 	cl.player->hp = max_hp;
-	cl.player->bullet = 30;
+
+	switch (cl.map_type)
+	{
+	case MapType::FIRST_PATH:
+	{
+		for (auto& zom : r_zombie1)
+		{
+			if (zom._state != ZombieState::SPAWN) continue;
+			if (NCDis_check(cl._id, zom) == false) continue;
+
+			cl.zombie_list.insert(zom._id);
+			Send_viewlist_put_packet(cl._id, zom._id, cl.map_type, r_zombie1[zom._id].zombie->GetX(), r_zombie1[zom._id].zombie->GetZ(), MsgType::SC_ZOMBIE_MOVE, r_zombie1[zom._id].zombie->_type);
+		}
+
+		break;
+	}
+	case MapType::SECOND_PATH:
+	{
+		for (auto& zom : r_zombie2)
+		{
+			if (zom._state != ZombieState::SPAWN) continue;
+			if (NCDis_check(cl._id, zom) == false) continue;
+
+			cl.zombie_list.insert(zom._id);
+			Send_viewlist_put_packet(cl._id, zom._id, cl.map_type, r_zombie2[zom._id].zombie->GetX(), r_zombie2[zom._id].zombie->GetZ(), MsgType::SC_ZOMBIE_MOVE, r_zombie2[zom._id].zombie->_type);
+		}
+
+		break;
+	}
+	case MapType::FINAL_PATH:
+	{
+		for (auto& zom : r_zombie3)
+		{
+			if (zom._state != ZombieState::SPAWN) continue;
+			if (NCDis_check(cl._id, zom) == false) continue;
+
+			cl.zombie_list.insert(zom._id);
+			Send_viewlist_put_packet(cl._id, zom._id, cl.map_type, r_zombie3[zom._id].zombie->GetX(), r_zombie3[zom._id].zombie->GetZ(), MsgType::SC_ZOMBIE_MOVE, r_zombie3[zom._id].zombie->_type);
+		}
+
+		break;
+	}
+	case MapType::CHECK_POINT_ONE:
+	{
+		for (auto& zom : b_zombie1)
+		{
+			if (zom._state != ZombieState::SPAWN) continue;
+			if (NCDis_check(cl._id, zom) == false) continue;
+
+			cl.zombie_list.insert(zom._id);
+			Send_viewlist_put_packet(cl._id, zom._id, cl.map_type, b_zombie1[zom._id].zombie->GetX(), b_zombie1[zom._id].zombie->GetZ(), MsgType::SC_ZOMBIE_MOVE, b_zombie1[zom._id].zombie->_type);
+		}
+
+		break;
+	}
+	case MapType::CHECK_POINT_TWO:
+	{
+		for (auto& zom : b_zombie2)
+		{
+			if (zom._state != ZombieState::SPAWN) continue;
+			if (NCDis_check(cl._id, zom) == false) continue;
+
+			cl.zombie_list.insert(zom._id);
+			Send_viewlist_put_packet(cl._id, zom._id, cl.map_type, b_zombie2[zom._id].zombie->GetX(), b_zombie2[zom._id].zombie->GetZ(), MsgType::SC_ZOMBIE_MOVE, b_zombie2[zom._id].zombie->_type);
+		}
+
+		break;
+	}
+	case MapType::CHECK_POINT_FINAL:
+	{
+		for (auto& zom : b_zombie3)
+		{
+			if (zom._state != ZombieState::SPAWN) continue;
+			if (NCDis_check(cl._id, zom) == false) continue;
+
+			cl.zombie_list.insert(zom._id);
+			Send_viewlist_put_packet(cl._id, zom._id, cl.map_type, b_zombie3[zom._id].zombie->GetX(), b_zombie3[zom._id].zombie->GetZ(), MsgType::SC_ZOMBIE_MOVE, b_zombie3[zom._id].zombie->_type);
+		}
+
+		break;
+	}
+	}
 
 	for (auto& s_cl : g_clients)
 	{
-		if (s_cl._state == ClientState::INGAME) continue;
+		if (s_cl._state != ClientState::INGAME) continue;
 
 		Send_commander_skill_packet(s_cl._id, cl._id);
 	}
@@ -970,12 +1040,6 @@ void Server::Send_commander_skill_check_packet(int c_id, int s_id)
 
 void Server::CommanderSpecialSkill(Client& cl)
 {
-	if (cl.player->special_skill == 0)
-	{
-		Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
-		return;
-	}
-
 	for (auto& other : g_clients)
 	{
 		if (other._id == cl._id)
@@ -988,17 +1052,17 @@ void Server::CommanderSpecialSkill(Client& cl)
 			continue;
 		}
 
-		if (Distance(cl.player->x, cl.player->z, other.player->x, other.player->z) <= 2.0f)
+		if (Distance(cl.player->x, cl.player->z, other.player->x, other.player->z) <= 3.0f)
 		{
-			Send_commander_skill_check_packet(cl._id, other._id);
+			ResurrectionPlayer(other);
 		}
 
 	}
 }
 
-bool Server::EngineerSpecialSkillMapCheck(int x, int z, DIR dir)
+bool Server::EngineerSpecialSkillMapCheck(int x, int z, Direction dir)
 {
-	if (dir == DIR::WIDTH)
+	if (dir == Direction::UP || dir == Direction::DOWN)
 	{
 		for (int j = 0; j < 3; ++j)
 		{
@@ -1011,7 +1075,7 @@ bool Server::EngineerSpecialSkillMapCheck(int x, int z, DIR dir)
 			}
 		}
 	}
-	else
+	else if(dir == Direction::RIGHT || dir == Direction::LEFT)
 	{
 		for (int j = 0; j < 3; ++j)
 		{
@@ -1024,13 +1088,93 @@ bool Server::EngineerSpecialSkillMapCheck(int x, int z, DIR dir)
 			}
 		}
 	}
+	else if (dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
+	{
+		for (int t_z = z - 2; t_z <= z; ++t_z)
+		{
+			for (int t_x = x - 2; t_x <= x; ++t_x)
+			{
+				if (map.map[t_z][t_x] == (char)MazeWall::BARRICADE)
+					return false;
+				if (map.map[t_z][t_x] == (char)MazeWall::WALL)
+					return false;
+			}
+		}
+
+		for (int t_z = z; t_z <= z + 2; ++t_z)
+		{
+			for (int t_x = x; t_x <= x + 2; ++t_x)
+			{
+				if (map.map[t_z][t_x] == (char)MazeWall::BARRICADE)
+					return false;
+				if (map.map[t_z][t_x] == (char)MazeWall::WALL)
+					return false;
+			}
+		}
+
+		if (map.map[z - 3][x - 1] == (char)MazeWall::BARRICADE || map.map[z - 3][x - 1] == (char)MazeWall::WALL)
+			return false;
+
+		if (map.map[z - 1][x - 3] == (char)MazeWall::BARRICADE || map.map[z - 1][x - 3] == (char)MazeWall::WALL)
+			return false;
+		if (map.map[z - 1][x + 1] == (char)MazeWall::BARRICADE || map.map[z - 1][x + 1] == (char)MazeWall::WALL)
+			return false;
+
+		if (map.map[z + 1][x - 1] == (char)MazeWall::BARRICADE || map.map[z + 1][x - 1] == (char)MazeWall::WALL)
+			return false;
+		if (map.map[z + 1][x + 3] == (char)MazeWall::BARRICADE || map.map[z + 1][x + 3] == (char)MazeWall::WALL)
+			return false;
+
+		if (map.map[z + 3][x + 1] == (char)MazeWall::BARRICADE || map.map[z + 3][x + 1] == (char)MazeWall::WALL)
+			return false;
+	}
+	else if(dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
+	{
+		for (int t_z = z; t_z <= z + 2; ++t_z)
+		{
+			for (int t_x = x - 2; t_x <= x; ++t_x)
+			{
+				if (map.map[t_z][t_x] == (char)MazeWall::BARRICADE)
+					return false;
+				if (map.map[t_z][t_x] == (char)MazeWall::WALL)
+					return false;
+			}
+		}
+
+		for (int t_z = z - 2; t_z <= z; ++t_z)
+		{
+			for (int t_x = x; t_x <= x + 2; ++t_x)
+			{
+				if (map.map[t_z][t_x] == (char)MazeWall::BARRICADE)
+					return false;
+				if (map.map[t_z][t_x] == (char)MazeWall::WALL)
+					return false;
+			}
+		}
+
+		if (map.map[z + 3][x + 1] == (char)MazeWall::BARRICADE || map.map[z + 3][x + 1] == (char)MazeWall::WALL)
+			return false;
+
+		if (map.map[z - 1][x - 1] == (char)MazeWall::BARRICADE || map.map[z - 1][x - 1] == (char)MazeWall::WALL)
+			return false;
+		if (map.map[z - 1][x + 3] == (char)MazeWall::BARRICADE || map.map[z - 1][x + 3] == (char)MazeWall::WALL)
+			return false;
+
+		if (map.map[z + 1][x + 1] == (char)MazeWall::BARRICADE || map.map[z + 1][x + 1] == (char)MazeWall::WALL)
+			return false;
+		if (map.map[z + 1][x - 3] == (char)MazeWall::BARRICADE || map.map[z + 1][x - 3] == (char)MazeWall::WALL)
+			return false;
+
+		if (map.map[z + 3][x - 1] == (char)MazeWall::BARRICADE || map.map[z + 3][x - 1] == (char)MazeWall::WALL)
+			return false;
+	}
 
 	return true;
 }
 
-void Server::EngineerBuildBarricade(int bx, int bz, DIR dir)
+void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 {
-	if (dir == DIR::HEIGHT)
+	if (dir == Direction::RIGHT || dir == Direction::LEFT)
 	{
 		for (int j = 0; j < 3; ++j)
 		{
@@ -1040,7 +1184,7 @@ void Server::EngineerBuildBarricade(int bx, int bz, DIR dir)
 			}
 		}
 	}
-	else
+	else if (dir == Direction::UP || dir == Direction::DOWN)
 	{
 		for (int j = 0; j < 3; ++j)
 		{
@@ -1049,6 +1193,62 @@ void Server::EngineerBuildBarricade(int bx, int bz, DIR dir)
 				map.map[bz - 1 + j][bx - 2 + i] = (char)MazeWall::BARRICADE;
 			}
 		}
+	}
+	else if (dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
+	{
+		for (int t_z = bz - 2; t_z <= bz; ++t_z)
+		{
+			for (int t_x = bx - 2; t_x <= bx; ++t_x)
+			{
+				map.map[t_z][t_x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int t_z = bz; t_z <= bz + 2; ++t_z)
+		{
+			for (int t_x = bx; t_x <= bx + 2; ++t_x)
+			{
+				map.map[t_z][t_x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map.map[bz - 3][bx - 1] = (char)MazeWall::BARRICADE;
+
+		map.map[bz - 1][bx - 3] = (char)MazeWall::BARRICADE;
+		map.map[bz - 1][bx + 1] = (char)MazeWall::BARRICADE;
+
+		map.map[bz + 1][bx - 1] = (char)MazeWall::BARRICADE;
+		map.map[bz + 1][bx + 3] = (char)MazeWall::BARRICADE;
+
+		map.map[bz + 3][bx + 1] = (char)MazeWall::BARRICADE;
+	}
+	else if (dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
+	{
+		for (int t_z = bz; t_z <= bz + 2; ++t_z)
+		{
+			for (int t_x = bx - 2; t_x <= bx; ++t_x)
+			{
+				map.map[t_z][t_x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		for (int t_z = bz - 2; t_z <= bz; ++t_z)
+		{
+			for (int t_x = bx; t_x <= bx + 2; ++t_x)
+			{
+				map.map[t_z][t_x] = (char)MazeWall::BARRICADE;
+			}
+		}
+
+		map.map[bz - 3][bx + 1] = (char)MazeWall::BARRICADE;
+
+		map.map[bz - 1][bx - 1] = (char)MazeWall::BARRICADE;
+		map.map[bz - 1][bx + 3] = (char)MazeWall::BARRICADE;
+
+		map.map[bz + 1][bx + 1] = (char)MazeWall::BARRICADE;
+		map.map[bz + 1][bx - 3] = (char)MazeWall::BARRICADE;
+
+		map.map[bz + 3][bx - 1] = (char)MazeWall::BARRICADE;
 	}
 }
 
@@ -1076,12 +1276,6 @@ void Server::Send_engineer_skill_check_packet(int c_id, int x, int z)
 
 void Server::EngineerSpecialSkill(Client& cl)
 {
-	if (cl.player->special_skill == 0)
-	{
-		Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
-		return;
-	}
-
 	bool check = true;	// true : 지을수 있음, false : 지을 수 없음
 	int t_x = 0, t_z = 0;
 
@@ -1102,107 +1296,54 @@ void Server::EngineerSpecialSkill(Client& cl)
 		return;
 	}
 
-	if (cl.player->special_dir == DIR::HEIGHT)
+	
+	if (cl.player->dir == Direction::UP)
 	{
-		if (cl.player->dir == Direction::UP)
-		{
-			t_x = cl_root_x;
-			t_z = cl_root_z - 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
-		}
-		else if (cl.player->dir == Direction::UP_RIGHT)
-		{
-			t_x = cl_root_x + 2;
-			t_z = cl_root_z - 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
-		}
-		else if (cl.player->dir == Direction::RIGHT)
-		{
-			t_x = cl_root_x + 2;
-			t_z = cl_root_z;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
-		}
-		else if (cl.player->dir == Direction::DOWN_RIGHT)
-		{
-			t_x = cl_root_x + 2;
-			t_z = cl_root_z + 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
-		}
-		else if (cl.player->dir == Direction::DOWN)
-		{
-			t_x = cl_root_x;
-			t_z = cl_root_z + 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
-		}
-		else if (cl.player->dir == Direction::DOWN_LEFT)
-		{
-			t_x = cl_root_x - 2;
-			t_z = cl_root_z + 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
-		}
-		else if (cl.player->dir == Direction::LEFT)
-		{
-			t_x = cl_root_x - 2;
-			t_z = cl_root_z;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
-		}
-		else if (cl.player->dir == Direction::UP_LEFT)
-		{
-			t_x = cl_root_x - 2;
-			t_z = cl_root_z - 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::HEIGHT);
-		}
+		t_x = cl_root_x;
+		t_z = cl_root_z + 3;
+		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP);
 	}
-	else
+	else if (cl.player->dir == Direction::UP_RIGHT)
 	{
-		if (cl.player->dir == Direction::UP)
-		{
-			t_x = cl_root_x;
-			t_z = cl_root_z - 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
-		}
-		else if (cl.player->dir == Direction::UP_RIGHT)
-		{
-			t_x = cl_root_x + 3;
-			t_z = cl_root_z - 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
-		}
-		else if (cl.player->dir == Direction::RIGHT)
-		{
-			t_x = cl_root_x + 3;
-			t_z = cl_root_z;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
-		}
-		else if (cl.player->dir == Direction::DOWN_RIGHT)
-		{
-			t_x = cl_root_x + 3;
-			t_z = cl_root_z + 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
-		}
-		else if (cl.player->dir == Direction::DOWN)
-		{
-			t_x = cl_root_x;
-			t_z = cl_root_z + 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
-		}
-		else if (cl.player->dir == Direction::DOWN_LEFT)
-		{
-			t_x = cl_root_x - 3;
-			t_z = cl_root_z + 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
-		}
-		else if (cl.player->dir == Direction::LEFT)
-		{
-			t_x = cl_root_x - 3;
-			t_z = cl_root_z;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
-		}
-		else if (cl.player->dir == Direction::UP_LEFT)
-		{
-			t_x = cl_root_x - 3;
-			t_z = cl_root_z - 2;
-			check = EngineerSpecialSkillMapCheck(t_x, t_z, DIR::WIDTH);
-		}
+		t_x = cl_root_x + 3;
+		t_z = cl_root_z + 3;
+		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP_RIGHT);
+	}
+	else if (cl.player->dir == Direction::RIGHT)
+	{
+		t_x = cl_root_x + 3;
+		t_z = cl_root_z;
+		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::RIGHT);
+	}
+	else if (cl.player->dir == Direction::DOWN_RIGHT)
+	{
+		t_x = cl_root_x + 3;
+		t_z = cl_root_z - 3;
+		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN_RIGHT);
+	}
+	else if (cl.player->dir == Direction::DOWN)
+	{
+		t_x = cl_root_x;
+		t_z = cl_root_z - 3;
+		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN);
+	}
+	else if (cl.player->dir == Direction::DOWN_LEFT)
+	{
+		t_x = cl_root_x - 3;
+		t_z = cl_root_z - 3;
+		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN_LEFT);
+	}
+	else if (cl.player->dir == Direction::LEFT)
+	{
+		t_x = cl_root_x - 3;
+		t_z = cl_root_z;
+		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::LEFT);
+	}
+	else if (cl.player->dir == Direction::UP_LEFT)
+	{
+		t_x = cl_root_x - 3;
+		t_z = cl_root_z + 3;
+		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP_LEFT);
 	}
 
 	if (map_type == MapType::CHECK_POINT_ONE)
@@ -1356,12 +1497,6 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 void Server::MercenarySpecialSkill(Client& cl)
 {
-	if (cl.player->special_skill == 0)
-	{
-		Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
-		return;
-	}
-
 
 }
 
@@ -1485,16 +1620,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		cs_attack_packet* packet = reinterpret_cast<cs_attack_packet*>(p);
 
 		if (cl._state != ClientState::INGAME) break;
-		if (cl.player->bullet == 0)
-		{
-			// 플레이어의 총알이 모두 떨어졌으므로 재장전해야합니다.
-			Send_fail_packet(cl._id, MsgType::SC_PLAYER_RELOAD_REQUEST);
-			return;
-		}
-
-		cl.player->bullet -= 1;
-
-		Send_player_bullet_info_packet(cl._id, cl.player->bullet);
 
 		// 총알이 소모되고 공격을 하였기 때문에 모두에게 공격이 되었다고 전달
 		for (auto& a_cl : g_clients)
@@ -1727,10 +1852,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	}
 	case (int)MsgType::CS_PLAYER_RELOAD_REQUEST:
 	{
-		//cl.bullet_lock.lock();
-		cl.player->bullet = 30;
-		//cl.bullet_lock.unlock();
-
 		for (auto& s_cl : g_clients)
 		{
 			//s_cl.state_lock.lock();
@@ -1741,7 +1862,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			}
 			//s_cl.state_lock.unlock();
 
-			Send_player_reload_packet(s_cl._id, cl._id, cl.player->bullet);
+			Send_player_reload_packet(s_cl._id, cl._id);
 		}
 		break;
 	}
@@ -2148,6 +2269,12 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	{
 		if (cl._state != ClientState::INGAME)
 		{
+			break;
+		}
+
+		if (cl.player->special_skill == 0)
+		{
+			Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
 			break;
 		}
 
@@ -3453,6 +3580,7 @@ void Server::ZombiePlayerAttack(NPC& npc, MapType m_type)
 
 			// 플레이어 상태변화
 			cl._state = ClientState::DEAD;
+			cl.zombie_list.clear();
 
 			int dead_player = 0;
 			for (auto& d_cl : g_clients)
@@ -3916,6 +4044,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 	// Astar 알고리즘을 돌리지 않았다면 npc의 Astar 알고리즘 돌려서 스택 집어 넣기
 	if (npc.astar_check == false)
 	{
+		cout << "새로 astar를 돌릴 것이다 \n";
 		float root_path[3] = { 999999, 999999, 999999 };
 
 		// 각 클라이언트와의 거리 구하기
