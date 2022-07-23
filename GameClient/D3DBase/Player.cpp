@@ -477,7 +477,10 @@ void CMainGamePlayer::Reload()
 	if (server_player_info->left_bullet >= server_player_info->max_bullet || is_reloading) return;
 	is_reloading = true;
 	reload_time = reload_duration;
-	((CPlayerStateMachine*)state_machine)->PlayReloadAnim();
+	((CPlayerStateMachine*)state_machine)->PlayReloadAnim(); 
+#ifdef ENABLE_NETWORK
+	network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
+#endif
 }
 
 #include "CStaticObjectShader.h"

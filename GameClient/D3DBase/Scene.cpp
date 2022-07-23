@@ -375,7 +375,7 @@ void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandLis
 
 	unsigned int model_index;
 #ifndef ENABLE_NETWORK
-	network.g_client[network.my_id]._type = PlayerType::MERCENARY;
+	network.g_client[network.my_id]._type = PlayerType::COMMANDER;
 #endif
 	model_index = (int)(network.g_client[network.my_id]._type);
 	m_pPlayer = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
@@ -531,11 +531,6 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 		network.Send_request_packet(MsgType::CS_PLAYER_INTERATION);
 	}
 	// 채팅용 키 엔터 또는 등등을 만들어야 할 수도 있음 현재는 만들지 않음
-
-	if ((pKeysBuffer['R'] & 0xF0) && network.key_down_state == false) {
-		network.key_down_state = true;
-		network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
-	}
 
 	if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false && network.g_client[network.my_id].special_skill > 0)
 	{

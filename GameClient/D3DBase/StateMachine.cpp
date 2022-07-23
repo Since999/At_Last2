@@ -231,7 +231,7 @@ void CPlayerStateMachine::PlayReloadAnim()
 	default:
 		break;
 	}*/
-	anim_state = (ClientAnimationState)(((int)(anim_state) + 1) % 6);
+	/*anim_state = (ClientAnimationState)(((int)(anim_state) + 1) % 6);
 	switch (anim_state) {
 	case ClientAnimationState::WALK_AND_SHOOT:
 		model->PlayAni(PLAYER::WALK_AND_SHOOT);
@@ -255,7 +255,7 @@ void CPlayerStateMachine::PlayReloadAnim()
 		break;
 	case ClientAnimationState::WALK:
 		break;
-	}
+	}*/
 	//model->PlayAni(PLAYER::WALK_AND_RELOAD);
 }
 
