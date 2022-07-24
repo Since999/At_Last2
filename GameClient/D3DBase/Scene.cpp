@@ -363,6 +363,9 @@ void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandLis
 	m_ppShaders[0] = pObjectShader;*/
 
 	CAnimationObjectShader* ani_shader = new CAnimationObjectShader(device, list, m_pd3dGraphicsRootSignature);
+	//TEST
+	test_zombie = ani_shader->GetFirstZombie();
+	//TEST
 	m_ppShaders[0] = ani_shader;
 
 
@@ -485,6 +488,48 @@ void CMainGameScene::ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPlayer3->ShadowMapRender(pd3dCommandList);
 }
 
+bool CMainGameScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+{
+	switch (nMessageID)
+	{
+	case WM_LBUTTONDOWN:
+	{
+		((CMainGamePlayer*)client_player)->StartFire();
+
+		//TEST
+		test_zombie->ChangeAni();
+		//TEST
+#ifdef TEST
+		POINT point;
+		::GetCursorPos(&point);
+		ScreenToClient(hWnd, &point);
+
+		RECT rect;
+		GetClientRect(hWnd, &rect);
+		float width = rect.right - rect.left;
+		float height = rect.bottom - rect.top;
+		float x = point.x - (width / 2);
+		float y = point.y - (height / 2);
+		x = -x;
+		((CMainGamePlayer*)client_player)->MoveTo(x, y);
+#endif
+	}
+	break;
+	case WM_RBUTTONDOWN:
+		break;
+	case WM_LBUTTONUP:
+		((CMainGamePlayer*)client_player)->StopFire();
+		break;
+	case WM_RBUTTONUP:
+		break;
+	case WM_MOUSEMOVE:
+		break;
+	default:
+		break;
+	}
+	return(false);
+}
+
 bool CMainGameScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	switch (nMessageID)
@@ -605,13 +650,7 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 		cursor_direction = XMVector2Normalize(cursor_direction);
 		network.g_client[network.my_id].mx = cursor_direction.m128_f32[0];
 		network.g_client[network.my_id].mz = cursor_direction.m128_f32[1];
-		if (GetCapture() == hwnd)
-		{
-			((CMainGamePlayer*)client_player)->StartFire();
-		}
-		else {
-			((CMainGamePlayer*)client_player)->StopFire();
-		}
+		
 	}
 
 #ifdef ENABLE_NETWORK

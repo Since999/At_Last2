@@ -154,6 +154,8 @@ public:
 	void StopFire();
 
 	void Reload();
+
+	void MoveTo(float x, float y);
 private:
 	void Fire();
 };

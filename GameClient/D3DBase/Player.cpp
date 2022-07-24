@@ -445,8 +445,14 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 
 	pre_location = curr_location;
 
+	//fire
 	fire_time -= fTimeElapsed;
-
+	if (is_firing) {
+		if (fire_time < 0.f) {
+			Fire();
+			fire_time = fire_rate;
+		}
+	}
 	//reload
 	if (is_reloading) {
 		reload_time -= fTimeElapsed;
@@ -460,16 +466,14 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 
 void CMainGamePlayer::StartFire()
 {
-	if (fire_time < 0.f) {
-		Fire();
-		fire_time = fire_rate;
-	}
+	is_firing = true;
+	fire_time = fire_rate;
+	
 }
 
 void CMainGamePlayer::StopFire()
 {
-	/*is_firing = false;
-	fire_time = 0.f;*/
+	is_firing = false;
 }
 
 void CMainGamePlayer::Reload()
@@ -504,4 +508,12 @@ void CMainGamePlayer::Fire()
 #ifdef ENABLE_NETWORK
 	Network::Send_attack_packet(server_player_info->mx, server_player_info->mz);
 #endif
+}
+
+void CMainGamePlayer::MoveTo(float x, float y)
+{
+	XMFLOAT3 move_to_pos = GetPosition();
+	move_to_pos.x += x;
+	move_to_pos.z += y;
+	ParticleSystem::GetInstance()->AddParticle(move_to_pos, L"lightning");
 }

@@ -9,6 +9,7 @@
 class CObject;
 class CGameFramework;
 class CSunLight;
+class CAnimationObject;
 
 class CScene
 {
@@ -82,6 +83,7 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void ReleaseShaderVariables();
 
+	virtual bool OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	virtual bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	virtual bool ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd);
 	virtual void AnimateObjects(float fTimeElapsed);
@@ -97,4 +99,6 @@ private:
 	CPlayer* m_pPlayer3 = NULL;
 	CPlayer* client_player = NULL;
 	CSunLight* sun_light = NULL;
+
+	CAnimationObject* test_zombie = NULL;
 };

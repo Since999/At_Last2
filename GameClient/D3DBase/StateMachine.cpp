@@ -16,8 +16,9 @@ const array<XMMATRIX, 96>& CStateMachine::GetBoneMat()
 {
 	Update(TIMEMANAGER.GetTimeElapsed());
 	auto& mat = model->GetBoneMat();
+	anim_mat = mat;
 	if (blend_time < max_blend_time) {
-		CAnimationBlend::BlendAnimation(mat, blend_mat, blend_time / max_blend_time, mat);
+		CAnimationBlend::BlendAnimation(blend_mat, mat, blend_time / max_blend_time, mat);
 	}
 	return mat;
 }
@@ -38,6 +39,13 @@ void CStateMachine::ChangeAniWithBlend(int idx, const array<XMMATRIX, 96>& start
 	blend_mat = start_mat;
 	blend_time = 0.f;
 	max_blend_time = max_time;
+}
+
+void CStateMachine::ChangeAniWithBlend()
+{
+	_playAniIdx += 1;
+	_playAniIdx = _playAniIdx % 5;
+	ChangeAniWithBlend(_playAniIdx, anim_mat, 1.0f);
 }
 
 #include "CAnimationObject.h"
@@ -135,7 +143,8 @@ const array<XMMATRIX, 96>& CZombieStateMachine::GetBoneMat()
 {
 	if (is_dead) {
 		return blend_mat;
-	}
+	} 
+	
 	return CStateMachine::GetBoneMat();
 }
 
