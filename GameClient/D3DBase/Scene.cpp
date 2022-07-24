@@ -393,7 +393,7 @@ void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandLis
 	m_pPlayer2->SetPosition({ (network.g_client[network.other_client_id1].Get_Client_X() - 550.0f) * (-100.0f), 00.0f, (network.g_client[network.other_client_id1].Get_Client_Z() - 210.0f) * (-100.0f) });
 	m_pPlayer3->SetPosition({ (network.g_client[network.other_client_id2].Get_Client_X() - 550.0f) * (-100.0f), 00.0f, (network.g_client[network.other_client_id2].Get_Client_Z() - 210.0f) * (-100.0f) });
 
-	framework->client_player = m_pPlayer;
+	client_player = m_pPlayer;
 #else
 	m_pPlayer->SetPosition({ 50500.0f, bottom, 14000.0f });
 	m_pPlayer2->SetPosition({ 50500.0f, bottom, 14000.0f });
@@ -600,14 +600,6 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 	{
 		network.mouse_state = true;
 		network.Send_rotate_packet(network.g_client[network.my_id].mx, network.g_client[network.my_id].mz);
-	}
-
-	if (GetCapture() == m_hWnd && network.attack_state == false)
-	{
-		network.attack_state = true;
-		int m_x = ptCursorPos.x - 640;
-		int m_z = ptCursorPos.y - 360;
-		network.Send_attack_packet(m_x, m_z);
 	}
 #endif
 	if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))

@@ -93,9 +93,9 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 	}
 	else
 	{
-		cout << root.top()->Get_X() << ", " << root.top()->Get_Y() << "¿¡¼­";
+		//cout << root.top()->Get_X() << ", " << root.top()->Get_Y() << "¿¡¼­";
 		root.pop();
-		cout << root.top()->Get_X() << ", " << root.top()->Get_Y() << "·Î º¯°æµÇ¾ú´Ù. \n";
+		//cout << root.top()->Get_X() << ", " << root.top()->Get_Y() << "·Î º¯°æµÇ¾ú´Ù. \n";
 		return MoveResult::MOVE;
 	}
 
@@ -171,8 +171,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 
 		if (true == IsCollied(root_z + 1, root_x, map))
 		{
-			cout << "UP_RIGHT Áß UP ÀÌ ¸·Èû \n";
-			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+			//cout << "UP_RIGHT Áß UP ÀÌ ¸·Èû \n";
+			//cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
 
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
@@ -195,8 +195,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		if (true == IsCollied(root_z, root_x + 1, map))
 		{
-			cout << "UP_RIGHT Áß RIGHT ÀÌ ¸·Èû \n";
-			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+			//cout << "UP_RIGHT Áß RIGHT ÀÌ ¸·Èû \n";
+			//cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
 
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
@@ -345,8 +345,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 
 		if (true == IsCollied(root_z + 1, root_x, map))
 		{
-			cout << "UP_LEFT Áß UP ÀÌ ¸·Èû \n";
-			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+			//cout << "UP_LEFT Áß UP ÀÌ ¸·Èû \n";
+			//cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
 
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
@@ -368,8 +368,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		if (true == IsCollied(root_z, root_x - 1, map))
 		{
-			cout << "UP_LEFT Áß LEFT ÀÌ ¸·Èû \n";
-			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+			//cout << "UP_LEFT Áß LEFT ÀÌ ¸·Èû \n";
+			//cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
 
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
@@ -612,8 +612,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 
 		if (true == IsCollied(root_z - 1, root_x, map))
 		{
-			cout << "DOWN_LEFT Áß DOWN ÀÌ ¸·Èû \n";
-			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+			//cout << "DOWN_LEFT Áß DOWN ÀÌ ¸·Èû \n";
+			//cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
 
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
@@ -635,8 +635,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		if (true == IsCollied(root_z, root_x - 1, map))
 		{
-			cout << "DOWN_LEFT Áß LEFT ÀÌ ¸·Èû \n";
-			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+			//cout << "DOWN_LEFT Áß LEFT ÀÌ ¸·Èû \n";
+			//cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
 
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
@@ -776,8 +776,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 
 		if (true == IsCollied(root_z - 1, root_x, map))
 		{
-			cout << "DOWN_RIGHT Áß DOWN ÀÌ ¸·Èû \n";
-			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+			//cout << "DOWN_RIGHT Áß DOWN ÀÌ ¸·Èû \n";
+			//cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
 
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();
@@ -799,8 +799,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		if (true == IsCollied(root_z, root_x + 1, map))
 		{
-			cout << "DOWN_RIGHT Áß RIGHT ÀÌ ¸·Èû \n";
-			cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
+			//cout << "DOWN_RIGHT Áß RIGHT ÀÌ ¸·Èû \n";
+			//cout << "root_x : " << root_x << ", root_z : " << root_z << "\n";
 
 			int temp_x = node->Get_X();
 			int temp_z = node->Get_Y();

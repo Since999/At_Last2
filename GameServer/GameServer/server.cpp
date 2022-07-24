@@ -4044,7 +4044,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 	// Astar 알고리즘을 돌리지 않았다면 npc의 Astar 알고리즘 돌려서 스택 집어 넣기
 	if (npc.astar_check == false)
 	{
-		cout << "새로 astar를 돌릴 것이다 \n";
+		//cout << "새로 astar를 돌릴 것이다 \n";
 		float root_path[3] = { 999999, 999999, 999999 };
 
 		// 각 클라이언트와의 거리 구하기

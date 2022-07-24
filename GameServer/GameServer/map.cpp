@@ -1032,13 +1032,13 @@ void Map::EditMap(iPos sp, iPos ep)
 		}
 	}
 
-	for (int i = sp.z + 1; i < ep.z; ++i)
-	{
-		for (int j = sp.x + 1; j < ep.x; ++j)
-		{
-			cout << "x : " << j << "z : " << i << "ดย -> " << map[i][j] << " ";
-		}
-	}
+	//for (int i = sp.z + 1; i < ep.z; ++i)
+	//{
+	//	for (int j = sp.x + 1; j < ep.x; ++j)
+	//	{
+	//		cout << "x : " << j << "z : " << i << "ดย -> " << map[i][j] << " ";
+	//	}
+	//}
 }
 
 void Map::MazeTypeInit(iPos* base, BarricadeType b_type, int num)
