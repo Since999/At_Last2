@@ -1,5 +1,6 @@
 #include "Network.h"
 #include "AnimationShader.h"
+#include "SoundSystem.h"
 
 Socket Network::_socket;
 array<Client, MAX_PLAYER> Network::g_client;
@@ -72,6 +73,7 @@ void Network::ReadMapFile()
 
 void Network::Initialize()
 {
+	CSoundSystem::GetInstance()->Play(L"test bgm");
 	ReadMapFile();
 
 	map_type = MapType::SPAWN;
@@ -122,15 +124,15 @@ BarricadePos Network::Change_Client_Pos(iPos pos)
 	temp.z = (pos.z - 210.0f) * (-100.0f);
 	if (pos.angle == ANGLE::ZERO)
 	{
-		temp.angle = 0;
+		temp.angle = 90;
 	}
 	else if (pos.angle == ANGLE::FIFTEEN)
 	{
-		temp.angle = 15;
+		temp.angle = 75;
 	}
 	else if (pos.angle == ANGLE::THIRTY)
 	{
-		temp.angle = 30;
+		temp.angle = 60;
 	}
 	else if (pos.angle == ANGLE::FORTY_FIVE)
 	{
@@ -138,47 +140,47 @@ BarricadePos Network::Change_Client_Pos(iPos pos)
 	}
 	else if (pos.angle == ANGLE::SIXTY)
 	{
-		temp.angle = 60;
+		temp.angle = 30;
 	}
 	else if (pos.angle == ANGLE::SEVENTY_FIVE)
 	{
-		temp.angle = 75;
+		temp.angle = 15;
 	}
 	else if (pos.angle == ANGLE::NINETY)
 	{
-		temp.angle = 90;
+		temp.angle = 0;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_FIVE)
 	{
-		temp.angle = 105;
+		temp.angle = 345;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_TWENTY)
 	{
-		temp.angle = 120;
+		temp.angle = 330;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_THIRTY_FIVE)
 	{
-		temp.angle = 135;
+		temp.angle = 315;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDERED_FIFTY)
 	{
-		temp.angle = 150;
+		temp.angle = 300;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_SIXTY_FIVE)
 	{
-		temp.angle = 165;
+		temp.angle = 285;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_EIGHTY)
 	{
-		temp.angle = 180;
+		temp.angle = 270;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_NINETY_FIVE)
 	{
-		temp.angle = 195;
+		temp.angle = 255;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_TEN)
 	{
-		temp.angle = 210;
+		temp.angle = 240;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_TWENTY_FIVE)
 	{
@@ -186,35 +188,35 @@ BarricadePos Network::Change_Client_Pos(iPos pos)
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_FORTY)
 	{
-		temp.angle = 240;
+		temp.angle = 210;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_FIFTY_FIVE)
 	{
-		temp.angle = 255;
+		temp.angle = 195;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_SEVENTY)
 	{
-		temp.angle = 270;
+		temp.angle = 180;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_EIGHTY_FIVE)
 	{
-		temp.angle = 285;
+		temp.angle = 165;
 	}
 	else if (pos.angle == ANGLE::THREE_HUNDRED)
 	{
-		temp.angle = 300;
+		temp.angle = 150;
 	}
 	else if (pos.angle == ANGLE::THREE_HUNDRED_FIFTEEN)
 	{
-		temp.angle = 315;
+		temp.angle = 135;
 	}
 	else if (pos.angle == ANGLE::THREE_HUNDRED_THIRD)
 	{
-		temp.angle = 330;
+		temp.angle = 120;
 	}
 	else if (pos.angle == ANGLE::THREE_HUNDRED_FORTY_FIVE)
 	{
-		temp.angle = 345;
+		temp.angle = 105;
 	}
 	temp.b_type = pos.b_type;
 	return temp;
@@ -304,10 +306,10 @@ void Network::ChangeWall(iPos pos, ANGLE angle)
 			}
 		}
 
-		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+		map[pos.z - 3][pos.x] = (char)MazeWall::BARRICADE;
 
-		map[pos.z + 2][pos.x + 2] = (char)MazeWall::BARRICADE;
-		map[pos.z + 1][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x + 2] = (char)MazeWall::BARRICADE;
 		map[pos.z][pos.x + 2] = (char)MazeWall::BARRICADE;
 
 		map[pos.z][pos.x - 2] = (char)MazeWall::BARRICADE;
@@ -334,7 +336,7 @@ void Network::ChangeWall(iPos pos, ANGLE angle)
 			}
 		}
 
-		map[pos.z + 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+		map[pos.z - 3][pos.x + 1] = (char)MazeWall::BARRICADE;
 
 		map[pos.z - 1][pos.x - 1] = (char)MazeWall::BARRICADE;
 		map[pos.z - 1][pos.x + 3] = (char)MazeWall::BARRICADE;
@@ -644,7 +646,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		cout << "게임 시작 \n";
 		game_start = true;
 		Send_request_packet(MsgType::CS_GAME_START);
-
+		CSoundSystem::GetInstance()->StopBGM();
+		CSoundSystem::GetInstance()->Play(L"in game bgm");
 		AddTimer(my_id, EVENT_TYPE::PLAYER_MOVE, 100);
 		break;
 	}
@@ -654,7 +657,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_PLAYER_ATTACK:
 	{
-		
+		cout << "공겨어어어억 \n";
+		CSoundSystem::GetInstance()->Play(L"gun fire");
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_KILL_NUMBER:
@@ -686,19 +690,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_player_reload_packet* packet = reinterpret_cast<sc_player_reload_packet*>(ptr);
 
-		g_client[packet->id].bullet = packet->bullet;
-
-		break;
-	}
-	case (int)MsgType::SC_PLAYER_BULLET_INFO:
-	{
-		sc_player_bullet_info_packet* packet = reinterpret_cast<sc_player_bullet_info_packet*>(ptr);
-
-		cout << (int)packet->id << "의 총알이 " << (int)packet->bullet << "개 있습니다 \n";
-
-		//bullet_lock.lock();
-		g_client[packet->id].bullet = packet->bullet;
-		//bullet_lock.unlock();
 
 		break;
 	}
@@ -742,7 +733,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	case (int)MsgType::SC_PLAYER_MOVE:
 	{
 		sc_player_move_packet* packet = reinterpret_cast<sc_player_move_packet*>(ptr);
-
+		
 		int id = packet->id;
 		if (id != Network::my_id) {
 			g_client[id].x = packet->x;
@@ -830,6 +821,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			}
 		}
 
+		g_client[packet->id]._state = ClientState::INGAME;
 		g_client[packet->id].hp = packet->hp;
 		g_client[packet->id].bullet = packet->bullet;
 
@@ -897,10 +889,10 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_player_dead_packet* packet = reinterpret_cast<sc_player_dead_packet*>(ptr);
 
-		cout << (int)packet->id << "가 죽었습니다 \n";
-		//state_lock.lock();
+		CSoundSystem::GetInstance()->Play(L"P_Death");
+		
 		g_client[packet->id]._state = ClientState::DEAD;
-		//state_lock.unlock();
+		
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_SEARCH:
@@ -918,11 +910,9 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_player_hp_packet* packet = reinterpret_cast<sc_player_hp_packet*>(ptr);
 
-		cout << (int)packet->id << "의 체력이 " << (int)packet->hp << "로 변경되었습니다 \n";
+		CSoundSystem::GetInstance()->Play(L"P_Attacked");
 
-		//g_client[packet->id].hp_lock.lock();
 		g_client[packet->id].hp = packet->hp;
-		//g_client[packet->id].hp_lock.unlock();
 
 		break;
 	}
@@ -942,50 +932,44 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 		case MapType::FIRST_PATH:
 		{
-			//r_zombie1[id].hp_lock.lock();
 			r_zombie1[id].hp = packet->hp;
 			r_zombie1[id]._animation = ZombieAnimationState::ATTACKED;
-			//r_zombie1[id].hp_lock.unlock();
+			CSoundSystem::GetInstance()->Play(L"zombie-hit");
 			break;
 		}
 		case MapType::SECOND_PATH:
 		{
-			//r_zombie2[id].hp_lock.lock();
 			r_zombie2[id].hp = packet->hp;
 			r_zombie2[id]._animation = ZombieAnimationState::ATTACKED;
-			//r_zombie2[id].hp_lock.unlock();
+			CSoundSystem::GetInstance()->Play(L"zombie-hit");
 			break;
 		}
 		case MapType::FINAL_PATH:
 		{
-			//r_zombie3[id].hp_lock.lock();
 			r_zombie3[id].hp = packet->hp;
 			r_zombie3[id]._animation = ZombieAnimationState::ATTACKED;
-			//r_zombie3[id].hp_lock.unlock();
+			CSoundSystem::GetInstance()->Play(L"zombie-hit");
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
-			//b_zombie1[id].hp_lock.lock();
 			b_zombie1[id].hp = packet->hp;
 			b_zombie1[id]._animation = ZombieAnimationState::ATTACKED;
-			//b_zombie1[id].hp_lock.unlock();
+			CSoundSystem::GetInstance()->Play(L"zombie-hit");
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
-			//b_zombie2[id].hp_lock.lock();
 			b_zombie2[id].hp = packet->hp;
 			b_zombie2[id]._animation = ZombieAnimationState::ATTACKED;
-			//b_zombie2[id].hp_lock.unlock();
+			CSoundSystem::GetInstance()->Play(L"zombie-hit");
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
-			//b_zombie3[id].hp_lock.lock();
 			b_zombie3[id].hp = packet->hp;
 			b_zombie3[id]._animation = ZombieAnimationState::ATTACKED;
-			//b_zombie3[id].hp_lock.unlock();
+			CSoundSystem::GetInstance()->Play(L"zombie-hit");
 			break;
 		}
 		}
@@ -1155,6 +1139,20 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_zombie_spawn_packet* packet = reinterpret_cast<sc_zombie_spawn_packet*>(ptr);
 
+		if (map_type != packet->map_type)
+		{
+			if (packet->map_type == MapType::FIRST_PATH || packet->map_type == MapType::SECOND_PATH || packet->map_type == MapType::FINAL_PATH)
+			{
+				CSoundSystem::GetInstance()->StopBGM();
+				CSoundSystem::GetInstance()->Play(L"in game bgm");
+			}
+			else if (packet->map_type == MapType::CHECK_POINT_ONE || packet->map_type == MapType::CHECK_POINT_TWO || packet->map_type == MapType::CHECK_POINT_FINAL)
+			{
+				CSoundSystem::GetInstance()->StopBGM();
+				CSoundSystem::GetInstance()->Play(L"wavw");
+			}
+		}
+
 		map_type = packet->map_type;
 
 		switch (map_type)
@@ -1171,6 +1169,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie1[id]._type = packet->zomtype;
 			r_zombie1[id]._animation = ZombieAnimationState::SPAWN;
 			r_zombie1[id].angle = packet->angle;
+
+			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			//CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie1[id]);
 			//cout << "r_zombie1 [ " << id << "] 의 좌표 x : " << packet->x << ", z : " << packet->z << ", 체력 hp : " << packet->hp << "\n";
 			//cout << "비교하기 위한 [ " << id << "]의 좌표 x : " << r_zombie1[id].x << ", z : " << r_zombie1[id].z << ", hp : " << r_zombie1[id].hp << "\n";
@@ -1189,6 +1189,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie2[id]._animation = ZombieAnimationState::SPAWN;
 			r_zombie2[id].angle = packet->angle;
 
+			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			//cout << "r_zombie2 [ " << id << "] 의 좌표 x : " << packet->x << ", z : " << packet->z << ", 체력 hp : " << packet->hp << "\n";
 			//cout << "비교하기 위한 [ " << id << "]의 좌표 x : " << r_zombie2[id].x << ", z : " << r_zombie2[id].z << ", hp : " << r_zombie2[id].hp << "\n";
 			break;
@@ -1206,6 +1207,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie3[id]._animation = ZombieAnimationState::SPAWN;
 			r_zombie3[id].angle = packet->angle;
 
+			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
@@ -1221,6 +1223,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie1[id]._animation = ZombieAnimationState::SPAWN;
 			b_zombie1[id].angle = packet->angle;
 
+			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			//cout << "b_zombie1 [" << id << "] 의 좌표 x : " << packet->x << ", z : " << packet->z << ", 체력 hp : " << packet->hp << "\n";
 			//cout << "비교하기 위한 [ " << id << "]의 좌표 x : " << b_zombie1[id].x << ", z : " << b_zombie1[id].z << ", hp : " << b_zombie1[id].hp << "\n";
 
@@ -1239,6 +1242,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie2[id]._animation = ZombieAnimationState::SPAWN;
 			b_zombie2[id].angle = packet->angle;
 
+			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
@@ -1254,6 +1258,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie3[id]._animation = ZombieAnimationState::SPAWN;
 			b_zombie3[id].angle = packet->angle;
 
+			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			break;
 		}
 		}
@@ -1624,7 +1629,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			cout << (int)id << "죽음 \n";
 			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
 			r_zombie1[id]._state = ZombieState::DEAD;
-			//r_zombie1[id].~Zombie();
+			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
 			break;
 		}
 		case MapType::SECOND_PATH:
@@ -1632,7 +1637,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			cout << (int)id << "죽음 \n";
 			r_zombie2[id]._animation = ZombieAnimationState::DEAD;
 			r_zombie2[id]._state = ZombieState::DEAD;
-			//r_zombie2[id].~Zombie();
+			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
 			break;
 		}
 		case MapType::FINAL_PATH:
@@ -1640,7 +1645,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			cout << (int)id << "죽음 \n";
 			r_zombie3[id]._animation = ZombieAnimationState::DEAD;
 			r_zombie3[id]._state = ZombieState::DEAD;
-			//r_zombie3[id].~Zombie();
+			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
@@ -1648,7 +1653,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			cout << (int)id << "죽음 \n";
 			b_zombie1[id]._animation = ZombieAnimationState::DEAD;
 			b_zombie1[id]._state = ZombieState::DEAD;
-			//b_zombie1[id].~Zombie();
+			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
@@ -1656,7 +1661,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			cout << (int)id << "죽음 \n";
 			b_zombie2[id]._animation = ZombieAnimationState::DEAD;
 			b_zombie2[id]._state = ZombieState::DEAD;
-			//b_zombie2[id].~Zombie();
+			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
@@ -1664,7 +1669,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			cout << (int)id << "죽음 \n";
 			b_zombie3[id]._animation = ZombieAnimationState::DEAD;
 			b_zombie3[id]._state = ZombieState::DEAD;
-			//b_zombie3[id].~Zombie();
+			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
 			break;
 		}
 		}
@@ -2003,11 +2008,11 @@ void Network::Do_Timer()
 			mouse_time = chrono::system_clock::now() + 33ms;
 		}
 
-		if (attack_time < chrono::system_clock::now() && attack_state == true)
-		{
-			attack_state = false;
-			attack_time = chrono::system_clock::now() + 250ms;
-		}
+		//if (attack_time < chrono::system_clock::now() && attack_state == true)
+		//{
+		//	attack_state = false;
+		//	attack_time = chrono::system_clock::now() + 250ms;
+		//}
 
 		while (true)
 		{

@@ -82,16 +82,16 @@
   y ="1055"
   image="Resources/UI/stage.png"/>
   <UI
-width ="500"
+width ="80"
 height ="10"
 x = "1000"
-y ="200"
+y ="440"
 image="Resources/UI/background.png"/>
   <BAR
-width ="500"
+width ="80"
 height ="10"
-x = "1000"
-y ="200"
+x = "960"
+y ="440"
 image="Resources/UI/HP_BAR.png"/>
 
   <Number

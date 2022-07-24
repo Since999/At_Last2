@@ -111,6 +111,8 @@ public:
 
 	void UpdateBoneTransforms(float fTimeElapsed);
 
+	void SetSize(float size) { this->size = size; }
+	float GetSize() const { return size; }
 protected:
 	virtual const array<XMMATRIX, 96>& GetBoneMat();
 

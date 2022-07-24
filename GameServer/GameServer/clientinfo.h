@@ -9,7 +9,7 @@ public:
 	char attack;
 	char interaction;
 	char special_skill;
-	atomic_char bullet;
+	//atomic_char bullet;
 	float x, z;
 	float m_x, m_z;
 	float speed;

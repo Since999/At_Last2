@@ -87,6 +87,9 @@ void CZombieStateMachine::Update(float time_elapsed)
 
 	switch (object_info->_animation) {
 	case ZombieAnimationState::ATTACK:
+		if (!is_anim_ended) {
+			return;
+		}
 		break;
 	case ZombieAnimationState::SPAWN:
 		break;

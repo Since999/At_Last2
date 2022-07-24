@@ -14,6 +14,7 @@ Client::Client()
 	special_skill = 0;
 	left_bullet = max_bullet;
 	zombie_kill_num = 0;
+	attack_x = 0, attack_z = 0;
 }
 
 Client::~Client()

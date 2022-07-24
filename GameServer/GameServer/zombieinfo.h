@@ -18,7 +18,7 @@ public:
 	stack<AS_Node*> root;			// AStarAI 를 통해 얻은 내용을 여기에 저장할 것
 	AStarAI astar;
 	Direction zombie_dir;
-	AS_Node* add_node;
+	AS_Node add_node;
 
 	mutex z_move_lock;
 	//mutex z_speed_lock;
