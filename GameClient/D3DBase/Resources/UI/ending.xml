@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UISystem>
+  
+
+
+
+
+  <UI
+width ="2000"
+height ="1080"
+x = "980"
+y ="540"
+image="Resources/UI/ending.jpg"/>
+
+
+  <UI
+width ="1000"
+height ="200"
+x = "960"
+y ="560"
+image="Resources/UI/GAME_CLEAR.png"/>
+
+
+  <!-- <UI
+width ="460"
+height ="100"
+x = "960"
+y ="240"
+image="Resources/UI/B_back.png"/> -->
+
+  <!-- <Button
+width ="440"
+height ="80"
+x = "960"
+y ="240"
+image="Resources/UI/Login.png"
+action="login"/> -->
+
+
+</UISystem>
