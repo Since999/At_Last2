@@ -139,8 +139,8 @@ void CAnimationObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphi
 			int n = i - ROAD_ZOMBIE_NUM;
 			if(n <= FIRST_CHECK_POINT_ZOMBIE_NUM) zom = &Network::b_zombie1[n];
 		}
-		zom->_id = i;
-		zom->_type = (ZombieType)(((int)zom->_type + i) % 5);
+		//zom->_id = i;
+		//zom->_type = (ZombieType)(((int)zom->_type + i) % 5);
 		AddZombie(zom);
 	}
 }
@@ -213,15 +213,20 @@ z1 - zombie
 z2 zomie_goul_nomal
 z3 - pumpkinHulk_diffuse
 */
-const map<ZombieType, pair<string, wstring>>& CAnimationObjectShader::GetModelMap()
+const map<ZombieType, ZombieInfo>& CAnimationObjectShader::GetModelMap()
 {
 	if (!zombie_model_map.empty()) return zombie_model_map;
-	zombie_model_map.emplace(ZombieType::NORMAL, make_pair(string("Z1.fbx"), wstring(L"Zombie.png")));
+	ZombieInfo info;
+	info.model = "Z1.fbx"; info.texture = L"Zombie.png"; info.size = 1.0f;
+	zombie_model_map.emplace(ZombieType::NORMAL, info);
 	//Test
-	zombie_model_map.emplace(ZombieType::SOLIDEIR, make_pair(string("Z2.fbx"), wstring(L"zombie_goul_nomal.png")));
+	info.model = "Z2.fbx"; info.texture = L"zombie_goul_nomal.png"; info.size = 1.0f;
+	zombie_model_map.emplace(ZombieType::SOLIDEIR, info);
 	//Test
-	zombie_model_map.emplace(ZombieType::TANKER, make_pair(string("Z3.fbx"), wstring(L"pumpkinHulk_diffuse.png")));
-	zombie_model_map.emplace(ZombieType::DOG, make_pair(string("z4_dog.fbx"), wstring(L"Zombie.png")));
+	info.model = "Z3.fbx"; info.texture = L"pumpkinHulk_diffuse.png"; info.size = 0.5f;
+	zombie_model_map.emplace(ZombieType::TANKER, info);
+	info.model = "z4_dog.fbx"; info.texture = L"Zombie.png"; info.size = 1.0f;
+	zombie_model_map.emplace(ZombieType::DOG, info);
 	return zombie_model_map;
 }
 
@@ -235,8 +240,9 @@ void CAnimationObjectShader::AddZombie(Zombie* zombie)
 		object = new CZombie();
 	}
 	else {
-		auto& name = (*found).second;
-		object = new CZombie(name.first, name.second);
+		auto& info = (*found).second;
+		object = new CZombie(info.model, info.texture);
+		object->SetSize(object->GetSize() * info.size);
 	}
 #ifdef ENABLE_NETWORK
 	XMFLOAT3 pos = XMFLOAT3{ 100500.0f, CConfiguration::bottom, 14000.0f };

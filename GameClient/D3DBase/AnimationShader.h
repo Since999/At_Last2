@@ -25,6 +25,12 @@ public:
 
 };
 
+struct ZombieInfo {
+	string model;
+	wstring texture;
+	float size;
+};
+
 class CAnimationObjectShader : public CAnimationShader
 {
 public:
@@ -69,7 +75,7 @@ protected:
 	CB_ANIMATION_OBJECT_INFO* m_pcbMappedGameObjects = NULL;
 
 	CShadowShader* shadow_shader = NULL;
-	map<ZombieType, pair<string, wstring>> zombie_model_map;
+	map<ZombieType, ZombieInfo> zombie_model_map;
 
-	const map<ZombieType, pair<string, wstring>>& GetModelMap();
+	const map<ZombieType, ZombieInfo>& GetModelMap();
 };
