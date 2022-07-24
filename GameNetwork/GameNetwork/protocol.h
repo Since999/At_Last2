@@ -532,7 +532,7 @@ struct sc_engineer_barrigate_build_packet		// ¼­¹ö¿¡¼­ ¿£Áö´Ï¾î°¡ Æ¯¼ö´É·Â »ç¿ëÇ
 	MsgType type;										// ¸Ş½ÃÁö Å¸ÀÔ ENGINEER_SPECIAL
 	char id;
 	short x, z;												// ¹Ù¸®°ÔÀÌÆ® Áß½É À§Ä¡
-	DIR dir;													// ¹æÇâ
+	Direction dir;											// ¹æÇâ
 };
 
 struct sc_player_attack_packet						// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ğÆ®¿¡°Ô ´©°¡ °ø°İÇÏ°í ÀÖ´ÂÁö ¾Ë·ÁÁÖ±â

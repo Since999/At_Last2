@@ -513,7 +513,7 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 		network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
 	}
 
-	if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false && network.g_client[network.my_id].special_skill > 0)
+	if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false && network.g_client[network.my_id].special_skill > 0 && network.key_down_state == false)
 	{
 		network.key_down_state = true;
 		network.Send_request_packet(MsgType::CS_PLAYER_SPECIAL);

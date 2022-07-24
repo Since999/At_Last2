@@ -124,6 +124,7 @@ public:
 	static void CommanderSpecialSkill(Client& cl);
 	static void EngineerSpecialSkill(Client& cl);
 	static bool EngineerSpecialSkillMapCheck(int x, int z, Direction dir);
+	static bool EngineerSpecialSkillZombieCheck(int x, int z, Direction dir, NPC& npc);
 	static void EngineerBuildBarricade(int bx, int bz, Direction dir);
 	static void MercenarySpecialSkill(Client& cl);
 	static void DieZombie(Zombie* zombie) { delete zombie; zombie = nullptr; };
