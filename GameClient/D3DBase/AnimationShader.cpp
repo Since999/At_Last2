@@ -154,7 +154,7 @@ void CAnimationObjectShader::ReleaseObjects()
 
 void CAnimationObjectShader::AnimateObjects(float fTimeElapsed)
 {
-	AddZombieInNetwork();
+	//AddZombieInNetwork();
 	for (auto& object : objects) {
 		object->Animate(fTimeElapsed);
 	}
