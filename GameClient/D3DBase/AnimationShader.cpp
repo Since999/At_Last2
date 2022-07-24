@@ -131,8 +131,7 @@ void CAnimationObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphi
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	CreateConstantBufferViews(pd3dDevice, max_object_num, m_pd3dcbGameObjects, ((sizeof(CB_ANIMATION_OBJECT_INFO) + 255) & ~255));
 	//+ FIRST_CHECK_POINT_ZOMBIE_NUM;
-	//for(int i = 0; i< ROAD_ZOMBIE_NUM + FIRST_CHECK_POINT_ZOMBIE_NUM; ++i)
-	for (int i = 0; i < 1; ++i)
+	for(int i = 0; i< ROAD_ZOMBIE_NUM + FIRST_CHECK_POINT_ZOMBIE_NUM; ++i)
 	{
 		Zombie* zom = NULL;
 		if(i < ROAD_ZOMBIE_NUM) zom = &Network::r_zombie1[i];

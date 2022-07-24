@@ -9,7 +9,6 @@
 class CObject;
 class CGameFramework;
 class CSunLight;
-class CAnimationObject;
 
 class CScene
 {
@@ -99,6 +98,4 @@ private:
 	CPlayer* m_pPlayer3 = NULL;
 	CPlayer* client_player = NULL;
 	CSunLight* sun_light = NULL;
-
-	CAnimationObject* test_zombie = NULL;
 };

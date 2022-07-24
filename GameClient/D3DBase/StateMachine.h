@@ -31,7 +31,6 @@ protected:
 	float max_blend_time = 0.f;
 	float blend_time = 0.f;
 	array<XMMATRIX, 96> blend_mat;
-	array<XMMATRIX, 96> anim_mat;
 public:
 	CStateMachine(SkinModel* model, CPlayer* object) : model(model), object(object) {}
 
@@ -40,7 +39,6 @@ public:
 	void ChangeAni() { _playAniIdx += 1;
 	_playAniIdx = _playAniIdx % 5;
 	}
-	void ChangeAniWithBlend();
 protected:
 	void PlayAni(int index);
 	void ChangeAniWithBlend(int index, const array<XMMATRIX, 96>& start_mat, float max_time = 0.5f);

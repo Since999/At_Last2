@@ -274,5 +274,5 @@ void CZombie::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 
 void CAnimationObject::ChangeAni()
 {
-	state_machine->ChangeAniWithBlend();
+	state_machine->ChangeAni();
 }

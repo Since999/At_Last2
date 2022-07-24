@@ -467,8 +467,10 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 void CMainGamePlayer::StartFire()
 {
 	is_firing = true;
-	fire_time = fire_rate;
-	
+	if (fire_time < 0.f) {
+		Fire();
+		fire_time = fire_rate;
+	}
 }
 
 void CMainGamePlayer::StopFire()

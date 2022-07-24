@@ -363,11 +363,7 @@ void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandLis
 	m_ppShaders[0] = pObjectShader;*/
 
 	CAnimationObjectShader* ani_shader = new CAnimationObjectShader(device, list, m_pd3dGraphicsRootSignature);
-	//TEST
-	test_zombie = ani_shader->GetFirstZombie();
-	//TEST
 	m_ppShaders[0] = ani_shader;
-
 
 	m_ppShaders[1] = CStaticObjectShader::InitInstance(device, list, m_pd3dGraphicsRootSignature);
 
@@ -496,9 +492,6 @@ bool CMainGameScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	{
 		((CMainGamePlayer*)client_player)->StartFire();
 
-		//TEST
-		test_zombie->ChangeAni();
-		//TEST
 #ifdef TEST
 		POINT point;
 		::GetCursorPos(&point);
