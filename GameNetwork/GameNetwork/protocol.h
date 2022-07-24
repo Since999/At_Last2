@@ -35,7 +35,7 @@ const int MAX_NAME_SIZE = 20;					// 플레이어 이름 길이
 
 const int ROAD_ZOMBIE_NUM = 20;
 
-const int FIRST_CHECK_POINT_ZOMBIE_NUM = 1;
+const int FIRST_CHECK_POINT_ZOMBIE_NUM = 100;
 const int TWO_CHECK_POINT_ZOMBIE_NUM = 150;
 const int THREE_CHECK_POINT_ZOMBIE_NUM = 200;
 
