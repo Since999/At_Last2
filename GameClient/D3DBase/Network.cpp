@@ -538,7 +538,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 		my_id = packet->id;
 		g_client[my_id]._id = packet->id;
-		strcpy_s(g_client[my_id].Name, packet->name);
 		g_client[my_id]._state = ClientState::INGAME;
 
 		g_client[my_id].move_time = chrono::system_clock::now();
@@ -564,7 +563,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			id_lock.lock();
 			g_client[id]._id = packet->id;
-			strcpy_s(g_client[id].Name, packet->name);
 			other_client_id1 = id;
 			g_client[other_client_id1]._state = ClientState::INGAME;
 
@@ -578,7 +576,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			id_lock.lock();
 			g_client[id]._id = packet->id;
-			strcpy_s(g_client[id].Name, packet->name);
 			other_client_id2 = id;
 			g_client[other_client_id2]._state = ClientState::INGAME;
 
@@ -1764,12 +1761,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 	
 }
 
-void Network::send_login_packet(char* str)
+void Network::send_login_packet()
 {
 	cs_login_packet packet;
 	packet.size = sizeof(packet);
 	packet.type = MsgType::CS_LOGIN_REQUEST;
-	strcpy_s(packet.name, str);
 	_socket.do_send(sizeof(packet), &packet);
 }
 
@@ -1857,18 +1853,10 @@ void Network::PlayerMove(int p_id)
 	AddTimer(p_id, EVENT_TYPE::PLAYER_MOVE, 100);
 }
 
-void Network::Work()
+void Network::Login()
 {
-	// 0. 클라이언트 초기화
-	Initialize();
-
-	// 1. 로그인 요청
-	char name[MAX_NAME_SIZE];
-
 	while (true) {
-		cout << "login : ";
-		cin >> name;
-		send_login_packet(name);
+		send_login_packet();
 
 		Sleep(10);
 
@@ -1898,6 +1886,24 @@ void Network::Work()
 		if (login_complete)
 			break;
 	}
+
+}
+
+void Network::Player_Select(PlayerType type)
+{
+	send_player_select_packet(type);
+	this_thread::sleep_for(10ms);
+
+	Send_request_packet(MsgType::CS_BARRICADE_REQUEST);
+}
+
+void Network::Work()
+{
+	// 0. 클라이언트 초기화
+	Initialize();
+
+	// 1. 로그인 요청
+	Login();
 
 	int select;
 	PlayerType type = PlayerType::NONE;
@@ -1959,10 +1965,7 @@ void Network::Work()
 			else if (select == 3)
 				type = PlayerType::MERCENARY;
 
-			send_player_select_packet(type);
-			this_thread::sleep_for(10ms);
-
-			Send_request_packet(MsgType::CS_BARRICADE_REQUEST);
+			Player_Select(type);
 			this_thread::sleep_for(10ms);
 			//select_lock.unlock();
 			continue;

@@ -132,7 +132,6 @@ void Server::Send_login_ok_packet(int c_id)
 	packet.size = sizeof(packet);
 	packet.id = c_id;
 	packet.type = MsgType::SC_LOGIN_OK;
-	strcpy_s(packet.name, g_clients[c_id].player_name);
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -1532,60 +1531,29 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	case (int)MsgType::CS_LOGIN_REQUEST:
 	{
 		cs_login_packet* packet = reinterpret_cast<cs_login_packet*>(p);
-
-		for (auto& other : g_clients)
-		{
-			//other.state_lock.lock();
-			if (other._state == ClientState::FREE)
-			{
-				//other.state_lock.unlock();
-				continue;
-			}
-			//other.state_lock.unlock();
-
-			if (strcmp(other.player_name, packet->name) == 0)
-			{
-				Send_fail_packet(client_id, MsgType::SC_LOGIN_FAIL);
-				check = true;
-				break;
-			}
-		}
-
-		if (check)
-			break;
-
-		strcpy_s(cl.player_name, packet->name);
 		Send_login_ok_packet(client_id);
 
 		// 클라이언트가 접속하였으므로 INGAME 상태로 변환
 		Client& cl = g_clients[client_id];
-		//cl.state_lock.lock();
 		cl._state = ClientState::INGAME;
-		//cl.state_lock.unlock();
 
 		// 클라이언트가 접속한 시점에는 스폰지점에 있으므로 스폰지점으로 설정
-		//cl.map_lock.lock();
 		cl.map_type = MapType::SPAWN;
-		//cl.map_lock.unlock();
 
-		// 다른 플레이어에게 로그인 아이디, 플레이어 네임 보내기
+		// 다른 플레이어에게 로그인 아이디
 		
 		for (auto& other : g_clients)
 		{
 			if (other._id == client_id)
 				continue;
 
-			//other.state_lock.lock();
 			if (ClientState::INGAME != other._state)
 			{
-				//other.state_lock.unlock();
 				continue;
 			}
-			//other.state_lock.unlock();
 
 			sc_login_other_packet login_packet;
 			login_packet.id = client_id;
-			strcpy_s(login_packet.name, cl.player_name);
 			login_packet.size = sizeof(login_packet);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
 			other.do_send(sizeof(login_packet), &login_packet);
@@ -1597,18 +1565,14 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			if (other._id == client_id)
 				continue;
 
-			//other.state_lock.lock();
 			if (ClientState::INGAME != other._state)
 			{
-				//other.state_lock.unlock();
 				continue;
 			}
-			//other.state_lock.unlock();
 
 			sc_login_other_packet login_packet;
 			login_packet.id = other._id;
 			login_packet.size = sizeof(login_packet);
-			strcpy_s(login_packet.name, other.player_name);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
 			cl.do_send(sizeof(login_packet), &login_packet);
 		}

@@ -305,7 +305,6 @@ struct cs_login_packet									// 클라이언트에서 서버로 로그인 패킷 전송
 {
 	unsigned short size;									// 사이즈 전송
 	MsgType type;										// 메시지 타입 LOGIN_REQUEST
-	char name[MAX_NAME_SIZE];
 };
 
 struct cs_move_packet								// 클라이언트에서 서버로 움직이는 방향 전송
@@ -381,7 +380,6 @@ struct sc_login_ok_packet							// 서버에서 클라이언트에게 로그인이 되었다고 전�
 	unsigned short size;
 	MsgType type;										// 메시지 타입 LOGIN_OK
 	char id;													// 클라이언트 ID 전송
-	char name[MAX_NAME_SIZE];					// 자신의 이름
 };
 
 struct sc_login_other_packet
@@ -389,7 +387,6 @@ struct sc_login_other_packet
 	unsigned short size;
 	MsgType type;										// 메시지 타입 LOGIN_OK
 	char id;													// 클라이언트 ID 전송
-	char name[MAX_NAME_SIZE];					// 이름
 };
 
 struct sc_fail_packet						 			// 서버에서 클라이언트에게 로그인에 실패하였다고 전송
