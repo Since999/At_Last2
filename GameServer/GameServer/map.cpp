@@ -206,10 +206,10 @@ void Map::ChangeWall(iPos pos, ANGLE angle)
 			}
 		}
 
-		map[pos.z + 3][pos.x] = (char)MazeWall::BARRICADE;
+		map[pos.z - 3][pos.x] = (char)MazeWall::BARRICADE;
 
-		map[pos.z + 2][pos.x + 2] = (char)MazeWall::BARRICADE;
-		map[pos.z + 1][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 2][pos.x + 2] = (char)MazeWall::BARRICADE;
+		map[pos.z - 1][pos.x + 2] = (char)MazeWall::BARRICADE;
 		map[pos.z][pos.x + 2] = (char)MazeWall::BARRICADE;
 
 		map[pos.z][pos.x - 2] = (char)MazeWall::BARRICADE;
@@ -236,7 +236,7 @@ void Map::ChangeWall(iPos pos, ANGLE angle)
 			}
 		}
 
-		map[pos.z + 3][pos.x + 1] = (char)MazeWall::BARRICADE;
+		map[pos.z - 3][pos.x + 1] = (char)MazeWall::BARRICADE;
 
 		map[pos.z - 1][pos.x - 1] = (char)MazeWall::BARRICADE;
 		map[pos.z - 1][pos.x + 3] = (char)MazeWall::BARRICADE;
@@ -526,7 +526,7 @@ bool Map::CheckBarricade(iPos pos, ANGLE angle)
 
 		for (int z = pos.z - 2; z <= pos.z; ++z)
 		{
-			for (int x = pos.x; x <= pos.z + 2; ++x)
+			for (int x = pos.x; x <= pos.x + 2; ++x)
 			{
 				if (map[z][x] == (char)MazeWall::BARRICADE)
 					return true;
@@ -535,20 +535,20 @@ bool Map::CheckBarricade(iPos pos, ANGLE angle)
 			}
 		}
 
-		if(map[pos.z + 3][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x + 1] == map[pos.z + 3][pos.x + 1] == (char)MazeWall::WALL)
+		if(map[pos.z + 3][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x + 1] == (char)MazeWall::WALL)
 			return true;
 																																															  
-		if (map[pos.z - 1][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x - 1] == map[pos.z - 1][pos.x - 1] ==(char)MazeWall::WALL )
+		if (map[pos.z - 1][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x - 1] == (char)MazeWall::WALL )
 			return true;
-		if (map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x + 3] == map[pos.z - 1][pos.x + 3] ==(char)MazeWall::WALL )
-			return true;
-																																															  
-		if (map[pos.z + 1][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 1] == map[pos.z + 1][pos.x + 1] ==(char)MazeWall::WALL )
-			return true;
-		if (map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 3] == map[pos.z + 1][pos.x - 3] ==(char)MazeWall::WALL )
+		if (map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE || map[pos.z - 1][pos.x + 3] == (char)MazeWall::WALL )
 			return true;
 																																															  
-		if (map[pos.z + 3][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x - 1] == map[pos.z + 3][pos.x - 1] ==(char)MazeWall::WALL )
+		if (map[pos.z + 1][pos.x + 1] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x + 1] == (char)MazeWall::WALL )
+			return true;
+		if (map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE || map[pos.z + 1][pos.x - 3] == (char)MazeWall::WALL )
+			return true;
+																																															  
+		if (map[pos.z + 3][pos.x - 1] == (char)MazeWall::BARRICADE || map[pos.z + 3][pos.x - 1] == (char)MazeWall::WALL )
 			return true;
 	}
 	else if (angle == ANGLE::SIXTY || angle == ANGLE::TWO_HUNDRED_FORTY)											// 60도, 240도
@@ -641,20 +641,20 @@ bool Map::CheckBarricade(iPos pos, ANGLE angle)
 			}
 		}
 
-		if(map[pos.z - 2][pos.x - 2] == (char)MazeWall::BARRICADE ==  map[pos.z - 2][pos.x - 2] == (char)MazeWall::WALL)
+		if(map[pos.z - 2][pos.x - 2] == (char)MazeWall::BARRICADE ||  map[pos.z - 2][pos.x - 2] == (char)MazeWall::WALL)
 			return true;
-		if(map[pos.z - 2][pos.x - 1] == (char)MazeWall::BARRICADE ==  map[pos.z - 2][pos.x - 1] == (char)MazeWall::WALL)
+		if(map[pos.z - 2][pos.x - 1] == (char)MazeWall::BARRICADE ||  map[pos.z - 2][pos.x - 1] == (char)MazeWall::WALL)
 			return true;
 																																										  
-		if(map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE ==  map[pos.z - 1][pos.x + 3] == (char)MazeWall::WALL)
+		if(map[pos.z - 1][pos.x + 3] == (char)MazeWall::BARRICADE ||  map[pos.z - 1][pos.x + 3] == (char)MazeWall::WALL)
 			return true;
 																																										 
-		if(map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE ==  map[pos.z + 1][pos.x - 3] == (char)MazeWall::WALL)
+		if(map[pos.z + 1][pos.x - 3] == (char)MazeWall::BARRICADE ||  map[pos.z + 1][pos.x - 3] == (char)MazeWall::WALL)
 			return true;
 																																									
-		if(map[pos.z + 2][pos.x + 1] == (char)MazeWall::BARRICADE ==  map[pos.z + 2][pos.x + 1] == (char)MazeWall::WALL)
+		if(map[pos.z + 2][pos.x + 1] == (char)MazeWall::BARRICADE ||  map[pos.z + 2][pos.x + 1] == (char)MazeWall::WALL)
 			return true;
-		if(map[pos.z + 2][pos.x + 2] == (char)MazeWall::BARRICADE ==  map[pos.z + 2][pos.x + 2] == (char)MazeWall::WALL)
+		if(map[pos.z + 2][pos.x + 2] == (char)MazeWall::BARRICADE ||  map[pos.z + 2][pos.x + 2] == (char)MazeWall::WALL)
 			return true;
 	}
 	else if (angle == ANGLE::ONE_HUNDRED_TWENTY || angle == ANGLE::THREE_HUNDRED)						// 120도, 300도
@@ -1013,22 +1013,30 @@ void Map::MakeDoor()
 }
 
 void Map::EditMap(iPos sp, iPos ep)
-{
+{	
 	for (int i = sp.z + 1; i < ep.z; ++i)
 	{
-		for (int j = sp.x + 1; j < ep.z; ++j)
+		for (int j = sp.x + 1; j < ep.x; ++j)
 		{
 			if (map[i][j] == (char)MazeWall::BARRICADE)
 			{
-				if (map[i][j + 1] == (char)MazeWall::ROAD && map[i + 1][j] == (char)MazeWall::ROAD && map[i + 1][j + 1] == (char)MazeWall::BARRICADE)
+				if (map[i][j + 1] == (char)MazeWall::ROAD && map[i - 1][j] == (char)MazeWall::ROAD && map[i - 1][j + 1] == (char)MazeWall::BARRICADE)
 				{
 					map[i][j + 1] = (char)MazeWall::BARRICADE;
 				}
-				if (map[i][j - 1] == (char)MazeWall::ROAD && map[i + 1][j] == (char)MazeWall::ROAD && map[i - 1][j + 1] == (char)MazeWall::BARRICADE)
+				if (map[i][j - 1] == (char)MazeWall::ROAD && map[i - 1][j] == (char)MazeWall::ROAD && map[i - 1][j - 1] == (char)MazeWall::BARRICADE)
 				{
 					map[i][j - 1] = (char)MazeWall::BARRICADE;
 				}
 			}
+		}
+	}
+
+	for (int i = sp.z + 1; i < ep.z; ++i)
+	{
+		for (int j = sp.x + 1; j < ep.x; ++j)
+		{
+			cout << "x : " << j << "z : " << i << "는 -> " << map[i][j] << " ";
 		}
 	}
 }
@@ -1055,9 +1063,9 @@ void Map::Initialize()
 	MazeTypeInit(three_base2, BarricadeType::BARRICADE, Three_Level);
 
 	EditMap(One_Base_Pos, One_Base_End_Pos);
-	EditMap(TWO_Base_Pos, TWO_Base_End_Pos);
-	EditMap(THREE_Base_Pos, THREE_Base_End_Pos);
-	EditMap(THREE_Base_Pos2, THREE_Base_End_Pos2);
+	//EditMap(TWO_Base_Pos, TWO_Base_End_Pos);
+	//EditMap(THREE_Base_Pos, THREE_Base_End_Pos);
+	//EditMap(THREE_Base_Pos2, THREE_Base_End_Pos2);
 }
 
 AS_Map::AS_Map()
