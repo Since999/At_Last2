@@ -324,7 +324,7 @@ CLobbyScene::~CLobbyScene()
 void CLobbyScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CScene::BuildObjects(pd3dDevice, pd3dCommandList);
-	CGameFramework::GetInstance()->ChangeUI(new UISystem(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), "Resources/UI/ending.xml"));
+	CGameFramework::GetInstance()->ChangeUI(new UISystem(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), "Resources/UI/lobby_UI.xml"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
