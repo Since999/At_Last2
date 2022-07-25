@@ -63,6 +63,8 @@ public:
 	void ChangeUI(UISystem* ui_sys);
 
 	void StartEvent();
+
+	void AddCommand(const function<void()>& func);
 private:
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd;
@@ -117,6 +119,9 @@ private:
 	POINT						m_ptOldCursorPos;
 
 	_TCHAR						m_pszFrameRate[50];
+
+	vector<function<void()>> func_list;
+	CRITICAL_SECTION crit;
 public:
 
 	CScene* m_pScene = NULL;
