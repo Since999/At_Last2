@@ -570,7 +570,7 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 	}
 	// 채팅용 키 엔터 또는 등등을 만들어야 할 수도 있음 현재는 만들지 않음
 
-	if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false && network.g_client[network.my_id].special_skill > 0)
+	if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false && network.g_client[network.my_id].special_skill > 0 && network.key_down_state == false)
 	{
 		network.key_down_state = true;
 		network.Send_request_packet(MsgType::CS_PLAYER_SPECIAL);
