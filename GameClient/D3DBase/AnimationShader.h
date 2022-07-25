@@ -62,9 +62,7 @@ public:
 	virtual void DeleteZombie(CGameObject* object);
 
 	virtual void AddZombieInNetwork();
-	template<class Arr>
-	void CheckZombies(Arr arr);
-
+	CAnimationObject* GetFirstZombie();
 protected:
 	std::list<CAnimationObject*> objects;
 	vector<CGameObject*> remove_list;

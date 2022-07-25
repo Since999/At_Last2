@@ -393,7 +393,6 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	{
 	case WM_LBUTTONDOWN:
 	{
-		::SetCapture(hWnd);
 		::GetCursorPos(&m_ptOldCursorPos);
 		ScreenToClient(hWnd, &m_ptOldCursorPos);
 
@@ -411,7 +410,6 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
-		::ReleaseCapture();
 		break;
 	case WM_MOUSEMOVE:
 		break;

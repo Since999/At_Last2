@@ -73,6 +73,7 @@ public:
 	virtual void Update(float time_elapsed);
 	virtual const array<XMMATRIX, 96>& GetBoneMat();
 
+	void PlayReloadAnim();
 	// Node Functions
 public:
 	static bool IsWalking(CStateMachine*);

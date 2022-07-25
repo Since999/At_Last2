@@ -39,6 +39,7 @@ public:
 	//mutex hp_lock;
 
 	int left_bullet;
+	int max_bullet = 30;
 public:
 	Client();
 	~Client();

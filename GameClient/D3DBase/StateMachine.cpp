@@ -5,6 +5,7 @@
 void CStateMachine::Update(float time_elapsed)
 {
 	is_anim_ended = model->UpdateNodeTM(animation_time, time_elapsed, _playAniIdx);
+
 	//curr_node->func(time_elapsed);
 	//if (curr_node->state_change_func()) {
 		//curr_node = curr_node->next_node;
@@ -16,7 +17,7 @@ const array<XMMATRIX, 96>& CStateMachine::GetBoneMat()
 	Update(TIMEMANAGER.GetTimeElapsed());
 	auto& mat = model->GetBoneMat();
 	if (blend_time < max_blend_time) {
-		CAnimationBlend::BlendAnimation(mat, blend_mat, blend_time / max_blend_time, mat);
+		CAnimationBlend::BlendAnimation(blend_mat, mat, blend_time / max_blend_time, mat);
 	}
 	return mat;
 }
@@ -137,19 +138,25 @@ const array<XMMATRIX, 96>& CZombieStateMachine::GetBoneMat()
 {
 	if (is_dead) {
 		return blend_mat;
-	}
+	} 
+	
 	return CStateMachine::GetBoneMat();
 }
 
 //-----------------------------------------------------------------------------------------------
+//p 0 - foward / 1 - left / 2 - right / 3 - backward / 4- shoot / 5- idle / 6 - attacked / 7 - dying
 namespace PLAYER {
 	enum PLAYER_ANIM_INDEX
 	{
-		IDLE = 0,
-		WALK_AND_SHOOT = 1,
-		ATTACKED = 2,
-		WALK = 3,
-		WALK_AND_RELOAD = 4,
+		FORWARD = 0,
+		LEFT = 1,
+		RIGHT = 2,
+		BACKWARD = 3,
+		WALK_AND_SHOOT = 4,
+		IDLE = 5,
+		ATTACKED = 6,
+		DYING = 7,
+		WALK_AND_RELOAD = 7
 	};
 }
 
@@ -177,12 +184,14 @@ void CPlayerStateMachine::Update(float time_elapsed)
 	if (anim_state == ClientAnimationState::WALK) {
 		anim_time = time_elapsed * (speed / 1000.f);
 	}
-	CStateMachine::Update(anim_time);
+	else {
+		CStateMachine::Update(anim_time);
+	}
 
 	auto object_info = ((CMainGamePlayer*)object)->GetPlayerInfo();
 	if (anim_state == object_info->_animation) return;
 
-	switch (object_info->_animation) {
+	switch (anim_state) {
 	case ClientAnimationState::ATTACKED:
 	case ClientAnimationState::WALK_AND_RELOAD:
 	case ClientAnimationState::DEAD:
@@ -195,31 +204,73 @@ void CPlayerStateMachine::Update(float time_elapsed)
 	anim_state = object_info->_animation;
 	switch (anim_state) {
 	case ClientAnimationState::WALK_AND_SHOOT:
+		PlayAni(PLAYER::WALK_AND_SHOOT);
+		break;
+	case ClientAnimationState::ATTACKED:
+		PlayAni(PLAYER::ATTACKED);
+		break;
+	case ClientAnimationState::WALK_AND_RELOAD:
+		PlayAni(PLAYER::WALK_AND_RELOAD);
+		break;
+	case ClientAnimationState::DEAD:
+		PlayAni(PLAYER::IDLE);
+		break;
+	case ClientAnimationState::IDLE:
+		PlayAni(PLAYER::IDLE);
+		break;
+	case ClientAnimationState::WALK:
+		//model->PlayAni(PLAYER::WALK);
+		break;
+	}
+}
+
+void CPlayerStateMachine::PlayReloadAnim()
+{
+	/*switch (((CMainGamePlayer*)object)->GetPlayerInfo()->_animation) {
+	case ClientAnimationState::ATTACKED:
+	case ClientAnimationState::WALK_AND_RELOAD:
+	case ClientAnimationState::DEAD:
+		return;
+		break;
+	default:
+		break;
+	}*/
+	/*anim_state = (ClientAnimationState)(((int)(anim_state) + 1) % 6);
+	switch (anim_state) {
+	case ClientAnimationState::WALK_AND_SHOOT:
 		model->PlayAni(PLAYER::WALK_AND_SHOOT);
+		cout << "WALK_AND_SHOOT" << endl;
 		break;
 	case ClientAnimationState::ATTACKED:
 		model->PlayAni(PLAYER::ATTACKED);
+		cout << "ATTACKED" << endl;
 		break;
 	case ClientAnimationState::WALK_AND_RELOAD:
 		model->PlayAni(PLAYER::WALK_AND_RELOAD);
+		cout << "WALK_AND_RELOAD" << endl;
 		break;
 	case ClientAnimationState::DEAD:
-		model->PlayAni(PLAYER::IDLE);
+		model->PlayAni(PLAYER::DYING);
+		cout << "DYING" << endl;
 		break;
 	case ClientAnimationState::IDLE:
 		model->PlayAni(PLAYER::IDLE);
+		cout << "IDLE" << endl;
 		break;
 	case ClientAnimationState::WALK:
-		model->PlayAni(PLAYER::WALK);
 		break;
-	}
+	}*/
+	//model->PlayAni(PLAYER::WALK_AND_RELOAD);
 }
 
 const array<XMMATRIX, 96>& CPlayerStateMachine::GetBoneMat()
 {
 	//return CStateMachine::GetBoneMat();
 	Update(TIMEMANAGER.GetTimeElapsed());
-	return ((CBlendSkinModel*)model)->GetBoneMat(TIMEMANAGER.GetTimeElapsed(), speed, angle);
+	if (anim_state == ClientAnimationState::WALK) {
+		return ((CBlendSkinModel*)model)->GetBoneMat(TIMEMANAGER.GetTimeElapsed(), speed, angle);
+	}
+	return model->GetBoneMat();
 }
 
 

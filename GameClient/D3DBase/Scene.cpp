@@ -354,26 +354,28 @@ void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandLis
 
 	CGameFramework* framework = CGameFramework::GetInstance();
 
-	m_nShaders = 4;
+	m_nShaders = 3;
 	m_ppShaders = new CShader * [m_nShaders];
 
-	CTerrainShader* pObjectShader = new CTerrainShader();
+	/*CTerrainShader* pObjectShader = new CTerrainShader();
 	pObjectShader->CreateShader(device, m_pd3dGraphicsRootSignature);
 	pObjectShader->BuildObjects(device, list, NULL);
-	m_ppShaders[0] = pObjectShader;
+	m_ppShaders[0] = pObjectShader;*/
 
 	CAnimationObjectShader* ani_shader = new CAnimationObjectShader(device, list, m_pd3dGraphicsRootSignature);
-	m_ppShaders[1] = ani_shader;
+	m_ppShaders[0] = ani_shader;
 
-
-	m_ppShaders[2] = CStaticObjectShader::InitInstance(device, list, m_pd3dGraphicsRootSignature);
+	m_ppShaders[1] = CStaticObjectShader::InitInstance(device, list, m_pd3dGraphicsRootSignature);
 
 	C2DShader* particle_shader = new C2DShader(device, list, m_pd3dGraphicsRootSignature);
-	m_ppShaders[3] = particle_shader;
+	m_ppShaders[2] = particle_shader;
 
 	framework->ChangeUI(new UISystem(device, list, GetGraphicsRootSignature(), "Resources/UI/TestUI.xml"));
 
 	unsigned int model_index;
+#ifndef ENABLE_NETWORK
+	network.g_client[network.my_id]._type = PlayerType::COMMANDER;
+#endif
 	model_index = (int)(network.g_client[network.my_id]._type);
 	m_pPlayer = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
 		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
@@ -482,6 +484,66 @@ void CMainGameScene::ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	m_pPlayer3->ShadowMapRender(pd3dCommandList);
 }
 
+bool CMainGameScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+{
+	switch (nMessageID)
+	{
+	case WM_LBUTTONDOWN:
+	{
+		((CMainGamePlayer*)client_player)->StartFire();
+
+#ifdef TEST
+		POINT point;
+		::GetCursorPos(&point);
+		ScreenToClient(hWnd, &point);
+
+		RECT rect;
+		GetClientRect(hWnd, &rect);
+		float width = rect.right - rect.left;
+		float height = rect.bottom - rect.top;
+		float x = point.x - (width / 2);
+		float y = point.y - (height / 2);
+		x = -x;
+		((CMainGamePlayer*)client_player)->MoveTo(x, y);
+#endif
+	}
+	break;
+	case WM_RBUTTONDOWN:
+		break;
+	case WM_LBUTTONUP:
+		((CMainGamePlayer*)client_player)->StopFire();
+		break;
+	case WM_RBUTTONUP:
+		break;
+	case WM_MOUSEMOVE:
+		break;
+	default:
+		break;
+	}
+	return(false);
+}
+
+bool CMainGameScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+{
+	switch (nMessageID)
+	{
+		
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case 'R':
+			((CMainGamePlayer*)client_player)->Reload();
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+	return(false);
+}
+
 bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 {
 	DWORD dwDirection = 0;
@@ -507,11 +569,6 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 		network.Send_request_packet(MsgType::CS_PLAYER_INTERATION);
 	}
 	// 채팅용 키 엔터 또는 등등을 만들어야 할 수도 있음 현재는 만들지 않음
-
-	if ((pKeysBuffer['R'] & 0xF0) && network.key_down_state == false) {
-		network.key_down_state = true;
-		network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
-	}
 
 	if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && network.key_down_state == false && network.g_client[network.my_id].special_skill > 0)
 	{
@@ -586,13 +643,7 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 		cursor_direction = XMVector2Normalize(cursor_direction);
 		network.g_client[network.my_id].mx = cursor_direction.m128_f32[0];
 		network.g_client[network.my_id].mz = cursor_direction.m128_f32[1];
-		if (GetCapture() == hwnd)
-		{
-			((CMainGamePlayer*)client_player)->StartFire();
-		}
-		else {
-			((CMainGamePlayer*)client_player)->StopFire();
-		}
+		
 	}
 
 #ifdef ENABLE_NETWORK

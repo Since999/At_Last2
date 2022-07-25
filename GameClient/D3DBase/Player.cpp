@@ -445,11 +445,28 @@ void CMainGamePlayer::Update(float fTimeElapsed)
 
 	pre_location = curr_location;
 
+	//fire
 	fire_time -= fTimeElapsed;
+	if (is_firing) {
+		if (fire_time < 0.f) {
+			Fire();
+			fire_time = fire_rate;
+		}
+	}
+	//reload
+	if (is_reloading) {
+		reload_time -= fTimeElapsed;
+		if (reload_time <= 0.f) {
+			server_player_info->left_bullet += 30;
+			server_player_info->left_bullet = clamp(server_player_info->left_bullet, 0, server_player_info->max_bullet);
+			is_reloading = false;
+		}
+	}
 }
 
 void CMainGamePlayer::StartFire()
 {
+	is_firing = true;
 	if (fire_time < 0.f) {
 		Fire();
 		fire_time = fire_rate;
@@ -458,8 +475,18 @@ void CMainGamePlayer::StartFire()
 
 void CMainGamePlayer::StopFire()
 {
-	/*is_firing = false;
-	fire_time = 0.f;*/
+	is_firing = false;
+}
+
+void CMainGamePlayer::Reload()
+{
+	if (server_player_info->left_bullet >= server_player_info->max_bullet || is_reloading) return;
+	is_reloading = true;
+	reload_time = reload_duration;
+	((CPlayerStateMachine*)state_machine)->PlayReloadAnim(); 
+#ifdef ENABLE_NETWORK
+	network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
+#endif
 }
 
 #include "CStaticObjectShader.h"
@@ -468,6 +495,7 @@ void CMainGamePlayer::Fire()
 	if (server_player_info->left_bullet <= 0) {
 		return;
 	}
+	is_reloading = false;
 	server_player_info->left_bullet -= 1;
 	XMFLOAT3 dir = XMFLOAT3(-server_player_info->mx, 0.0f, server_player_info->mz);
 	dir = Vector3::Normalize(dir);
@@ -482,4 +510,12 @@ void CMainGamePlayer::Fire()
 #ifdef ENABLE_NETWORK
 	Network::Send_attack_packet(server_player_info->attack_x, server_player_info->attack_z);
 #endif
+}
+
+void CMainGamePlayer::MoveTo(float x, float y)
+{
+	XMFLOAT3 move_to_pos = GetPosition();
+	move_to_pos.x += x;
+	move_to_pos.z += y;
+	ParticleSystem::GetInstance()->AddParticle(move_to_pos, L"lightning");
 }

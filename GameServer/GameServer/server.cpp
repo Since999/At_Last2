@@ -4264,7 +4264,8 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 					//m_speed *= 100;
 
 					// 좀비 이동 방향, 이동 전 위치, 이동 속도 등 보내기
-					Send_zombie_move_packet(cl._id, npc._id, pre_x, pre_z, m_type, t_x, t_z, m_speed, npc.zombie->zombie_dir);
+					// (수정)서진석: 이동 전 위치 -> 이동 후 위치으로 수정, speed는 m_speed -> npc.zombie->speed(좀비의 초당 이동속도)로 수정
+					Send_zombie_move_packet(cl._id, npc._id, npc.zombie->GetX(), npc.zombie->GetZ(), m_type, t_x, t_z, npc.zombie->speed, npc.zombie->zombie_dir);
 
 					// 이동에 성공했고, 서치 범위 내 플레이어가 접근했다면 다시 A*를 돌리고, 더이상 서치하지 않기
 					if (npc.search_check == false)

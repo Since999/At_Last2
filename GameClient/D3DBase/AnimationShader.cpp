@@ -278,8 +278,8 @@ void CAnimationObjectShader::AddZombieInNetwork()
 	Network::b_zombie3;
 }
 
-template<class Arr>
-void CheckZombies(Arr arr){
-	Network::r_zombie1;
-	int i = 0;
+CAnimationObject* CAnimationObjectShader::GetFirstZombie()
+{
+	if (objects.empty()) return NULL;
+	return *(objects.begin());
 }
