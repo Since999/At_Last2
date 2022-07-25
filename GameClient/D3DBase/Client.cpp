@@ -15,6 +15,7 @@ Client::Client()
 	left_bullet = max_bullet;
 	zombie_kill_num = 0;
 	attack_x = 0, attack_z = 0;
+	_animation = ClientAnimationState::IDLE;
 }
 
 Client::~Client()

@@ -644,6 +644,14 @@ void Network::ProcessPacket(unsigned char* ptr)
 		cout << "게임 시작 \n";
 		game_start = true;
 		Send_request_packet(MsgType::CS_GAME_START);
+
+		for (auto& other : g_client)
+		{
+			if (other._state != ClientState::INGAME) continue;
+
+			other._animation = ClientAnimationState::IDLE;
+		}
+
 		CSoundSystem::GetInstance()->StopBGM();
 		CSoundSystem::GetInstance()->Play(L"in game bgm");
 		AddTimer(my_id, EVENT_TYPE::PLAYER_MOVE, 100);
@@ -1003,6 +1011,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 		case MapType::FIRST_PATH:
 		{
+			cout << id << "의 HP 가 " << packet->hp << "만큼 남았다~ \n";
 			r_zombie1[id].hp = packet->hp;
 			r_zombie1[id]._animation = ZombieAnimationState::ATTACKED;
 			CSoundSystem::GetInstance()->Play(L"zombie-hit");
@@ -1963,7 +1972,7 @@ void Network::Do_Timer()
 				this_thread::sleep_for(10ms);
 			}
 
-			Send_request_packet(MsgType::CS_SERVER_REQUEST);
+			//Send_request_packet(MsgType::CS_SERVER_REQUEST);
 
 			total_time = chrono::system_clock::now() + 1000ms;
 		}

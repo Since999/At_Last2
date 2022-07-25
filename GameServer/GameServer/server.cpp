@@ -896,7 +896,6 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 	{
 		//zom.zombie->z_attack_lock.lock();
 		hp -= cl.player->attack;
-
 		if (hp <= 0)
 		{
 			hp = 0;
@@ -2208,7 +2207,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		// 이동했을 때 기본에 있었는데 가까운데에 없어졌다면
 		for (auto& zom : cl_z_list)	// 전 리스트
 		{
-			if (0 == near_zombie_list.count(zom))	// 근데 지금 없다면?
+			if (0 != near_zombie_list.count(zom))	// 근데 지금 없다면?
 			{
 				cl.list_lock.lock();
 				cl.zombie_list.erase(zom);
@@ -3914,7 +3913,7 @@ void Server::Work()
 				delete exp_over;
 				exp_over = nullptr;
 
-				AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 99);
+				AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
 				break;
 			}
 
@@ -3922,7 +3921,7 @@ void Server::Work()
 			delete exp_over;
 			exp_over = nullptr;
 
-			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 99);
+			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
 		}
 			break;
 		case IOType::NPC_DEAD:
@@ -4468,7 +4467,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 	}
 
 	// 30fps에 맞게 1초에 10번 이동
-	AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_MOVE, 99);
+	AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_MOVE, 100);
 }
 
 void Server::ZombieMove(int z_id)
