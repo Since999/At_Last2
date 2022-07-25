@@ -354,21 +354,21 @@ void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandLis
 
 	CGameFramework* framework = CGameFramework::GetInstance();
 
-	m_nShaders = 3;
+	m_nShaders = 4;
 	m_ppShaders = new CShader * [m_nShaders];
 
-	/*CTerrainShader* pObjectShader = new CTerrainShader();
+	CTerrainShader* pObjectShader = new CTerrainShader();
 	pObjectShader->CreateShader(device, m_pd3dGraphicsRootSignature);
 	pObjectShader->BuildObjects(device, list, NULL);
-	m_ppShaders[0] = pObjectShader;*/
+	m_ppShaders[0] = pObjectShader;
 
 	CAnimationObjectShader* ani_shader = new CAnimationObjectShader(device, list, m_pd3dGraphicsRootSignature);
-	m_ppShaders[0] = ani_shader;
+	m_ppShaders[1] = ani_shader;
 
-	m_ppShaders[1] = CStaticObjectShader::InitInstance(device, list, m_pd3dGraphicsRootSignature);
+	m_ppShaders[2] = CStaticObjectShader::InitInstance(device, list, m_pd3dGraphicsRootSignature);
 
 	C2DShader* particle_shader = new C2DShader(device, list, m_pd3dGraphicsRootSignature);
-	m_ppShaders[2] = particle_shader;
+	m_ppShaders[3] = particle_shader;
 
 	framework->ChangeUI(new UISystem(device, list, GetGraphicsRootSignature(), "Resources/UI/TestUI.xml"));
 
