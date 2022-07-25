@@ -35,7 +35,7 @@ const int MAX_NAME_SIZE = 20;					// ÇÃ·¹ÀÌ¾î ÀÌ¸§ ±æÀÌ
 
 const int ROAD_ZOMBIE_NUM = 20;
 
-const int FIRST_CHECK_POINT_ZOMBIE_NUM = 100;
+const int FIRST_CHECK_POINT_ZOMBIE_NUM = 1;
 const int TWO_CHECK_POINT_ZOMBIE_NUM = 150;
 const int THREE_CHECK_POINT_ZOMBIE_NUM = 200;
 
@@ -305,7 +305,6 @@ struct cs_login_packet									// Å¬¶óÀÌ¾ğÆ®¿¡¼­ ¼­¹ö·Î ·Î±×ÀÎ ÆĞÅ¶ Àü¼Û
 {
 	unsigned short size;									// »çÀÌÁî Àü¼Û
 	MsgType type;										// ¸Ş½ÃÁö Å¸ÀÔ LOGIN_REQUEST
-	char name[MAX_NAME_SIZE];
 };
 
 struct cs_move_packet								// Å¬¶óÀÌ¾ğÆ®¿¡¼­ ¼­¹ö·Î ¿òÁ÷ÀÌ´Â ¹æÇâ Àü¼Û
@@ -381,7 +380,6 @@ struct sc_login_ok_packet							// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ğÆ®¿¡°Ô ·Î±×ÀÎÀÌ µÇ¾ú´Ù°í Àü¼
 	unsigned short size;
 	MsgType type;										// ¸Ş½ÃÁö Å¸ÀÔ LOGIN_OK
 	char id;													// Å¬¶óÀÌ¾ğÆ® ID Àü¼Û
-	char name[MAX_NAME_SIZE];					// ÀÚ½ÅÀÇ ÀÌ¸§
 };
 
 struct sc_login_other_packet
@@ -389,7 +387,6 @@ struct sc_login_other_packet
 	unsigned short size;
 	MsgType type;										// ¸Ş½ÃÁö Å¸ÀÔ LOGIN_OK
 	char id;													// Å¬¶óÀÌ¾ğÆ® ID Àü¼Û
-	char name[MAX_NAME_SIZE];					// ÀÌ¸§
 };
 
 struct sc_fail_packet						 			// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ğÆ®¿¡°Ô ·Î±×ÀÎ¿¡ ½ÇÆĞÇÏ¿´´Ù°í Àü¼Û
@@ -535,7 +532,7 @@ struct sc_engineer_barrigate_build_packet		// ¼­¹ö¿¡¼­ ¿£Áö´Ï¾î°¡ Æ¯¼ö´É·Â »ç¿ëÇ
 	MsgType type;										// ¸Ş½ÃÁö Å¸ÀÔ ENGINEER_SPECIAL
 	char id;
 	short x, z;												// ¹Ù¸®°ÔÀÌÆ® Áß½É À§Ä¡
-	DIR dir;													// ¹æÇâ
+	Direction dir;											// ¹æÇâ
 };
 
 struct sc_player_attack_packet						// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ğÆ®¿¡°Ô ´©°¡ °ø°İÇÏ°í ÀÖ´ÂÁö ¾Ë·ÁÁÖ±â

@@ -85,8 +85,10 @@ public:
 	~Network();
 	
 	static void Initialize();
+	static void Login();
+	static void Player_Select(PlayerType type);
 	static void ReadMapFile();
-	static void send_login_packet(char* str);
+	static void send_login_packet();
 	static void send_player_select_packet(PlayerType type);
 	static void ProcessPacket(unsigned char* ptr);
 	static void volatile ProcessData(Exp_Over& exp_over, int &size);

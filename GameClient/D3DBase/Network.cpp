@@ -1,6 +1,7 @@
 #include "Network.h"
 #include "AnimationShader.h"
 #include "SoundSystem.h"
+#include "CStaticObjectShader.h"
 
 Socket Network::_socket;
 array<Client, MAX_PLAYER> Network::g_client;
@@ -538,7 +539,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 		my_id = packet->id;
 		g_client[my_id]._id = packet->id;
-		strcpy_s(g_client[my_id].Name, packet->name);
 		g_client[my_id]._state = ClientState::INGAME;
 
 		g_client[my_id].move_time = chrono::system_clock::now();
@@ -564,28 +564,24 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			id_lock.lock();
 			g_client[id]._id = packet->id;
-			strcpy_s(g_client[id].Name, packet->name);
 			other_client_id1 = id;
 			g_client[other_client_id1]._state = ClientState::INGAME;
 
 			g_client[other_client_id1]._animation = ClientAnimationState::IDLE;
 			id_lock.unlock();
 
-			cout << "다른 클라1 : " << other_client_id1 << "\n";
 			break;
 		}
 		if (other_client_id2 == -1 && other_client_id1 != id)
 		{
 			id_lock.lock();
 			g_client[id]._id = packet->id;
-			strcpy_s(g_client[id].Name, packet->name);
 			other_client_id2 = id;
 			g_client[other_client_id2]._state = ClientState::INGAME;
 
 			g_client[other_client_id2]._animation = ClientAnimationState::IDLE;
 			id_lock.unlock();
 
-			cout << "다른 클라2 : " << other_client_id2 << "\n";
 			break;
 		}
 		break;
@@ -657,7 +653,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_PLAYER_ATTACK:
 	{
-		cout << "공겨어어어억 \n";
 		CSoundSystem::GetInstance()->Play(L"gun fire");
 		break;
 	}
@@ -666,7 +661,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		sc_player_zombie_klil_packet* packet = reinterpret_cast<sc_player_zombie_klil_packet*>(ptr);
 
 		g_client[packet->id].zombie_kill_num = packet->zom_num;
-		cout << packet->id << "가 " << packet->zom_num << "만큼 죽여 " << g_client[packet->id].zombie_kill_num << "를 죽였습니다. \n";
 
 		break;
 	}
@@ -681,8 +675,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_PLAYER_RELOAD_REQUEST:
 	{
-		// 발사가 안되어 딸각 딸각 하거나, 재장전 메시지를 출력하면 좋을듯
-		cout << "총알이 모두 떨어져 재장전 해야합니다! \n";
 
 		break;
 	}
@@ -708,7 +700,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_player_chat_packet* packet = reinterpret_cast<sc_player_chat_packet*>(ptr);
 
-		cout << "[ " << g_client[packet->s_id].Name << " ] 이 보냄 : " << packet->message << "\n";
 
 		break;
 	}
@@ -720,13 +711,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_door_open_packet* packet = reinterpret_cast<sc_door_open_packet*>(ptr);
 
-		cout << packet->row << ", " << packet->col << "에 있는 문이 열렸습니다 \n";
 
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_NOT_ENGINEER:
 	{
-		cout << "당신은 엔지니어가 아니라 상호작용할 수 없습니다 \n";
 
 		break;
 	}
@@ -781,15 +770,10 @@ void Network::ProcessPacket(unsigned char* ptr)
 		//g_client[id].speed = packet->speed;
 		g_client[id].max_speed = packet->speed;;
 
-		cout << id << " : x : " << packet->x << ", z : " << packet->z << "\n";
-
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_SELECT_FAIL:
 	{
-		// 플레이어가 캐릭터 선택에 실패했다는 메시지 출력이 있으면 좋을 것 같음
-		cout << "플레이어가 이미 선택되었습니다 \n";
-
 		sc_fail_packet* packet = reinterpret_cast<sc_fail_packet*>(ptr);
 
 		if(g_client[packet->id]._type == PlayerType::NONE)
@@ -824,6 +808,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		g_client[packet->id]._state = ClientState::INGAME;
 		g_client[packet->id].hp = packet->hp;
 		g_client[packet->id].bullet = packet->bullet;
+		g_client[packet->id].special_skill -= 1;
 
 		break;
 	}
@@ -833,11 +818,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 		if (g_client[packet->id]._type == PlayerType::ENGINEER)
 		{
-			cout << "엔지니어를 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
+			//cout << "엔지니어를 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
 		}
 		else
 		{
-			cout << "용병을 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
+		//	cout << "용병을 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
 		}
 
 		g_client[my_id].special_skill_key = true;
@@ -850,27 +835,107 @@ void Network::ProcessPacket(unsigned char* ptr)
 		sc_engineer_barrigate_build_packet* packet = reinterpret_cast<sc_engineer_barrigate_build_packet*>(ptr);
 		
 		BarricadePos temp;
-		temp.x = packet->x;
-		temp.z = packet->z;
+		temp.x = (packet->x - 550.0f) * (-100.0f);
+		temp.z = (packet->z - 210.0f) * (-100.0f);
+		temp.b_type = BarricadeType::BARRICADE;
 		
-		skill_barricade[3 - g_client[packet->id].special_skill] = temp;
-
-		if (packet->dir == DIR::HEIGHT)
+		switch (packet->dir)
 		{
-			for (int i = 0; i < 5; ++i)
-			{
-				map[packet->z + i][packet->x] = (char)MazeWall::BARRICADE;
-			}
-		}
-		else
+		case Direction::UP:
+		case Direction::DOWN:
 		{
-			for (int i = 0; i < 5; ++i)
+			temp.angle = 0.0f;
+			for (int j = 0; j < 3; ++j)
 			{
-				map[packet->z][packet->x + i] = (char)MazeWall::BARRICADE;
+				for (int i = 0; i < 5; ++i)
+				{
+					map[packet->z - 1 + j][packet->x - 2 + i] = (char)MazeWall::BARRICADE;
+				}
 			}
+			break;
+		}
+		case Direction::LEFT:
+		case Direction::RIGHT:
+		{
+			temp.angle = 90.0f;
+			for (int j = 0; j < 3; ++j)
+			{
+				for (int i = 0; i < 5; ++i)
+				{
+					map[packet->z - 2 + i][packet->x - 1 + j] = (char)MazeWall::BARRICADE;
+				}
+			}
+			break;
+		}
+		case Direction::UP_LEFT:
+		case Direction::DOWN_RIGHT:
+		{
+			temp.angle = 45.0f;
+			for (int t_z = packet->z - 2; t_z <= packet->z; ++t_z)
+			{
+				for (int t_x = packet->x - 2; t_x <= packet->x; ++t_x)
+				{
+					map[t_z][t_x] = (char)MazeWall::BARRICADE;
+				}
+			}
+
+			for (int t_z = packet->z; t_z <= packet->z + 2; ++t_z)
+			{
+				for (int t_x = packet->x; t_x <= packet->x + 2; ++t_x)
+				{
+					map[t_z][t_x] = (char)MazeWall::BARRICADE;
+				}
+			}
+
+			map[packet->z - 3][packet->x - 1] = (char)MazeWall::BARRICADE;
+
+			map[packet->z - 1][packet->x - 3] = (char)MazeWall::BARRICADE;
+			map[packet->z - 1][packet->x + 1] = (char)MazeWall::BARRICADE;
+
+			map[packet->z + 1][packet->x - 1] = (char)MazeWall::BARRICADE;
+			map[packet->z + 1][packet->x + 3] = (char)MazeWall::BARRICADE;
+
+			map[packet->z + 3][packet->x + 1] = (char)MazeWall::BARRICADE;
+
+			break;
+		}
+		case Direction::UP_RIGHT:
+		case Direction::DOWN_LEFT:
+		{
+			temp.angle = 135.0f;
+			for (int t_z = packet->z; t_z <= packet->z + 2; ++t_z)
+			{
+				for (int t_x = packet->x - 2; t_x <= packet->x; ++t_x)
+				{
+					map[t_z][t_x] = (char)MazeWall::BARRICADE;
+				}
+			}
+
+			for (int t_z = packet->z - 2; t_z <= packet->z; ++t_z)
+			{
+				for (int t_x = packet->x; t_x <= packet->x + 2; ++t_x)
+				{
+					map[t_z][t_x] = (char)MazeWall::BARRICADE;
+				}
+			}
+
+			map[packet->z - 3][packet->x + 1] = (char)MazeWall::BARRICADE;
+
+			map[packet->z - 1][packet->x - 1] = (char)MazeWall::BARRICADE;
+			map[packet->z - 1][packet->x + 3] = (char)MazeWall::BARRICADE;
+
+			map[packet->z + 1][packet->x + 1] = (char)MazeWall::BARRICADE;
+			map[packet->z + 1][packet->x - 3] = (char)MazeWall::BARRICADE;
+
+			map[packet->z + 3][packet->x - 1] = (char)MazeWall::BARRICADE;
+
+			break;
+		}
 		}
 
-		g_client[packet->id].special_skill -= 1;
+		CStaticObjectShader::GetInstance()->AddBarricade(temp);
+
+		//g_client[packet->id].special_skill -= 1;
 		break;
 	}
 	case (int)MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL:
@@ -899,7 +964,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_search_packet* packet = reinterpret_cast<sc_search_packet*>(ptr);
 
-		cout << "x : " << packet->x << ", z : " << packet->z << "에 " << (char)packet->obj_type <<  "이 있습니다. \n";
 		break;
 	}
 	case (int)MsgType::SC_UPDATE_OBJECT_INFO:
@@ -925,8 +989,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		sc_update_zombie_info_packet* packet = reinterpret_cast<sc_update_zombie_info_packet*>(ptr);
 
 		int id = packet->id;
-
-		cout << (int)packet->id << "의 체력이 " << (int)packet->hp << "로 바뀌었습니다 \n";
 
 		switch (packet->map_type)
 		{
@@ -988,37 +1050,31 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 		case MapType::FIRST_PATH:
 		{
-			cout << (int)packet->id << "가 공격 했습니다\n";
 			r_zombie1[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::SECOND_PATH:
 		{
-			cout << (int)packet->id << "가 공격 했습니다\n";
 			r_zombie2[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::FINAL_PATH:
 		{
-			cout << (int)packet->id << "가 공격 했습니다\n";
 			r_zombie3[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
-			cout << (int)packet->id << "가 공격 했습니다\n";
 			b_zombie1[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
-			cout << (int)packet->id << "가 공격 했습니다\n";
 			b_zombie2[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
-			cout << (int)packet->id << "가 공격 했습니다\n";
 			b_zombie3[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
@@ -1287,7 +1343,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		sc_zombie_num_packet* packet = reinterpret_cast<sc_zombie_num_packet*>(ptr);
 
 		remain_zombie = packet->zombie_num;
-		cout << "remain_zombie : " << remain_zombie << "\n";
 
 		break;
 	}
@@ -1518,8 +1573,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
 			}
-
-			cout << "1길 좀비 모두 사망 \n";
 			break;
 		}
 		case MapType::SECOND_PATH:
@@ -1529,8 +1582,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
 			}
-
-			cout << "2길 좀비 모두 사망 \n";
 			break;
 		}
 		case MapType::FINAL_PATH:
@@ -1540,8 +1591,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
 			}
-
-				cout << "3길 좀비 모두 사망 \n";
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
@@ -1551,8 +1600,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
 			}
-
-			cout << "1거점 좀비 모두 사망 \n";
 
 			break;
 		}
@@ -1564,7 +1611,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 				zom._animation = ZombieAnimationState::DEAD;
 			}
 
-			cout << "2거점 좀비 모두 사망 \n";
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
@@ -1575,7 +1621,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 				zom._animation = ZombieAnimationState::DEAD;
 			}
 
-			cout << "3거점 좀비 모두 사망 \n";
 			break;
 		}
 		}
@@ -1591,7 +1636,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 		case MapType::FIRST_PATH:
 		{
-			cout << (int)id << "죽음 \n";
 			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
 			r_zombie1[id]._state = ZombieState::DEAD;
 			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
@@ -1599,7 +1643,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::SECOND_PATH:
 		{
-			cout << (int)id << "죽음 \n";
 			r_zombie2[id]._animation = ZombieAnimationState::DEAD;
 			r_zombie2[id]._state = ZombieState::DEAD;
 			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
@@ -1607,7 +1650,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::FINAL_PATH:
 		{
-			cout << (int)id << "죽음 \n";
 			r_zombie3[id]._animation = ZombieAnimationState::DEAD;
 			r_zombie3[id]._state = ZombieState::DEAD;
 			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
@@ -1615,7 +1657,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
-			cout << (int)id << "죽음 \n";
 			b_zombie1[id]._animation = ZombieAnimationState::DEAD;
 			b_zombie1[id]._state = ZombieState::DEAD;
 			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
@@ -1623,7 +1664,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
-			cout << (int)id << "죽음 \n";
 			b_zombie2[id]._animation = ZombieAnimationState::DEAD;
 			b_zombie2[id]._state = ZombieState::DEAD;
 			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
@@ -1631,7 +1671,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
-			cout << (int)id << "죽음 \n";
 			b_zombie3[id]._animation = ZombieAnimationState::DEAD;
 			b_zombie3[id]._state = ZombieState::DEAD;
 			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
@@ -1644,44 +1683,10 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_zombie_search_packet* packet = reinterpret_cast<sc_zombie_search_packet*>(ptr);
 
-		switch (packet->m_type)
-		{
-		case MapType::FIRST_PATH:
-		{
-			cout << (int)packet->z_id << "가 플레이어 " << (int)packet->p_id << "를 발견하였습니다 \n";
-			break;
-		}
-		case MapType::SECOND_PATH:
-		{
-			cout << (int)packet->z_id << "가 플레이어 " << (int)packet->p_id << "를 발견하였습니다 \n";
-			break;
-		}
-		case MapType::FINAL_PATH:
-		{
-			cout << (int)packet->z_id << "가 플레이어 " << (int)packet->p_id << "를 발견하였습니다 \n";
-			break;
-		}
-		case MapType::CHECK_POINT_ONE:
-		{
-			cout << (int)packet->z_id << "가 플레이어 " << (int)packet->p_id << "를 발견하였습니다 \n";
-			break;
-		}
-		case MapType::CHECK_POINT_TWO:
-		{
-			cout << (int)packet->z_id << "가 플레이어 " << (int)packet->p_id << "를 발견하였습니다 \n";
-			break;
-		case MapType::CHECK_POINT_FINAL:
-		{
-			cout << (int)packet->z_id << "가 플레이어 " << (int)packet->p_id << "를 발견하였습니다 \n";
-			break;
-		}
-		}
-		}
 		break;
 	}
 	case (int)MsgType::SC_ZOMBIE_REMAIN:
 	{
-		cout << "좀비가 아직 남아있으므로 죽이고 오세요 \n";
 
 		break;
 	}
@@ -1692,13 +1697,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_GAME_ALL_DEAD_END:
 	{
-		cout << "모든 플레이어가 사망하여 게임이 끝났습니다 \n";
 
 		break;
 	}
 	case (int)MsgType::SC_GAME_END:
 	{
-		cout << "게임에 클리어하였습니다! 고생하셨습니다 \n";
 
 		break;
 	}
@@ -1716,25 +1719,23 @@ void Network::ProcessPacket(unsigned char* ptr)
 		sc_gm_player_hp_packet* packet = reinterpret_cast<sc_gm_player_hp_packet*>(ptr);
 
 		g_client[packet->id].hp = packet->hp;
-		cout << packet->id << "가 " << packet->hp << "로 회복하였습니다 \n";
 
 		break;
 	}
 	default:
 	{
-		cout << packet_type << "으로 잘못왔음 \n";
+		//cout << packet_type << "으로 잘못왔음 \n";
 		break;
 	}
 	}
 	
 }
 
-void Network::send_login_packet(char* str)
+void Network::send_login_packet()
 {
 	cs_login_packet packet;
 	packet.size = sizeof(packet);
 	packet.type = MsgType::CS_LOGIN_REQUEST;
-	strcpy_s(packet.name, str);
 	_socket.do_send(sizeof(packet), &packet);
 }
 
@@ -1756,7 +1757,6 @@ void volatile Network::ProcessData(Exp_Over& exp_over, int& size)
 			packet_size = temp;
 			if (packet_size > 850)
 			{
-				cout << "packet_size : " << packet_size << "\n";
 				packet_size = 0;
 				remain_data = 0;
 				_prev_size = 0;
@@ -1822,18 +1822,10 @@ void Network::PlayerMove(int p_id)
 	AddTimer(p_id, EVENT_TYPE::PLAYER_MOVE, 100);
 }
 
-void Network::Work()
+void Network::Login()
 {
-	// 0. 클라이언트 초기화
-	Initialize();
-
-	// 1. 로그인 요청
-	char name[MAX_NAME_SIZE];
-
 	while (true) {
-		cout << "login : ";
-		cin >> name;
-		send_login_packet(name);
+		send_login_packet();
 
 		Sleep(10);
 
@@ -1864,10 +1856,29 @@ void Network::Work()
 			break;
 	}
 
+}
+
+void Network::Player_Select(PlayerType type)
+{
+	send_player_select_packet(type);
+	this_thread::sleep_for(10ms);
+
+	Send_request_packet(MsgType::CS_BARRICADE_REQUEST);
+}
+
+void Network::Work()
+{
+	// 0. 클라이언트 초기화
+	Initialize();
+
+	// 1. 로그인 요청
+	Login();
+
 	int select;
 	PlayerType type = PlayerType::NONE;
 	select_complete = false;
-	while (1) {
+	while (1)
+	{
 		HANDLE t_iocp = _socket.ReturnHandle();
 		DWORD num_byte;
 		LONG64 iocp_key;
@@ -1890,7 +1901,6 @@ void Network::Work()
 			break;
 		case IOType::SEND:
 			if (num_byte != exp_over->_wsa_buf.len) {
-				cout << "펑 \n";
 				exit(0);
 			}
 			delete exp_over;
@@ -1904,13 +1914,9 @@ void Network::Work()
 			exp_over = nullptr;
 		}
 			break;
-		default:
-			cout << "이건 아무것도 아님 \n";
-
 		}
 
 		// 2. 플레이어 캐릭터 선택
-		//select_lock.lock();
 		if (select_complete == false)
 		{
 			cout << "플레이어 선택 \n";
@@ -1924,15 +1930,10 @@ void Network::Work()
 			else if (select == 3)
 				type = PlayerType::MERCENARY;
 
-			send_player_select_packet(type);
+			Player_Select(type);
 			this_thread::sleep_for(10ms);
-
-			Send_request_packet(MsgType::CS_BARRICADE_REQUEST);
-			this_thread::sleep_for(10ms);
-			//select_lock.unlock();
 			continue;
 		}
-		//select_lock.unlock();
 	}
 	
 }
@@ -2247,46 +2248,8 @@ void Network::Update(float time_elapsed)
 		
 		if (player._state != ClientState::INGAME) continue;
 
-		//if(player._id != my_id)
-		//	if(player._animation != ClientAnimationState::WALK)
-		//		player._animation = ClientAnimationState::WALK;
 		player.move(time_elapsed);
 	}
-	/*test_time += time_elapsed;
-	if (test_time > 3.0f) {
-		test_time = 0.0f;
-		switch (r_zombie1[0]._animation) {
-		case ZombieAnimationState::ATTACK:
-			r_zombie1[0]._animation = ZombieAnimationState::SPAWN;
-			cout << "state: SPAWN" << endl;
-			break;
-		case ZombieAnimationState::SPAWN:
-			r_zombie1[0]._animation = ZombieAnimationState::DEAD;
-			cout << "state: DEAD" << endl;
-			break;
-		case ZombieAnimationState::DEAD:
-			r_zombie1[0]._animation = ZombieAnimationState::ATTACKED;
-			cout << "state: ATTACKED" << endl;
-			break;
-		case ZombieAnimationState::ATTACKED:
-			r_zombie1[0]._animation = ZombieAnimationState::IDLE;
-			cout << "state: IDLE" << endl;
-			break;
-		case ZombieAnimationState::IDLE:
-			r_zombie1[0]._animation = ZombieAnimationState::WALK;
-			cout << "state: WALK" << endl;
-			break;
-		case ZombieAnimationState::WALK:
-			r_zombie1[0]._animation = ZombieAnimationState::SPAWN;
-			cout << "state: SPAWN" << endl;
-			break;
-		default:
-			r_zombie1[0]._animation = ZombieAnimationState::SPAWN;
-			cout << "state: SPAWN" << endl;
-			break;
-		}
-		
-	}*/
 	
 	switch (map_type)
 	{

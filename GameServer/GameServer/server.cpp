@@ -132,7 +132,6 @@ void Server::Send_login_ok_packet(int c_id)
 	packet.size = sizeof(packet);
 	packet.id = c_id;
 	packet.type = MsgType::SC_LOGIN_OK;
-	strcpy_s(packet.name, g_clients[c_id].player_name);
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -1060,6 +1059,231 @@ void Server::CommanderSpecialSkill(Client& cl)
 	}
 }
 
+bool Server::EngineerSpecialSkillZombieCheck(int x, int z, Direction dir, NPC& npc)
+{
+	int root_x = (int)npc.zombie->GetX();
+	int root_z = (int)npc.zombie->GetZ();
+
+	float result_root_x = npc.zombie->GetX() - root_x;
+	float result_root_z = npc.zombie->GetZ() - root_z;
+
+	if (result_root_x > 0.5f)
+		root_x += 1;
+	if (result_root_z > 0.5f)
+		root_z += 1;
+
+	if (dir == Direction::UP)
+	{
+		for (int t_z = z + 1; t_z <= z + 5; ++t_z)
+		{
+			for (int t_x = x - 3; t_x <= x + 3; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+	}
+	else if (dir == Direction::DOWN)
+	{
+		for (int t_z = z - 5; t_z <= z  - 1; ++t_z)
+		{
+			for (int t_x = x - 3; t_x <= x + 3; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+	}
+	else if (dir == Direction::RIGHT)
+	{
+		for (int t_z = z - 3; t_z <= z  + 3; ++t_z)
+		{
+			for (int t_x = x + 1; t_x <= x + 5; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+	}
+	else if (dir == Direction::LEFT)
+	{
+		for (int t_z = z - 3; t_z <= z + 3; ++t_z)
+		{
+			for (int t_x = x - 5; t_x <= x - 1; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+	}
+	else if (dir == Direction::UP_RIGHT)
+	{
+		x += 2;
+		z += 2;
+
+		for (int t_z = z - 2; t_z <= z; ++t_z)
+		{
+			for (int t_x = x - 3; t_x <= x + 1; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+
+		for (int t_z = z; t_z <= z + 2; ++t_z)
+		{
+			for (int t_x = x - 1; t_x <= x + 3; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+
+		if (root_x == x - 1 && root_z == z + 4) return false;
+
+		if (root_x == x - 2 && root_z == z + 3) return false;
+		if (root_x == x - 1 && root_z == z + 3) return false;
+		if (root_x == x && root_z == z + 3) return false;
+
+		if (root_x == x - 4 && root_z == z + 1) return false;
+		if (root_x == x + 2 && root_z == z + 1) return false;
+
+		if (root_x == x - 2 && root_z == z - 1) return false;
+		if (root_x == x + 4 && root_z == z - 1) return false;
+
+		if (root_x == x && root_z == z - 3) return false;
+		if (root_x == x + 1 && root_z == z - 3) return false;
+		if (root_x == x + 2 && root_z == z - 3) return false;
+
+		if (root_x == x + 1 && root_z == z - 4) return false;
+	}
+	else if (dir == Direction::DOWN_LEFT)
+	{
+		x -= 2;
+		z -= 2;
+
+		for (int t_z = z - 2; t_z <= z; ++t_z)
+		{
+			for (int t_x = x - 3; t_x <= x + 1; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+
+		for (int t_z = z; t_z <= z + 2; ++t_z)
+		{
+			for (int t_x = x - 1; t_x <= x + 3; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+
+		if (root_x == x - 1 && root_z == z + 4) return false;
+
+		if (root_x == x - 2 && root_z == z + 3) return false;
+		if (root_x == x - 1 && root_z == z + 3) return false;
+		if (root_x == x && root_z == z + 3) return false;
+
+		if (root_x == x - 4 && root_z == z + 1) return false;
+		if (root_x == x + 2 && root_z == z + 1) return false;
+
+		if (root_x == x - 2 && root_z == z - 1) return false;
+		if (root_x == x + 4 && root_z == z - 1) return false;
+
+		if (root_x == x && root_z == z - 3) return false;
+		if (root_x == x + 1 && root_z == z - 3) return false;
+		if (root_x == x + 2 && root_z == z - 3) return false;
+
+		if (root_x == x + 1 && root_z == z - 4) return false;
+	}
+	else if (dir == Direction::UP_LEFT)
+	{
+		x -= 2;
+		z += 2;
+
+		for (int t_z = z - 2; t_z <= z; ++t_z)
+		{
+			for (int t_x = x - 1; t_x <= x + 3; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+
+		for (int t_z = z; t_z <= z + 2; ++t_z)
+		{
+			for (int t_x = x - 3; t_x <= x + 1; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+
+		if (root_x == x + 1 && root_z == z + 4) return false;
+
+		if (root_x == x && root_z == z + 3) return false;
+		if (root_x == x + 1 && root_z == z + 3) return false;
+		if (root_x == x + 2 && root_z == z + 3) return false;
+
+		if (root_x == x - 2 && root_z == z + 1) return false;
+		if (root_x == x + 4 && root_z == z + 1) return false;
+
+		if (root_x == x + 2 && root_z == z - 1) return false;
+		if (root_x == x - 4 && root_z == z - 1) return false;
+
+		if (root_x == x && root_z == z - 3) return false;
+		if (root_x == x - 1 && root_z == z - 3) return false;
+		if (root_x == x - 2 && root_z == z - 3) return false;
+
+		if (root_x == x - 1 && root_z == z - 4) return false;
+	}
+	else if (dir == Direction::DOWN_RIGHT)
+	{
+		x += 2;
+		z -= 2;
+
+		for (int t_z = z - 2; t_z <= z; ++t_z)
+		{
+			for (int t_x = x - 1; t_x <= x + 3; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+
+		for (int t_z = z; t_z <= z + 2; ++t_z)
+		{
+			for (int t_x = x - 3; t_x <= x + 1; ++t_x)
+			{
+				if (root_x == t_x && root_z == t_z)
+					return false;
+			}
+		}
+
+		if (root_x == x + 1 && root_z == z + 4) return false;
+
+		if (root_x == x && root_z == z + 3) return false;
+		if (root_x == x + 1 && root_z == z + 3) return false;
+		if (root_x == x + 2 && root_z == z + 3) return false;
+
+		if (root_x == x - 2 && root_z == z + 1) return false;
+		if (root_x == x + 4 && root_z == z + 1) return false;
+
+		if (root_x == x + 2 && root_z == z - 1) return false;
+		if (root_x == x - 4 && root_z == z - 1) return false;
+
+		if (root_x == x && root_z == z - 3) return false;
+		if (root_x == x - 1 && root_z == z - 3) return false;
+		if (root_x == x - 2 && root_z == z - 3) return false;
+
+		if (root_x == x - 1 && root_z == z - 4) return false;
+	}
+
+	return true;
+}
+
 bool Server::EngineerSpecialSkillMapCheck(int x, int z, Direction dir)
 {
 	if (dir == Direction::UP || dir == Direction::DOWN)
@@ -1088,7 +1312,7 @@ bool Server::EngineerSpecialSkillMapCheck(int x, int z, Direction dir)
 			}
 		}
 	}
-	else if (dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
+	else if (dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
 	{
 		for (int t_z = z - 2; t_z <= z; ++t_z)
 		{
@@ -1128,7 +1352,7 @@ bool Server::EngineerSpecialSkillMapCheck(int x, int z, Direction dir)
 		if (map.map[z + 3][x + 1] == (char)MazeWall::BARRICADE || map.map[z + 3][x + 1] == (char)MazeWall::WALL)
 			return false;
 	}
-	else if(dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
+	else if(dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
 	{
 		for (int t_z = z; t_z <= z + 2; ++t_z)
 		{
@@ -1194,7 +1418,7 @@ void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 			}
 		}
 	}
-	else if (dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
+	else if (dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
 	{
 		for (int t_z = bz - 2; t_z <= bz; ++t_z)
 		{
@@ -1222,7 +1446,7 @@ void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 
 		map.map[bz + 3][bx + 1] = (char)MazeWall::BARRICADE;
 	}
-	else if (dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
+	else if (dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
 	{
 		for (int t_z = bz; t_z <= bz + 2; ++t_z)
 		{
@@ -1255,7 +1479,7 @@ void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 void Server::Send_engineer_skill_packet(int c_id, int s_id, int t_x, int t_z)
 {
 	sc_engineer_barrigate_build_packet packet;
-	packet.dir = g_clients[s_id].player->special_dir;
+	packet.dir = g_clients[s_id].player->dir;
 	packet.x = t_x;
 	packet.z = t_z;
 	packet.id = s_id;
@@ -1296,54 +1520,64 @@ void Server::EngineerSpecialSkill(Client& cl)
 		return;
 	}
 
-	
-	if (cl.player->dir == Direction::UP)
+	// 설치 공간이 되는지??
 	{
-		t_x = cl_root_x;
-		t_z = cl_root_z + 3;
-		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP);
-	}
-	else if (cl.player->dir == Direction::UP_RIGHT)
-	{
-		t_x = cl_root_x + 3;
-		t_z = cl_root_z + 3;
-		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP_RIGHT);
-	}
-	else if (cl.player->dir == Direction::RIGHT)
-	{
-		t_x = cl_root_x + 3;
-		t_z = cl_root_z;
-		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::RIGHT);
-	}
-	else if (cl.player->dir == Direction::DOWN_RIGHT)
-	{
-		t_x = cl_root_x + 3;
-		t_z = cl_root_z - 3;
-		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN_RIGHT);
-	}
-	else if (cl.player->dir == Direction::DOWN)
-	{
-		t_x = cl_root_x;
-		t_z = cl_root_z - 3;
-		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN);
-	}
-	else if (cl.player->dir == Direction::DOWN_LEFT)
-	{
-		t_x = cl_root_x - 3;
-		t_z = cl_root_z - 3;
-		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN_LEFT);
-	}
-	else if (cl.player->dir == Direction::LEFT)
-	{
-		t_x = cl_root_x - 3;
-		t_z = cl_root_z;
-		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::LEFT);
-	}
-	else if (cl.player->dir == Direction::UP_LEFT)
-	{
-		t_x = cl_root_x - 3;
-		t_z = cl_root_z + 3;
-		check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP_LEFT);
+		if (cl.player->dir == Direction::UP)
+		{
+			cout << "UP 설치 \n";
+			t_x = cl_root_x;
+			t_z = cl_root_z + 3;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP);
+		}
+		else if (cl.player->dir == Direction::UP_RIGHT)
+		{
+			cout << "UP RIGHT 설치 \n";
+			t_x = cl_root_x + 3;
+			t_z = cl_root_z + 3;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP_RIGHT);
+		}
+		else if (cl.player->dir == Direction::RIGHT)
+		{
+			cout << "RIGHT 설치 \n";
+			t_x = cl_root_x + 3;
+			t_z = cl_root_z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::RIGHT);
+		}
+		else if (cl.player->dir == Direction::DOWN_RIGHT)
+		{
+			cout << "DOWN RIGHT 설치 \n";
+			t_x = cl_root_x + 3;
+			t_z = cl_root_z - 3;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN_RIGHT);
+		}
+		else if (cl.player->dir == Direction::DOWN)
+		{
+			cout << "DOWN 설치 \n";
+			t_x = cl_root_x;
+			t_z = cl_root_z - 3;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN);
+		}
+		else if (cl.player->dir == Direction::DOWN_LEFT)
+		{
+			cout << "DOWN LEFT 설치 \n";
+			t_x = cl_root_x - 3;
+			t_z = cl_root_z - 3;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN_LEFT);
+		}
+		else if (cl.player->dir == Direction::LEFT)
+		{
+			cout << "LEFT 설치 \n";
+			t_x = cl_root_x - 3;
+			t_z = cl_root_z;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::LEFT);
+		}
+		else if (cl.player->dir == Direction::UP_LEFT)
+		{
+			cout << "UP LEFT 설치 \n";
+			t_x = cl_root_x - 3;
+			t_z = cl_root_z + 3;
+			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP_LEFT);
+		}
 	}
 
 	if (map_type == MapType::CHECK_POINT_ONE)
@@ -1352,37 +1586,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 		{
 			if (npc._state != ZombieState::SPAWN) continue;
 
-			int root_x = (int)npc.zombie->GetX();
-			int root_z = (int)npc.zombie->GetZ();
-
-			float result_root_x = npc.zombie->GetX() - root_x;
-			float result_root_z = npc.zombie->GetZ() - root_z;
-
-			if (result_root_x > 0.5f)
-				root_x += 1;
-			if (result_root_z > 0.5f)
-				root_z += 1;
-
-			if (cl.player->special_dir == DIR::HEIGHT)
-			{
-				if (t_x == root_x)
-				{
-					if (t_z - 2 <= root_z && root_z <= t_z + 2)
-					{
-						check = false;
-					}
-				}
-			}
-			else
-			{
-				if (t_z == root_z)
-				{
-					if (t_x - 2 <= root_x && root_x <= t_x + 2)
-					{
-						check = false;
-					}
-				}
-			}
+			check = EngineerSpecialSkillZombieCheck(cl_root_x, cl_root_z, cl.player->dir, npc);
 		}
 	}
 	else if (map_type == MapType::CHECK_POINT_TWO)
@@ -1391,37 +1595,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 		{
 			if (npc._state != ZombieState::SPAWN) continue;
 
-			int root_x = (int)npc.zombie->GetX();
-			int root_z = (int)npc.zombie->GetZ();
-
-			float result_root_x = npc.zombie->GetX() - root_x;
-			float result_root_z = npc.zombie->GetZ() - root_z;
-
-			if (result_root_x > 0.5f)
-				root_x += 1;
-			if (result_root_z > 0.5f)
-				root_z += 1;
-
-			if (cl.player->special_dir == DIR::HEIGHT)
-			{
-				if (t_x == root_x)
-				{
-					if (t_z - 2 <= root_z && root_z <= t_z + 2)
-					{
-						check = false;
-					}
-				}
-			}
-			else
-			{
-				if (t_z == root_z)
-				{
-					if (t_x - 2 <= root_x && root_x <= t_x + 2)
-					{
-						check = false;
-					}
-				}
-			}
+			check = EngineerSpecialSkillZombieCheck(cl_root_x, cl_root_z, cl.player->dir, npc);
 		}
 	}
 	else if (map_type == MapType::CHECK_POINT_FINAL)
@@ -1430,46 +1604,16 @@ void Server::EngineerSpecialSkill(Client& cl)
 		{
 			if (npc._state != ZombieState::SPAWN) continue;
 
-			int root_x = (int)npc.zombie->GetX();
-			int root_z = (int)npc.zombie->GetZ();
-
-			float result_root_x = npc.zombie->GetX() - root_x;
-			float result_root_z = npc.zombie->GetZ() - root_z;
-
-			if (result_root_x > 0.5f)
-				root_x += 1;
-			if (result_root_z > 0.5f)
-				root_z += 1;
-
-			if (cl.player->special_dir == DIR::HEIGHT)
-			{
-				if (t_x == root_x)
-				{
-					if (t_z - 2 <= root_z && root_z <= t_z + 2)
-					{
-						check = false;
-					}
-				}
-			}
-			else
-			{
-				if (t_z == root_z)
-				{
-					if (t_x - 2 <= root_x && root_x <= t_x + 2)
-					{
-						check = false;
-					}
-				}
-			}
+			check = EngineerSpecialSkillZombieCheck(cl_root_x, cl_root_z, cl.player->dir, npc);
 		}
 	}
 
 	if (check)
 	{
+		EngineerBuildBarricade(t_x, t_z, cl.player->dir);
+		/*
 		Send_engineer_skill_check_packet(cl._id, t_x, t_z);
 
-		/*
-		EngineerBuildBarricade(t_x, t_z, cl.player->special_dir);
 
 		if (cl.player->special_dir == DIR::HEIGHT)
 		{
@@ -1479,6 +1623,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 		{
 			t_x -= 2;
 		}
+		*/
 
 		for (auto& other : g_clients)
 		{
@@ -1486,7 +1631,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 			Send_engineer_skill_packet(other._id, cl._id, t_x, t_z);
 		}
-		*/
+		
 	}
 	else
 	{
@@ -1532,60 +1677,29 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	case (int)MsgType::CS_LOGIN_REQUEST:
 	{
 		cs_login_packet* packet = reinterpret_cast<cs_login_packet*>(p);
-
-		for (auto& other : g_clients)
-		{
-			//other.state_lock.lock();
-			if (other._state == ClientState::FREE)
-			{
-				//other.state_lock.unlock();
-				continue;
-			}
-			//other.state_lock.unlock();
-
-			if (strcmp(other.player_name, packet->name) == 0)
-			{
-				Send_fail_packet(client_id, MsgType::SC_LOGIN_FAIL);
-				check = true;
-				break;
-			}
-		}
-
-		if (check)
-			break;
-
-		strcpy_s(cl.player_name, packet->name);
 		Send_login_ok_packet(client_id);
 
 		// 클라이언트가 접속하였으므로 INGAME 상태로 변환
 		Client& cl = g_clients[client_id];
-		//cl.state_lock.lock();
 		cl._state = ClientState::INGAME;
-		//cl.state_lock.unlock();
 
 		// 클라이언트가 접속한 시점에는 스폰지점에 있으므로 스폰지점으로 설정
-		//cl.map_lock.lock();
 		cl.map_type = MapType::SPAWN;
-		//cl.map_lock.unlock();
 
-		// 다른 플레이어에게 로그인 아이디, 플레이어 네임 보내기
+		// 다른 플레이어에게 로그인 아이디
 		
 		for (auto& other : g_clients)
 		{
 			if (other._id == client_id)
 				continue;
 
-			//other.state_lock.lock();
 			if (ClientState::INGAME != other._state)
 			{
-				//other.state_lock.unlock();
 				continue;
 			}
-			//other.state_lock.unlock();
 
 			sc_login_other_packet login_packet;
 			login_packet.id = client_id;
-			strcpy_s(login_packet.name, cl.player_name);
 			login_packet.size = sizeof(login_packet);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
 			other.do_send(sizeof(login_packet), &login_packet);
@@ -1597,18 +1711,14 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			if (other._id == client_id)
 				continue;
 
-			//other.state_lock.lock();
 			if (ClientState::INGAME != other._state)
 			{
-				//other.state_lock.unlock();
 				continue;
 			}
-			//other.state_lock.unlock();
 
 			sc_login_other_packet login_packet;
 			login_packet.id = other._id;
 			login_packet.size = sizeof(login_packet);
-			strcpy_s(login_packet.name, other.player_name);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
 			cl.do_send(sizeof(login_packet), &login_packet);
 		}
@@ -1873,6 +1983,51 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 
 		cs_rotate_packet* packet = reinterpret_cast<cs_rotate_packet*>(p);
 
+		// 플레이어 방향 정하기
+		{
+			if (0.75f < packet->mx && packet->mx <= 1.0f)
+			{
+				cl.player->dir = Direction::RIGHT;
+			}
+			else if (0.25f < packet->mx && packet->mx <= 0.75f)
+			{
+				if (packet->mz > 0.0f)
+				{
+					cl.player->dir = Direction::DOWN_RIGHT;
+				}
+				else
+				{
+					cl.player->dir = Direction::UP_RIGHT;
+				}
+			}
+			else if (-0.25f < packet->mx && packet->mx <= 0.25f)
+			{
+				if (packet->mz > 0.0f)
+				{
+					cl.player->dir = Direction::DOWN;
+				}
+				else
+				{
+					cl.player->dir = Direction::UP;
+				}
+			}
+			else if (-0.75f < packet->mx && packet->mx <= -0.25f)
+			{
+				if (packet->mz > 0.0f)
+				{
+					cl.player->dir = Direction::DOWN_LEFT;
+				}
+				else
+				{
+					cl.player->dir = Direction::UP_LEFT;
+				}
+			}
+			else
+			{
+				cl.player->dir = Direction::LEFT;
+			}
+		}
+
 		for (auto& s_cl : g_clients)
 		{
 			if (s_cl._state != ClientState::INGAME)
@@ -1908,50 +2063,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		cl.player->z = packet->z;
 		cl.move_lock.unlock();
 
-		// 플레이어 방향 정하기
-		{
-			if (0.75f < packet->t_x && packet->t_x <= 1.0f)
-		{
-			cl.player->dir = Direction::RIGHT;
-		}
-			else if (0.25f < packet->t_x && packet->t_x <= 0.75f)
-		{
-			if (packet->t_z > 0.0f)
-			{
-				cl.player->dir = Direction::UP_RIGHT;
-			}
-			else
-			{
-				cl.player->dir = Direction::DOWN_RIGHT;
-			}
-		}
-			else if (-0.25f < packet->t_x && packet->t_x <= 0.25f)
-		{
-			if (packet->t_z > 0.0f)
-			{
-				cl.player->dir = Direction::UP;
-			}
-			else
-			{
-				cl.player->dir = Direction::DOWN;
-			}
-		}
-			else if (-0.75f < packet->t_x && packet->t_x <= -0.25f)
-		{
-			if (packet->t_z > 0.0f)
-			{
-				cl.player->dir = Direction::UP_LEFT;
-			}
-			else
-			{
-				cl.player->dir = Direction::DOWN_LEFT;
-			}
-		}
-			else
-		{
-			cl.player->dir = Direction::LEFT;
-		}
-		}
 
 		// 미리 주변 뷰리스트 확인
 		unordered_set<int> near_zombie_list;
@@ -3803,7 +3914,7 @@ void Server::Work()
 				delete exp_over;
 				exp_over = nullptr;
 
-				AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
+				AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 99);
 				break;
 			}
 
@@ -3811,7 +3922,7 @@ void Server::Work()
 			delete exp_over;
 			exp_over = nullptr;
 
-			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
+			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 99);
 		}
 			break;
 		case IOType::NPC_DEAD:
@@ -4206,7 +4317,6 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 						Send_viewlist_put_packet(cl._id, npc._id, m_type, npc.zombie->GetX(), npc.zombie->GetZ(), MsgType::SC_ZOMBIE_MOVE, npc.zombie->_type);
 					}
 
-					float m_speed = npc.zombie->speed / 10;
 					float t_x = 0, t_z = 0;
 
 					switch (npc.zombie->zombie_dir)
@@ -4220,14 +4330,12 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 					{
 						t_x = -0.7f;
 						t_z = 0.7f;
-						m_speed *= 0.7f;
 						break;
 					}
 					case Direction::UP_RIGHT:
 					{
 						t_x = 0.7f;
 						t_z = 0.7f;
-						m_speed *= 0.7f;
 						break;
 					}
 					case Direction::RIGHT:
@@ -4249,14 +4357,12 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 					{
 						t_x = -0.7f;
 						t_z = -0.7f;
-						m_speed *= 0.7f;
 						break;
 					}
 					case Direction::DOWN_RIGHT:
 					{
 						t_x = 0.7f;
 						t_z = -0.7f;
-						m_speed *= 0.7f;
 						break;
 					}
 					}
@@ -4362,7 +4468,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 	}
 
 	// 30fps에 맞게 1초에 10번 이동
-	AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_MOVE, 100);
+	AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_MOVE, 99);
 }
 
 void Server::ZombieMove(int z_id)
