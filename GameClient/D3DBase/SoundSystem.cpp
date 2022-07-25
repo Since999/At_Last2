@@ -63,7 +63,7 @@ void CSoundSystem::Play(const wstring& name)
 #endif
 		return;
 	}
-	system->playSound(sound.sound, 0, false, &(*found_channel).second);
+	//system->playSound(sound.sound, 0, false, &(*found_channel).second);
 }
 
 void CSoundSystem::PlayBGM(const wstring& name)

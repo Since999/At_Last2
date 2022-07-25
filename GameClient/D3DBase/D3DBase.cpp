@@ -28,9 +28,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 {
 #ifdef ENABLE_NETWORK
 	thread Timer_thread{ network.Do_Timer };
-	network.Initialize();
-	//network.worker_threads.emplace_back(network.Work);
 	
+	network.worker_threads.emplace_back(network.Work);
 	/*while (1)
 	{
 		if (network.game_start)

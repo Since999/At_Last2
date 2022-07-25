@@ -589,6 +589,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_BARRICADE_SEND:
 	{
+		cout << "받음 \n";
 		sc_barricade_packet* packet = reinterpret_cast<sc_barricade_packet*>(ptr);
 
 		int i = 0;
@@ -1829,6 +1830,8 @@ void Network::PlayerMove(int p_id)
 
 void Network::Login()
 {
+	Initialize();
+
 	while (true) {
 		send_login_packet();
 
@@ -1873,15 +1876,10 @@ void Network::Player_Select(PlayerType type)
 
 void Network::Work()
 {
-	// 0. 클라이언트 초기화
-	Initialize();
-
-	// 1. 로그인 요청
 	Login();
-
-	int select;
-	PlayerType type = PlayerType::NONE;
-	select_complete = false;
+	//int select;
+	//PlayerType type = PlayerType::NONE;
+	//select_complete = false;
 	while (1)
 	{
 		HANDLE t_iocp = _socket.ReturnHandle();
@@ -1921,24 +1919,24 @@ void Network::Work()
 			break;
 		}
 
-		// 2. 플레이어 캐릭터 선택
-		if (select_complete == false)
-		{
-			cout << "플레이어 선택 \n";
-			cout << "1. 지휘관, 2. 엔지니어 3. 용병 \n";
-			cin >> select;
-			select_complete = true;
-			if (select == 1)
-				type = PlayerType::COMMANDER;
-			else if (select == 2)
-				type = PlayerType::ENGINEER;
-			else if (select == 3)
-				type = PlayerType::MERCENARY;
-
-			Player_Select(type);
-			this_thread::sleep_for(10ms);
-			continue;
-		}
+		//// 2. 플레이어 캐릭터 선택
+		//if (select_complete == false)
+		//{
+		//	cout << "플레이어 선택 \n";
+		//	cout << "1. 지휘관, 2. 엔지니어 3. 용병 \n";
+		//	cin >> select;
+		//	select_complete = true;
+		//	if (select == 1)
+		//		type = PlayerType::COMMANDER;
+		//	else if (select == 2)
+		//		type = PlayerType::ENGINEER;
+		//	else if (select == 3)
+		//		type = PlayerType::MERCENARY;
+		//
+		//	Player_Select(type);
+		//	this_thread::sleep_for(10ms);
+		//	continue;
+		//}
 	}
 	
 }
