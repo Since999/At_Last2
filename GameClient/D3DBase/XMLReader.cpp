@@ -21,6 +21,7 @@ const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
 {
     if (!function_map.empty()) return function_map;
     function_map.emplace(L"login", []() {
+        network.Login();
         auto framework = CGameFramework::GetInstance();
         auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
         framework->ChangeScene(new CSelectScene(sig));
@@ -30,7 +31,16 @@ const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
         auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
         framework->ChangeScene(new CMainGameScene(sig));
     });
-
+    function_map.emplace(L"select player 1", []() {
+        network.Player_Select(PlayerType::COMMANDER);
+    });
+    function_map.emplace(L"select player 2", []() {
+        network.Player_Select(PlayerType::ENGINEER);
+    });
+    function_map.emplace(L"select player 3", []() {
+        network.Player_Select(PlayerType::MERCENARY);
+    });
+    
     return function_map;
 }
 
