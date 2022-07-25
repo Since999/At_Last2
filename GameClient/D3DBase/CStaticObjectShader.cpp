@@ -146,10 +146,12 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		static_object->SetMaterial(materials[(unsigned int)bar_info.b_type]);
 		static_object->SetPosition(bar_info.x, bottom, bar_info.z);
 		if (bar_info.b_type == BarricadeType::CAR) {
-			static_object->Rotate(90.f, 0.0f, 0.0f);
+			static_object->Rotate(90.f, 0.0f, bar_info.angle);
+		}
+		else {
+			static_object->Rotate(0.0f, bar_info.angle, 0.0f);
 		}
 		static_object->Scale(0.1f);
-		static_object->Rotate(0.0f, bar_info.angle, 0.0f);
 		//pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		//pRotatingObject->SetRotationSpeed(10.0f * (i % 10));
 		static_object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * cb_size));

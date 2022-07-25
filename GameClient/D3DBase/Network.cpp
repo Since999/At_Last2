@@ -1040,13 +1040,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::FIRST_PATH:
 		{
 			//move_lock.lock();
-			r_zombie1[id].x = packet->x;
-			r_zombie1[id].z = packet->z;
-			r_zombie1[id].speed = packet->speed;
-			r_zombie1[id].t_x = packet->t_x;
-			r_zombie1[id].t_z = packet->t_z;
-			r_zombie1[id].dir = packet->dir;
-			r_zombie1[id].arrive = false;
+			SetZombieInfo(r_zombie1, id, packet);
+			
 			//r_zombie1[id]._animation = ZombieAnimationState::WALK;
 			//move_lock.unlock();
 
@@ -1056,13 +1051,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::SECOND_PATH:
 		{
 			//move_lock.lock();
-			r_zombie2[id].x = packet->x;
-			r_zombie2[id].z = packet->z;
-			r_zombie2[id].speed = packet->speed;
-			r_zombie2[id].t_x = packet->t_x;
-			r_zombie2[id].t_z = packet->t_z;
-			r_zombie2[id].dir = packet->dir;
-			r_zombie2[id].arrive = false;
+			SetZombieInfo(r_zombie2, id, packet);
 			//r_zombie2[id]._animation = ZombieAnimationState::WALK;
 			//move_lock.unlock();
 			//cout << id << "ÀÇ ÁÂÇ¥ x : " << packet->x << ", z : " << packet->z << "\n";
@@ -1072,13 +1061,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::FINAL_PATH:
 		{
 			//move_lock.lock();
-			r_zombie3[id].x = packet->x;
-			r_zombie3[id].z = packet->z;
-			r_zombie3[id].speed = packet->speed;
-			r_zombie3[id].t_x = packet->t_x;
-			r_zombie3[id].t_z = packet->t_z;
-			r_zombie3[id].dir = packet->dir;
-			r_zombie3[id].arrive = false;
+			SetZombieInfo(r_zombie3, id, packet);
 			//r_zombie3[id]._animation = ZombieAnimationState::WALK;
 			//move_lock.unlock();
 
@@ -1087,13 +1070,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::CHECK_POINT_ONE:
 		{
 			//move_lock.lock();
-			b_zombie1[id].x = packet->x;
-			b_zombie1[id].z = packet->z;
-			b_zombie1[id].speed = packet->speed;
-			b_zombie1[id].t_x = packet->t_x;
-			b_zombie1[id].t_z = packet->t_z;
-			b_zombie1[id].dir = packet->dir;
-			b_zombie1[id].arrive = false;
+			SetZombieInfo(b_zombie1, id, packet);
 		//	b_zombie1[id]._animation = ZombieAnimationState::WALK;
 			//move_lock.unlock();
 
@@ -1104,13 +1081,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::CHECK_POINT_TWO:
 		{
 			//move_lock.lock();
-			b_zombie2[id].x = packet->x;
-			b_zombie2[id].z = packet->z;
-			b_zombie2[id].speed = packet->speed;
-			b_zombie2[id].t_x = packet->t_x;
-			b_zombie2[id].t_z = packet->t_z;
-			b_zombie2[id].dir = packet->dir;
-			b_zombie2[id].arrive = false;
+			SetZombieInfo(b_zombie2, id, packet);
 			//b_zombie2[id]._animation = ZombieAnimationState::WALK;
 			//move_lock.unlock();
 
@@ -1119,13 +1090,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::CHECK_POINT_FINAL:
 		{
 			//move_lock.lock();
-			b_zombie3[id].x = packet->x;
-			b_zombie3[id].z = packet->z;
-			b_zombie3[id].speed = packet->speed;
-			b_zombie3[id].t_x = packet->t_x;
-			b_zombie3[id].t_z = packet->t_z;
-			b_zombie3[id].dir = packet->dir;
-			b_zombie3[id].arrive = false;
+			SetZombieInfo(b_zombie3, id, packet);
 			//b_zombie3[id]._animation = ZombieAnimationState::WALK;
 			//move_lock.unlock();
 
@@ -2257,8 +2222,9 @@ void Network::ZombieMove(Zombie& zombie, float time_elapsed)
 	float x, z;
 	x = zombie.x + zombie.speed * zombie.t_x * time_elapsed;
 	z = zombie.z + zombie.speed * zombie.t_z * time_elapsed;
-
-	int row = z;
+	zombie.x = x;
+	zombie.z = z;
+	/*int row = z;
 	int col = x;
 
 	float row_result = z - row;
@@ -2271,7 +2237,7 @@ void Network::ZombieMove(Zombie& zombie, float time_elapsed)
 	{
 		zombie.x = x;
 		zombie.z = z;
-	}
+	}*/
 }
 //float test_time = 0.0f;
 
@@ -2326,92 +2292,63 @@ void Network::Update(float time_elapsed)
 	{
 	case MapType::FIRST_PATH:
 	{
-		for (auto& zombie : r_zombie1)
-		{
-			if (zombie._state != ZombieState::SPAWN) continue;
-
-			ZombieAngle(zombie, time_elapsed);
-
-			if (zombie.arrive) continue;
-
-			ZombieMove(zombie, time_elapsed);
-		}
+		UpdateZombies(r_zombie1, time_elapsed);
 		break;
 	}
 	case MapType::SECOND_PATH:
 	{
-		for (auto& zombie : r_zombie2)
-		{
-			if (zombie._state != ZombieState::SPAWN) continue;
-
-			ZombieAngle(zombie, time_elapsed);
-
-			if (zombie.arrive) continue;
-
-			ZombieMove(zombie, time_elapsed);
-		}
-
+		UpdateZombies(r_zombie2, time_elapsed);
 		break;
 	}
 	case MapType::FINAL_PATH:
 	{
-		for (auto& zombie : r_zombie3)
-		{
-			if (zombie._state != ZombieState::SPAWN) continue;
-
-			ZombieAngle(zombie, time_elapsed);
-
-			if (zombie.arrive) continue;
-
-			ZombieMove(zombie, time_elapsed);
-		}
-
+		UpdateZombies(r_zombie3, time_elapsed);
 		break;
 	}
 	case MapType::CHECK_POINT_ONE:
 	{
-		for (auto& zombie : b_zombie1)
-		{
-			if (zombie._state != ZombieState::SPAWN) continue;
-
-			ZombieAngle(zombie, time_elapsed);
-
-			if (zombie.arrive) continue;
-
-			ZombieMove(zombie, time_elapsed);
-		}
-
+		UpdateZombies(b_zombie1, time_elapsed);
 		break;
 	}
 	case MapType::CHECK_POINT_TWO:
 	{
-		for (auto& zombie : b_zombie2)
-		{
-			if (zombie._state != ZombieState::SPAWN) continue;
-
-			ZombieAngle(zombie, time_elapsed);
-
-			if (zombie.arrive) continue;
-
-			ZombieMove(zombie, time_elapsed);
-		}
-
+		UpdateZombies(b_zombie2, time_elapsed);
 		break;
 	}
 	case MapType::CHECK_POINT_FINAL:
 	{
-		for (auto& zombie : b_zombie3)
-		{
-			if (zombie._state != ZombieState::SPAWN) continue;
-
-			ZombieAngle(zombie, time_elapsed);
-
-			if (zombie.arrive) continue;
-
-			ZombieMove(zombie, time_elapsed);
-		}
-
+		UpdateZombies(b_zombie3, time_elapsed);
 		break;
 	}
 	}
+}
+
+template<typename Arr>
+void Network::UpdateZombies(Arr& arr, float time_elapsed)
+{
+	for (auto& zombie : arr)
+	{
+		if (zombie._state != ZombieState::SPAWN) continue;
+
+		ZombieAngle(zombie, time_elapsed);
+
+		if (zombie.arrive) continue;
+
+		ZombieMove(zombie, time_elapsed);
+	}
+}
+
+template<typename Arr>
+static void Network::SetZombieInfo(Arr& arr, unsigned int id, sc_zombie_move_packet* packet)
+{
+	if (abs(arr[id].x - packet->x) + abs(arr[id].z - packet->z) > 20) {
+		arr[id].x = packet->x;
+		arr[id].z = packet->z;
+		cout << "ÁÂÇ¥ ¹Ù²ñ" << endl;
+	}
+	arr[id].speed = packet->speed;
+	arr[id].t_x = packet->t_x;
+	arr[id].t_z = packet->t_z;
+	arr[id].dir = packet->dir;
+	arr[id].arrive = false;
 }
