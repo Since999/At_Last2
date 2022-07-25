@@ -1312,7 +1312,7 @@ bool Server::EngineerSpecialSkillMapCheck(int x, int z, Direction dir)
 			}
 		}
 	}
-	else if (dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
+	else if (dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
 	{
 		for (int t_z = z - 2; t_z <= z; ++t_z)
 		{
@@ -1352,7 +1352,7 @@ bool Server::EngineerSpecialSkillMapCheck(int x, int z, Direction dir)
 		if (map.map[z + 3][x + 1] == (char)MazeWall::BARRICADE || map.map[z + 3][x + 1] == (char)MazeWall::WALL)
 			return false;
 	}
-	else if(dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
+	else if(dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
 	{
 		for (int t_z = z; t_z <= z + 2; ++t_z)
 		{
@@ -1418,7 +1418,7 @@ void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 			}
 		}
 	}
-	else if (dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
+	else if (dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
 	{
 		for (int t_z = bz - 2; t_z <= bz; ++t_z)
 		{
@@ -1446,7 +1446,7 @@ void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 
 		map.map[bz + 3][bx + 1] = (char)MazeWall::BARRICADE;
 	}
-	else if (dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
+	else if (dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
 	{
 		for (int t_z = bz; t_z <= bz + 2; ++t_z)
 		{
@@ -1993,33 +1993,33 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			{
 				if (packet->mz > 0.0f)
 				{
-					cl.player->dir = Direction::UP_RIGHT;
+					cl.player->dir = Direction::DOWN_RIGHT;
 				}
 				else
 				{
-					cl.player->dir = Direction::DOWN_RIGHT;
+					cl.player->dir = Direction::UP_RIGHT;
 				}
 			}
 			else if (-0.25f < packet->mx && packet->mx <= 0.25f)
 			{
 				if (packet->mz > 0.0f)
 				{
-					cl.player->dir = Direction::UP;
+					cl.player->dir = Direction::DOWN;
 				}
 				else
 				{
-					cl.player->dir = Direction::DOWN;
+					cl.player->dir = Direction::UP;
 				}
 			}
 			else if (-0.75f < packet->mx && packet->mx <= -0.25f)
 			{
 				if (packet->mz > 0.0f)
 				{
-					cl.player->dir = Direction::UP_LEFT;
+					cl.player->dir = Direction::DOWN_LEFT;
 				}
 				else
 				{
-					cl.player->dir = Direction::DOWN_LEFT;
+					cl.player->dir = Direction::UP_LEFT;
 				}
 			}
 			else
@@ -3914,7 +3914,7 @@ void Server::Work()
 				delete exp_over;
 				exp_over = nullptr;
 
-				AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
+				AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 99);
 				break;
 			}
 
@@ -3922,7 +3922,7 @@ void Server::Work()
 			delete exp_over;
 			exp_over = nullptr;
 
-			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
+			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 99);
 		}
 			break;
 		case IOType::NPC_DEAD:
@@ -4317,7 +4317,6 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 						Send_viewlist_put_packet(cl._id, npc._id, m_type, npc.zombie->GetX(), npc.zombie->GetZ(), MsgType::SC_ZOMBIE_MOVE, npc.zombie->_type);
 					}
 
-					float m_speed = npc.zombie->speed / 10;
 					float t_x = 0, t_z = 0;
 
 					switch (npc.zombie->zombie_dir)
@@ -4331,14 +4330,12 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 					{
 						t_x = -0.7f;
 						t_z = 0.7f;
-						m_speed *= 0.7f;
 						break;
 					}
 					case Direction::UP_RIGHT:
 					{
 						t_x = 0.7f;
 						t_z = 0.7f;
-						m_speed *= 0.7f;
 						break;
 					}
 					case Direction::RIGHT:
@@ -4360,14 +4357,12 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 					{
 						t_x = -0.7f;
 						t_z = -0.7f;
-						m_speed *= 0.7f;
 						break;
 					}
 					case Direction::DOWN_RIGHT:
 					{
 						t_x = 0.7f;
 						t_z = -0.7f;
-						m_speed *= 0.7f;
 						break;
 					}
 					}
@@ -4375,7 +4370,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 					//m_speed *= 100;
 
 					// 좀비 이동 방향, 이동 전 위치, 이동 속도 등 보내기
-					Send_zombie_move_packet(cl._id, npc._id, pre_x, pre_z, m_type, t_x, t_z, m_speed, npc.zombie->zombie_dir);
+					Send_zombie_move_packet(cl._id, npc._id, pre_x, pre_z, m_type, t_x, t_z, npc.zombie->speed / 10, npc.zombie->zombie_dir);
 
 					// 이동에 성공했고, 서치 범위 내 플레이어가 접근했다면 다시 A*를 돌리고, 더이상 서치하지 않기
 					if (npc.search_check == false)
@@ -4472,7 +4467,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_
 	}
 
 	// 30fps에 맞게 1초에 10번 이동
-	AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_MOVE, 100);
+	AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_MOVE, 99);
 }
 
 void Server::ZombieMove(int z_id)

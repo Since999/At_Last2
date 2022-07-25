@@ -835,8 +835,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		sc_engineer_barrigate_build_packet* packet = reinterpret_cast<sc_engineer_barrigate_build_packet*>(ptr);
 		
 		BarricadePos temp;
-		temp.x = packet->x;
-		temp.z = packet->z;
+		temp.x = (packet->x - 550.0f) * (-100.0f);
+		temp.z = (packet->z - 210.0f) * (-100.0f);
 		temp.b_type = BarricadeType::BARRICADE;
 		
 		switch (packet->dir)
@@ -844,7 +844,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case Direction::UP:
 		case Direction::DOWN:
 		{
-			temp.angle = 90.0f;
+			temp.angle = 0.0f;
 			for (int j = 0; j < 3; ++j)
 			{
 				for (int i = 0; i < 5; ++i)
@@ -857,7 +857,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case Direction::LEFT:
 		case Direction::RIGHT:
 		{
-			temp.angle = 0;
+			temp.angle = 90.0f;
 			for (int j = 0; j < 3; ++j)
 			{
 				for (int i = 0; i < 5; ++i)
@@ -867,10 +867,10 @@ void Network::ProcessPacket(unsigned char* ptr)
 			}
 			break;
 		}
-		case Direction::UP_RIGHT:
-		case Direction::DOWN_LEFT:
+		case Direction::UP_LEFT:
+		case Direction::DOWN_RIGHT:
 		{
-			temp.angle = 315;
+			temp.angle = 45.0f;
 			for (int t_z = packet->z - 2; t_z <= packet->z; ++t_z)
 			{
 				for (int t_x = packet->x - 2; t_x <= packet->x; ++t_x)
@@ -899,10 +899,10 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 			break;
 		}
-		case Direction::UP_LEFT:
-		case Direction::DOWN_RIGHT:
+		case Direction::UP_RIGHT:
+		case Direction::DOWN_LEFT:
 		{
-			temp.angle = 45.0f;
+			temp.angle = 135.0f;
 			for (int t_z = packet->z; t_z <= packet->z + 2; ++t_z)
 			{
 				for (int t_x = packet->x - 2; t_x <= packet->x; ++t_x)
@@ -2282,46 +2282,8 @@ void Network::Update(float time_elapsed)
 		
 		if (player._state != ClientState::INGAME) continue;
 
-		//if(player._id != my_id)
-		//	if(player._animation != ClientAnimationState::WALK)
-		//		player._animation = ClientAnimationState::WALK;
 		player.move(time_elapsed);
 	}
-	/*test_time += time_elapsed;
-	if (test_time > 3.0f) {
-		test_time = 0.0f;
-		switch (r_zombie1[0]._animation) {
-		case ZombieAnimationState::ATTACK:
-			r_zombie1[0]._animation = ZombieAnimationState::SPAWN;
-			cout << "state: SPAWN" << endl;
-			break;
-		case ZombieAnimationState::SPAWN:
-			r_zombie1[0]._animation = ZombieAnimationState::DEAD;
-			cout << "state: DEAD" << endl;
-			break;
-		case ZombieAnimationState::DEAD:
-			r_zombie1[0]._animation = ZombieAnimationState::ATTACKED;
-			cout << "state: ATTACKED" << endl;
-			break;
-		case ZombieAnimationState::ATTACKED:
-			r_zombie1[0]._animation = ZombieAnimationState::IDLE;
-			cout << "state: IDLE" << endl;
-			break;
-		case ZombieAnimationState::IDLE:
-			r_zombie1[0]._animation = ZombieAnimationState::WALK;
-			cout << "state: WALK" << endl;
-			break;
-		case ZombieAnimationState::WALK:
-			r_zombie1[0]._animation = ZombieAnimationState::SPAWN;
-			cout << "state: SPAWN" << endl;
-			break;
-		default:
-			r_zombie1[0]._animation = ZombieAnimationState::SPAWN;
-			cout << "state: SPAWN" << endl;
-			break;
-		}
-		
-	}*/
 	
 	switch (map_type)
 	{
