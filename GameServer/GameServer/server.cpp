@@ -2157,7 +2157,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		//cout << "client_id [ " << client_id << "] x : " << cl.player->x << ", z : " << cl.player->z << "\n";
 
 		cl.list_lock.lock();
-		unordered_set<int> cl_z_list{ cl.zombie_list };
+		unordered_set<int> cl_z_list = cl.zombie_list;
 		cl.list_lock.unlock();
 
 		// 이동 했을 때 주변에 좀비가 있을경우 뷰리스트에 넣는다.

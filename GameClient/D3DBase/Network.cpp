@@ -1409,9 +1409,9 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::FINAL_PATH:
 		{
 			r_zombie3[z_id].view = true;
-			r_zombie1[z_id].x = packet->x;
-			r_zombie1[z_id].z = packet->z;
-			r_zombie1[z_id]._type = packet->z_type;
+			r_zombie3[z_id].x = packet->x;
+			r_zombie3[z_id].z = packet->z;
+			r_zombie3[z_id]._type = packet->z_type;
 			switch (packet->animation)
 			{
 			case MsgType::SC_ZOMBIE_MOVE:
