@@ -21,6 +21,7 @@ const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
 {
     if (!function_map.empty()) return function_map;
     function_map.emplace(L"login", []() {
+        network.Login();
         auto framework = CGameFramework::GetInstance();
         auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
         framework->ChangeScene(new CSelectScene(sig));
