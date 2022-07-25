@@ -216,6 +216,7 @@ void CProgressBar::Animate(float fTimeElapsed)
 	CUIObject::Animate(fTimeElapsed);
 	if (value_ptr) {
 		value = (*value_ptr);
+		value = clamp(value, 0.f, max_value);
 	}
 	float real_factor = value / max_value;
 	float m = real_factor - factor;

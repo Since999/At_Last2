@@ -57,10 +57,12 @@ CGameFramework::CGameFramework()
 	m_pScene = NULL;
 
 	_tcscpy_s(m_pszFrameRate, _T("At Last... ("));
+	InitializeCriticalSection(&crit);
 }
 
 CGameFramework::~CGameFramework()
 {
+	DeleteCriticalSection(&crit);
 }
 
 bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
@@ -672,6 +674,12 @@ void CGameFramework::FrameAdvance()
 
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
+	EnterCriticalSection(&crit);
+	for (auto& func : func_list) {
+		func();
+	}
+	func_list.clear();
+	LeaveCriticalSection(&crit);
 }
 
 void CGameFramework::ShadowMapRender()
@@ -768,4 +776,11 @@ void CGameFramework::ChangeUI(UISystem* ui_sys)
 		delete ui_system;
 	}
 	ui_system = ui_sys;
+}
+
+void CGameFramework::AddCommand(const function<void()>& func)
+{
+	EnterCriticalSection(&crit);
+	func_list.push_back(func);
+	LeaveCriticalSection(&crit);
 }

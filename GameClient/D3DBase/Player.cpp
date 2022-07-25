@@ -484,6 +484,7 @@ void CMainGamePlayer::Reload()
 	is_reloading = true;
 	reload_time = reload_duration;
 	((CPlayerStateMachine*)state_machine)->PlayReloadAnim(); 
+	CSoundSystem::GetInstance()->Play(L"gun reload");
 #ifdef ENABLE_NETWORK
 	network.Send_request_packet(MsgType::CS_PLAYER_RELOAD_REQUEST);
 #endif

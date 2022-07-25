@@ -648,9 +648,12 @@ void Network::ProcessPacket(unsigned char* ptr)
 		CSoundSystem::GetInstance()->Play(L"in game bgm");
 		AddTimer(my_id, EVENT_TYPE::PLAYER_MOVE, 100);
 		//change to game scene
+		
 		auto framework = CGameFramework::GetInstance();
-		auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
-		framework->ChangeScene(new CMainGameScene(sig));
+		framework->AddCommand([framework]() {
+			auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
+			framework->ChangeScene(new CMainGameScene(sig));
+		});
 		break;
 	}
 	case (int)MsgType::SC_GAME_START_FAIL:
@@ -687,7 +690,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	case (int)MsgType::SC_PLAYER_RELOAD:
 	{
 		sc_player_reload_packet* packet = reinterpret_cast<sc_player_reload_packet*>(ptr);
-
+		CSoundSystem::GetInstance()->Play(L"gun reload");
 
 		break;
 	}

@@ -9,6 +9,7 @@
 
 캐릭터 피격 - male-scream-5
 캐릭터 사망 - male-death-02
+재장전 - reload
 캐릭터 특수능력 - 
 
 좀비 스폰 - zombie-spawn

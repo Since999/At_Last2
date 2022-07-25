@@ -8,6 +8,11 @@
   loop = "false"
   channel = "effect"/>
   <Sound
+  name = "gun reload"
+  sound = "Resources/Sound/reload.wav"
+  loop = "false"
+  channel = "effect"/>
+  <Sound
   name = "P_Attacked"
   sound = "Resources/Sound/male-scream-5.wav"
   loop = "false"
