@@ -1091,3 +1091,17 @@ void AS_Map::InitMap(Map& map)
 		}
 	}
 }
+
+void AS_Map::EditMap(int s_x, int s_z, int e_x, int e_z, Map& map)
+{
+	for (int z = s_z; z <= e_z; ++z)
+	{
+		for (int x = s_x; x <= e_x; ++x)
+		{
+			if (map.map[z][x] == (char)MazeWall::ROAD)
+				as_map[z][x] = AS_MAP_TYPE::ROAD;
+			else
+				as_map[z][x] = AS_MAP_TYPE::WALL;
+		}
+	}
+}

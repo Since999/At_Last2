@@ -887,7 +887,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case Direction::UP_LEFT:
 		case Direction::DOWN_RIGHT:
 		{
-			temp.angle = 45.0f;
+			temp.angle = 135.0f;
 			for (int t_z = packet->z - 2; t_z <= packet->z; ++t_z)
 			{
 				for (int t_x = packet->x - 2; t_x <= packet->x; ++t_x)
@@ -919,7 +919,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case Direction::UP_RIGHT:
 		case Direction::DOWN_LEFT:
 		{
-			temp.angle = 135.0f;
+			temp.angle = 45.0f;
 			for (int t_z = packet->z; t_z <= packet->z + 2; ++t_z)
 			{
 				for (int t_x = packet->x - 2; t_x <= packet->x; ++t_x)
@@ -2319,11 +2319,11 @@ void Network::UpdateZombies(Arr& arr, float time_elapsed)
 template<typename Arr>
 static void Network::SetZombieInfo(Arr& arr, unsigned int id, sc_zombie_move_packet* packet)
 {
-	if (abs(arr[id].x - packet->x) + abs(arr[id].z - packet->z) > 20) {
+	//if (abs(arr[id].x - packet->x) + abs(arr[id].z - packet->z) > 0.2f) {
 		arr[id].x = packet->x;
 		arr[id].z = packet->z;
-		cout << "ÁÂÇ¥ ¹Ù²ñ" << endl;
-	}
+	//	cout << "ÁÂÇ¥ ¹Ù²ñ" << endl;
+	//}
 	arr[id].speed = packet->speed;
 	arr[id].t_x = packet->t_x;
 	arr[id].t_z = packet->t_z;

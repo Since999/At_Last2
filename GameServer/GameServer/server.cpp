@@ -518,6 +518,7 @@ void Server::ChangeMapType(Client& cl)
 
 	if ((cl.map_type != MapType::FIRST_PATH) && ((One_Road_Pos.x <= cl.player->x && cl.player->x <= One_Road_Pos3.x) && (One_Road_Pos.z <= cl.player->z && cl.player->z <= One_Base_Pos.z - 1)))
 	{
+		cl.zombie_list.clear();
 		change = MapType::FIRST_PATH;
 		cl.map_type = MapType::FIRST_PATH;
 		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
@@ -528,6 +529,7 @@ void Server::ChangeMapType(Client& cl)
 	}
 	else if ((cl.map_type != MapType::CHECK_POINT_ONE) && ((One_Base_Pos.x <= cl.player->x && cl.player->x <= One_Base_End_Pos.x) && (One_Base_Pos.z <= cl.player->z && cl.player->z <= One_Base_End_Pos.z)))
 	{
+		cl.zombie_list.clear();
 		change = MapType::CHECK_POINT_ONE;
 		cl.map_type = MapType::CHECK_POINT_ONE;
 		Send_zombie_number_packet(cl._id, FIRST_CHECK_POINT_ZOMBIE_NUM);
@@ -538,6 +540,7 @@ void Server::ChangeMapType(Client& cl)
 	}
 	else if ((cl.map_type != MapType::CHECK_POINT_TWO) && ((TWO_Base_Pos.x <= cl.player->x && cl.player->x <= TWO_Base_End_Pos.x) && (TWO_Base_Pos.z <= cl.player->z && cl.player->z <= TWO_Base_End_Pos.z)))
 	{
+		cl.zombie_list.clear();
 		change = MapType::CHECK_POINT_TWO;
 		cl.map_type = MapType::CHECK_POINT_TWO;
 		Send_zombie_number_packet(cl._id, TWO_CHECK_POINT_ZOMBIE_NUM);
@@ -548,6 +551,7 @@ void Server::ChangeMapType(Client& cl)
 	}
 	else if ((cl.map_type != MapType::CHECK_POINT_FINAL) && ((THREE_Base_Pos.x <= cl.player->x && cl.player->x <= THREE_Base_End_Pos2.x) && (THREE_Base_Pos.z <= cl.player->z && cl.player->z <= THREE_Base_End_Pos.z)))
 	{
+		cl.zombie_list.clear();
 		change = MapType::CHECK_POINT_FINAL;
 		cl.map_type = MapType::CHECK_POINT_FINAL;
 		Send_zombie_number_packet(cl._id, THREE_CHECK_POINT_ZOMBIE_NUM);
@@ -558,6 +562,7 @@ void Server::ChangeMapType(Client& cl)
 	}
 	else if((cl.map_type != MapType::SECOND_PATH) && ((Two_Road_Pos.x <= cl.player->x&& cl.player->x <= TWO_Base_Pos.x) && (Two_Road_Pos.z <= cl.player->z&& cl.player->z <= Two_Road_Pos.z + ROAD_SIZE)))
 	{
+		cl.zombie_list.clear();
 		change = MapType::SECOND_PATH;
 		cl.map_type = MapType::SECOND_PATH;
 		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
@@ -568,6 +573,7 @@ void Server::ChangeMapType(Client& cl)
 	}
 	else if ((cl.map_type != MapType::FINAL_PATH) && ((Three_Road_Pos.x <= cl.player->x && cl.player->x <= THREE_Base_Pos.x) && (Three_Road_Pos.z <= cl.player->z && cl.player->z <= Three_Road_Pos.z + ROAD_SIZE)))
 	{
+		cl.zombie_list.clear();
 		change = MapType::FINAL_PATH;
 		cl.map_type = MapType::FINAL_PATH;
 		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
@@ -578,11 +584,12 @@ void Server::ChangeMapType(Client& cl)
 	}
 	else if ((cl.map_type != MapType::EXIT) && ((Exit_Pos.x <= cl.player->x && cl.player->x <= Exit_End_Pos.x) && (Exit_Pos.z <= cl.player->z && cl.player->z <= Exit_End_Pos.z)))
 	{
+		cl.zombie_list.clear();
 		change = MapType::EXIT;
 		cl.map_type = MapType::EXIT;
 	}
 
-	cl.zombie_list.clear();
+	//cl.zombie_list.clear();
 	if (zombie_send == false)
 	{
 		for (auto& s_cl : g_clients)
@@ -1406,6 +1413,8 @@ void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 				map.map[bz - 2 + i][bx - 1 + j] = (char)MazeWall::BARRICADE;
 			}
 		}
+
+		as_map.EditMap(bx - 1, bz - 2, bx + 1, bz + 2, map);
 	}
 	else if (dir == Direction::UP || dir == Direction::DOWN)
 	{
@@ -1416,6 +1425,8 @@ void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 				map.map[bz - 1 + j][bx - 2 + i] = (char)MazeWall::BARRICADE;
 			}
 		}
+
+		as_map.EditMap(bx - 2, bz - 2, bx + 2, bz + 2, map);
 	}
 	else if (dir == Direction::UP_LEFT || dir == Direction::DOWN_RIGHT)
 	{
@@ -1444,6 +1455,8 @@ void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 		map.map[bz + 1][bx + 3] = (char)MazeWall::BARRICADE;
 
 		map.map[bz + 3][bx + 1] = (char)MazeWall::BARRICADE;
+
+		as_map.EditMap(bx - 3, bz - 3, bx + 3, bz + 3, map);
 	}
 	else if (dir == Direction::UP_RIGHT || dir == Direction::DOWN_LEFT)
 	{
@@ -1472,6 +1485,8 @@ void Server::EngineerBuildBarricade(int bx, int bz, Direction dir)
 		map.map[bz + 1][bx - 3] = (char)MazeWall::BARRICADE;
 
 		map.map[bz + 3][bx - 1] = (char)MazeWall::BARRICADE;
+
+		as_map.EditMap(bx - 3, bz - 3, bx + 3, bz + 3, map);
 	}
 }
 
@@ -1523,60 +1538,58 @@ void Server::EngineerSpecialSkill(Client& cl)
 	{
 		if (cl.player->dir == Direction::UP)
 		{
-			cout << "UP 설치 \n";
 			t_x = cl_root_x;
 			t_z = cl_root_z + 3;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP);
 		}
 		else if (cl.player->dir == Direction::UP_RIGHT)
 		{
-			cout << "UP RIGHT 설치 \n";
 			t_x = cl_root_x + 3;
 			t_z = cl_root_z + 3;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP_RIGHT);
 		}
 		else if (cl.player->dir == Direction::RIGHT)
 		{
-			cout << "RIGHT 설치 \n";
 			t_x = cl_root_x + 3;
 			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::RIGHT);
 		}
 		else if (cl.player->dir == Direction::DOWN_RIGHT)
 		{
-			cout << "DOWN RIGHT 설치 \n";
 			t_x = cl_root_x + 3;
 			t_z = cl_root_z - 3;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN_RIGHT);
 		}
 		else if (cl.player->dir == Direction::DOWN)
 		{
-			cout << "DOWN 설치 \n";
 			t_x = cl_root_x;
 			t_z = cl_root_z - 3;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN);
 		}
 		else if (cl.player->dir == Direction::DOWN_LEFT)
 		{
-			cout << "DOWN LEFT 설치 \n";
 			t_x = cl_root_x - 3;
 			t_z = cl_root_z - 3;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::DOWN_LEFT);
 		}
 		else if (cl.player->dir == Direction::LEFT)
 		{
-			cout << "LEFT 설치 \n";
 			t_x = cl_root_x - 3;
 			t_z = cl_root_z;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::LEFT);
 		}
 		else if (cl.player->dir == Direction::UP_LEFT)
 		{
-			cout << "UP LEFT 설치 \n";
 			t_x = cl_root_x - 3;
 			t_z = cl_root_z + 3;
 			check = EngineerSpecialSkillMapCheck(t_x, t_z, Direction::UP_LEFT);
 		}
+	}
+
+	if (check == false)
+	{
+		Send_fail_packet(cl._id, MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL);
+		return;
 	}
 
 	if (map_type == MapType::CHECK_POINT_ONE)
@@ -1610,19 +1623,40 @@ void Server::EngineerSpecialSkill(Client& cl)
 	if (check)
 	{
 		EngineerBuildBarricade(t_x, t_z, cl.player->dir);
-		/*
-		Send_engineer_skill_check_packet(cl._id, t_x, t_z);
 
+		if (map_type == MapType::CHECK_POINT_ONE)
+		{
+			for (auto& npc : b_zombie1)
+			{
+				if (npc._state != ZombieState::SPAWN) continue;
 
-		if (cl.player->special_dir == DIR::HEIGHT)
-		{
-			t_z -= 2;
+				npc.zombie->astar.Map(as_map);
+				npc.astar_check = false;
+				npc.zombie->astar.Delete();
+			}
 		}
-		else
+		else if (map_type == MapType::CHECK_POINT_TWO)
 		{
-			t_x -= 2;
+			for (auto& npc : b_zombie2)
+			{
+				if (npc._state != ZombieState::SPAWN) continue;
+
+				npc.zombie->astar.Map(as_map);
+				npc.astar_check = false;
+				npc.zombie->astar.Delete();
+			}
 		}
-		*/
+		else if (map_type == MapType::CHECK_POINT_FINAL)
+		{
+			for (auto& npc : b_zombie3)
+			{
+				if (npc._state != ZombieState::SPAWN) continue;
+
+				npc.zombie->astar.Map(as_map);
+				npc.astar_check = false;
+				npc.zombie->astar.Delete();
+			}
+		}
 
 		for (auto& other : g_clients)
 		{
@@ -2061,8 +2095,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		cl.player->x = packet->x;
 		cl.player->z = packet->z;
 		cl.move_lock.unlock();
-
-
+		
 		// 미리 주변 뷰리스트 확인
 		unordered_set<int> near_zombie_list;
 		switch (cl.map_type)
@@ -2160,7 +2193,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		cl.list_lock.unlock();
 
 		// 이동 했을 때 주변에 좀비가 있을경우 뷰리스트에 넣는다.
-		for (auto& zom : near_zombie_list)	// 가까운 좀비 리스트
+		for (auto zom : near_zombie_list)	// 가까운 좀비 리스트
 		{
 			if (0 == cl_z_list.count(zom))	// 근데 지금 클라의 좀비 리스트에 있지 않다면?
 			{
@@ -2172,6 +2205,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 				{
 				case MapType::FIRST_PATH:
 				{
+					cout << "이 때 보내는듯 \n";
 					Send_viewlist_put_packet(cl._id, zom, cl.map_type, r_zombie1[zom].zombie->GetX(), r_zombie1[zom].zombie->GetZ(), MsgType::SC_ZOMBIE_MOVE, r_zombie1[zom].zombie->_type);
 					break;
 				}
@@ -2207,7 +2241,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		// 이동했을 때 기본에 있었는데 가까운데에 없어졌다면
 		for (auto& zom : cl_z_list)	// 전 리스트
 		{
-			if (0 != near_zombie_list.count(zom))	// 근데 지금 없다면?
+			if (0 == near_zombie_list.count(zom))	// 근데 지금 없다면?
 			{
 				cl.list_lock.lock();
 				cl.zombie_list.erase(zom);
@@ -3658,10 +3692,17 @@ void Server::ZombiePlayerAttack(NPC& npc, MapType m_type)
 		if (cl._state != ClientState::INGAME)	continue;
 		if (cl.map_type != map_type) continue;
 
+		cl.list_lock.lock();
 		if (cl.zombie_list.count(npc._id) != 0)
+		{
+			cl.list_lock.unlock();
 			Send_zombie_attack_packet(cl._id, npc._id, m_type);
+		}
 		else
+		{
+			cl.list_lock.unlock();
 			continue;
+		}
 
 		// 공격 범위가 되는 지 확인
 		bool attack_check = ZombieAttackRangeCheck(npc.zombie->zombie_dir, npc.zombie->attRange, npc.zombie->GetX(), npc.zombie->GetZ(), cl.player->x, cl.player->z);

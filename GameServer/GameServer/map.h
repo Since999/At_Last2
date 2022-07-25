@@ -113,5 +113,6 @@ public:
 	~AS_Map();
 
 	void InitMap(Map& map);
+	void EditMap(int s_x, int s_z, int e_x, int e_z, Map& map);
 	AS_MAP_TYPE GetMapInfo(int x, int y) { return as_map[y][x]; };
 };

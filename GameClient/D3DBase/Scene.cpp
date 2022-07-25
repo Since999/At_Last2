@@ -643,7 +643,10 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 		cursor_direction = XMVector2Normalize(cursor_direction);
 		network.g_client[network.my_id].mx = cursor_direction.m128_f32[0];
 		network.g_client[network.my_id].mz = cursor_direction.m128_f32[1];
-		
+
+		// 이거 기록일단..
+		network.g_client[network.my_id].attack_x = ptCursorPos.x;
+		network.g_client[network.my_id].attack_z = ptCursorPos.y;
 	}
 
 #ifdef ENABLE_NETWORK
