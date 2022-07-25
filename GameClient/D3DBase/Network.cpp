@@ -686,7 +686,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	case (int)MsgType::SC_PLAYER_RELOAD:
 	{
 		sc_player_reload_packet* packet = reinterpret_cast<sc_player_reload_packet*>(ptr);
-
+		CSoundSystem::GetInstance()->Play(L"gun reload");
 
 		break;
 	}
