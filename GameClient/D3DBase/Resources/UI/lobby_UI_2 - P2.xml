@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UISystem>
+  
+
+
+
+  <UI
+width ="300"
+height ="300"
+x = "980"
+y ="660"
+image="Resources/UI/close.png"/>
+
+
+
+</UISystem>
