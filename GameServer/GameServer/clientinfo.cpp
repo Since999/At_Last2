@@ -672,8 +672,11 @@ bool Player::PlayerAttack(float x1, float z1, float z_x, float z_z)
 	
 	float a_result = abs((degree * z_x) + (-1.0f * z_z) - (degree * x) + z) / sqrt(degree * degree + 1);
 
-	if (-0.5< a_result && a_result < 0.5f)	// 절대적인 거리가 1.0f안이면 충돌한것으로 판정하여 true를 반환, 그 외는 아니므로 false
+	if (-2.0f < a_result && a_result < 2.0f)	// 절대적인 거리가 1.0f안이면 충돌한것으로 판정하여 true를 반환, 그 외는 아니므로 false
+	{
+		cout << "공격은 했을지도 \n";
 		return true;
+	}
 	else
 		return false;
 }

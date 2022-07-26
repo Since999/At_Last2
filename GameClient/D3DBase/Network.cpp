@@ -670,6 +670,9 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_PLAYER_ATTACK:
 	{
+		sc_player_attack_packet* packet = reinterpret_cast<sc_player_attack_packet*>(ptr);
+		// packet->id 가 공격한 주체
+		
 		CSoundSystem::GetInstance()->Play(L"gun fire");
 		break;
 	}
@@ -1033,6 +1036,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
+			cout << id << "의 HP 가 " << packet->hp << "만큼 남았다~ \n";
 			b_zombie1[id].hp = packet->hp;
 			b_zombie1[id]._animation = ZombieAnimationState::ATTACKED;
 			CSoundSystem::GetInstance()->Play(L"zombie-hit");
