@@ -675,7 +675,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	case (int)MsgType::SC_PLAYER_ATTACK:
 	{
 		sc_player_attack_packet* packet = reinterpret_cast<sc_player_attack_packet*>(ptr);
-		
+
 		if (packet->id != my_id)
 		{
 			XMFLOAT3 dir = XMFLOAT3(packet->mx, 0.0f, packet->mz);
@@ -685,8 +685,9 @@ void Network::ProcessPacket(unsigned char* ptr)
 			position.y = CConfiguration::bottom;
 			position.z = (g_client[packet->id].z - 210.0f) * -100.f;
 			XMFLOAT3 pos = Vector3::Add(Vector3::Add(position, Vector3::ScalarProduct(dir, 100.f, false)), XMFLOAT3(0.0f, 500.0f, 0.0f));
-			CGameFramework::GetInstance()->GetCurruntScene()->AddObject(
-				new CBullet(pos, dir));
+			auto framework = CGameFramework::GetInstance();
+			framework->AddCommand([framework, pos, dir]() {framework->GetCurruntScene()->AddObject(
+				new CBullet(pos, dir)); });
 		}
 
 		CSoundSystem::GetInstance()->Play(L"gun fire");
