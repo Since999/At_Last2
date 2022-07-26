@@ -133,11 +133,13 @@ private:
 	float particle_test_time = 0.f;
 	float fire_rate = 0.3f;
 	float fire_time = 0.f;
-	bool is_firing = false;
 	bool is_reloading = false;
 	float reload_duration = 1.0f;
 	float reload_time = 0.f;
 //TEST
+public:
+	bool is_firing = false;
+
 public:
 	CMainGamePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext=NULL, int nMeshes=1,string mesh="", const wchar_t* texture=L"" );
 	virtual ~CMainGamePlayer();

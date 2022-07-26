@@ -3,6 +3,8 @@
 #include "SoundSystem.h"
 #include "CStaticObjectShader.h"
 #include "GameFramework.h"
+#include "Configuration.h"
+#include "Bullet.h"
 
 Socket Network::_socket;
 array<Client, MAX_PLAYER> Network::g_client;
@@ -670,6 +672,16 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_PLAYER_ATTACK:
 	{
+		sc_player_attack_packet* packet = reinterpret_cast<sc_player_attack_packet*>(ptr);
+		XMFLOAT3 dir = XMFLOAT3(-g_client[packet->id].mx, 0.0f, g_client[packet->id].mz);
+		dir = Vector3::Normalize(dir);
+		XMFLOAT3 position;
+		position.x = (g_client[packet->id].x - 500.0f) * -100.f;
+		position.y = CConfiguration::bottom;
+		position.z = (g_client[packet->id].z - 210.0f) * -100.f;
+		XMFLOAT3 pos = Vector3::Add(Vector3::Add(position, Vector3::ScalarProduct(dir, 100.f, false)), XMFLOAT3(0.0f, 500.0f, 0.0f));
+		CGameFramework::GetInstance()->GetCurruntScene()->AddObject(
+			new CBullet(pos, dir));
 		CSoundSystem::GetInstance()->Play(L"gun fire");
 		break;
 	}
