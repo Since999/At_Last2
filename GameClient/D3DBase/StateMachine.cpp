@@ -189,6 +189,12 @@ void CPlayerStateMachine::Update(float time_elapsed)
 	}
 
 	auto object_info = ((CMainGamePlayer*)object)->GetPlayerInfo();
+
+	if (anim_state == ClientAnimationState::ATTACKED
+		&& is_anim_ended) {
+		object_info->_animation = anim_state = ClientAnimationState::WALK;
+	}
+
 	if (anim_state == object_info->_animation) return;
 
 	switch (anim_state) {
@@ -213,7 +219,7 @@ void CPlayerStateMachine::Update(float time_elapsed)
 		PlayAni(PLAYER::WALK_AND_RELOAD);
 		break;
 	case ClientAnimationState::DEAD:
-		PlayAni(PLAYER::IDLE);
+		PlayAni(PLAYER::DYING);
 		break;
 	case ClientAnimationState::IDLE:
 		PlayAni(PLAYER::IDLE);

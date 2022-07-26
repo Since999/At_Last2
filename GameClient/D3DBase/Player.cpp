@@ -505,9 +505,6 @@ void CMainGamePlayer::Fire()
 		new CBullet(pos, dir));
 
 	CSoundSystem::GetInstance()->Play(L"gun fire");
-	//Test
-	ParticleSystem::GetInstance()->AddModelParticle(GetPosition(), L"lightning");
-	//Test
 #ifdef ENABLE_NETWORK
 	network.Send_attack_packet(server_player_info->attack_x, server_player_info->attack_z);
 #endif
