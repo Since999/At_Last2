@@ -337,6 +337,7 @@ struct cs_attack_packet								// 클라이언트에서 서버로 공격 방향 전송
 	unsigned short size;
 	MsgType type;										// 메시지 타입 PLYAER_ATTACK
 	short x, z;												// 공격할 좌표(마우스 클릭 위치) x,z
+	float mx, mz;											// 공격 방향
 };
 
 struct cs_build_packet									// 클라이언트에서 어느 위치에 무엇을 설치할 것인지 전송
@@ -540,6 +541,7 @@ struct sc_player_attack_packet						// 서버에서 클라이언트에게 누가 공격하고 있�
 	unsigned short size;
 	MsgType type;										// 메시지 타입 PLAYER_ATTACK
 	char id;
+	float mx, mz;
 };
 
 struct sc_player_dead_packet						// 서버에서 클라이언트에게 클라이언트가 죽었다고 보내기

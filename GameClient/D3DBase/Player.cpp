@@ -506,7 +506,7 @@ void CMainGamePlayer::Fire()
 
 	CSoundSystem::GetInstance()->Play(L"gun fire");
 #ifdef ENABLE_NETWORK
-	network.Send_attack_packet(server_player_info->attack_x, server_player_info->attack_z);
+	network.Send_attack_packet(server_player_info->attack_x, server_player_info->attack_z, -server_player_info->mx, server_player_info->mz);
 #endif
 }
 

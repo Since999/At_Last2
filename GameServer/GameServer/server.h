@@ -84,7 +84,7 @@ public:
 	static void Send_game_start_packet(int c_id);
 	static void Send_select_packet(int c_id, int s_id);
 	static void Send_player_move_packet(int c_id, int s_id, float x, float z,  float t_x, float t_z, float speed, float rotation, bool input);
-	static void Send_player_attack_packet(int c_id, int a_id);
+	static void Send_player_attack_packet(int c_id, int a_id, float mx, float mz);
 	static void Send_player_dead_packet(int c_id, int d_id);
 	static void Send_player_info_packet(int c_id, int s_id, short hp);
 	static void Send_player_reload_packet(int c_id, int s_id);

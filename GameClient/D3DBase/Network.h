@@ -99,7 +99,7 @@ public:
 	static void Send_commander_special_req_packet(int c_id);
 	static void Send_commander_special_change_packet(int c_id);
 	static void Send_chat_packet(char* msg);
-	static void Send_attack_packet(int m_x, int m_z);
+	static void Send_attack_packet(int m_x, int m_z, float mx, float mz);
 	static void Send_rotate_packet(float m_x, float m_z);
 	static BarricadePos Change_Client_Pos(iPos pos);
 	static void PlayerMove(int p_id);

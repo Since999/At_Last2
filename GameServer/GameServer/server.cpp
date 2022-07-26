@@ -716,12 +716,14 @@ void Server::ChangeMapType(Client& cl)
 	}
 }
 
-void Server::Send_player_attack_packet(int c_id, int a_id)
+void Server::Send_player_attack_packet(int c_id, int a_id, float mx, float mz)
 {
 	sc_player_attack_packet packet;
 	packet.size = sizeof(packet);
 	packet.id = a_id;
 	packet.type = MsgType::SC_PLAYER_ATTACK;
+	packet.mx = mx;
+	packet.mz = mz;
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -1769,7 +1771,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 			if (a_cl._state != ClientState::INGAME) continue;
 
-			Send_player_attack_packet(a_cl._id, cl._id);
+			Send_player_attack_packet(a_cl._id, cl._id, packet->mx, packet->mz);
 		}
 
 		switch (cl.map_type)
