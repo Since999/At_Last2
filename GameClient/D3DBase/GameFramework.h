@@ -65,6 +65,8 @@ public:
 	void StartEvent();
 
 	void AddCommand(const function<void()>& func);
+
+	float GetTotalTime();
 private:
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd;
@@ -120,7 +122,7 @@ private:
 
 	_TCHAR						m_pszFrameRate[50];
 
-	vector<function<void()>> func_list;
+	queue<function<void()>> func_queue;
 	CRITICAL_SECTION crit;
 public:
 

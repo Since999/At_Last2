@@ -35,6 +35,7 @@
 #include <wrl.h>
 
 #include <functional>
+#include <queue>
 
 #include "Network.h"
 

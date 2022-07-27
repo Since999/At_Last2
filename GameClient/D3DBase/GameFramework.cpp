@@ -11,12 +11,11 @@
 #include "Bullet.h"
 #include "SoundSystem.h"
 #include "2DShader.h"
+#include "Scene.h"
 
 DebugObject dd;
 
 float bottom = -500.0f;
-#define PRINT_RATE 10.0f
-float renderTime = 0.0f;
 
 CGameFramework* CGameFramework::singleton;
 
@@ -675,10 +674,10 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 	EnterCriticalSection(&crit);
-	for (auto& func : func_list) {
-		func();
+	while (!func_queue.empty()) {
+		func_queue.front()();
+		func_queue.pop();
 	}
-	func_list.clear();
 	LeaveCriticalSection(&crit);
 }
 
@@ -781,6 +780,11 @@ void CGameFramework::ChangeUI(UISystem* ui_sys)
 void CGameFramework::AddCommand(const function<void()>& func)
 {
 	EnterCriticalSection(&crit);
-	func_list.push_back(func);
+	func_queue.push(func);
 	LeaveCriticalSection(&crit);
+}
+
+float CGameFramework::GetTotalTime()
+{
+	return m_GameTimer.GetTotalTime();
 }

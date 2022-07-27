@@ -96,7 +96,7 @@ void CZombieStateMachine::Update(float time_elapsed)
 	case ZombieAnimationState::DEAD:
 		if (is_anim_ended) {
 			is_dead = true;
-			model->UpdateNodeTM(dead_time, 0.0f, _playAniIdx);
+			//model->UpdateNodeTM(dead_time, 0.0f, _playAniIdx);
 			blend_mat = model->GetBoneMat();
 		}
 		break;
