@@ -245,7 +245,7 @@ void CAnimationObjectShader::AddZombie(Zombie* zombie)
 		object->SetSize(object->GetSize() * info.size);
 	}
 #ifdef ENABLE_NETWORK
-	XMFLOAT3 pos = XMFLOAT3{ 100500.0f, CConfiguration::bottom, 14000.0f };
+	XMFLOAT3 pos = XMFLOAT3{ 100500.0f, CConfiguration::bottom, 14000.0f };	
 #else
 	XMFLOAT3 pos = XMFLOAT3{ 50500.0f - 500.0f * objects.size(), CConfiguration::bottom, 14000.0f };
 #endif

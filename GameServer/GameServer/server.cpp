@@ -34,6 +34,8 @@ int Server::door_num;
 bool Server::game_start;
 int Server::remain_zombie_num;
 
+char Server::select_type;
+
 Server::Server()
 {
 	wcout.imbue(locale("korean"));
@@ -60,6 +62,8 @@ Server::~Server()
 void Server::Initialize()
 {
 	game_timer.Start();
+
+	select_type = 0;
 
 	zombie_send = false;
 	game_start = false;
@@ -126,16 +130,17 @@ int Server::NewID()
 	return -1;
 }
 
-void Server::Send_login_ok_packet(int c_id)
+void Server::Send_login_ok_packet(int c_id, char s_type)
 {
 	sc_login_ok_packet packet;
 	packet.size = sizeof(packet);
 	packet.id = c_id;
 	packet.type = MsgType::SC_LOGIN_OK;
+	packet.select_type = s_type;
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
-void Server::Send_select_packet(int c_id, int s_id)
+void Server::Send_select_packet(int c_id, int s_id, char s_type)
 {
 	sc_player_select_packet packet;
 	packet.id = c_id;
@@ -148,6 +153,7 @@ void Server::Send_select_packet(int c_id, int s_id)
 	packet.z = g_clients[c_id].player->z;
 	packet.bullet = 30;
 	packet.speed = g_clients[c_id].player->speed;
+	packet.select_type = s_type;
 	g_clients[s_id].do_send(sizeof(packet), &packet);
 }
 
@@ -1712,7 +1718,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	case (int)MsgType::CS_LOGIN_REQUEST:
 	{
 		cs_login_packet* packet = reinterpret_cast<cs_login_packet*>(p);
-		Send_login_ok_packet(client_id);
+		Send_login_ok_packet(client_id, select_type);
 
 		// 클라이언트가 접속하였으므로 INGAME 상태로 변환
 		Client& cl = g_clients[client_id];
@@ -1737,6 +1743,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			login_packet.id = client_id;
 			login_packet.size = sizeof(login_packet);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
+			login_packet.select_type = select_type;
 			other.do_send(sizeof(login_packet), &login_packet);
 		}
 
@@ -1755,6 +1762,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			login_packet.id = other._id;
 			login_packet.size = sizeof(login_packet);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
+			login_packet.select_type = select_type;
 			cl.do_send(sizeof(login_packet), &login_packet);
 		}
 
@@ -2352,16 +2360,19 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 		case PlayerType::COMMANDER:
 		{
+			select_type += 1;
 			cl.player = new Commander;
 			break;
 		}
 		case PlayerType::ENGINEER:
 		{
+			select_type += 2;
 			cl.player = new Engineer;
 			break;
 		}
 		case PlayerType::MERCENARY:
 		{
+			select_type += 4;
 			cl.player = new Mercynary;
 			break;
 		}
@@ -2371,7 +2382,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		}
 		}
 
-		Send_select_packet(cl._id, cl._id);
+		Send_select_packet(cl._id, cl._id, select_type);
 
 		// 다른 플레이어에게 자신이 선택한 캐릭터 보내기
 		for (auto& other : g_clients)
@@ -2387,7 +2398,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			}
 			//other.state_lock.unlock();
 
-			Send_select_packet(cl._id, other._id);
+			Send_select_packet(cl._id, other._id, select_type);
 		}
 
 		// 다른 플레이어가 선택한 거 자신에게 보내기
@@ -2407,7 +2418,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			if (other._type == PlayerType::NONE)
 				continue;
 
-			Send_select_packet(other._id, cl._id);
+			Send_select_packet(other._id, cl._id, select_type);
 		}
 		break;
 	}
@@ -2505,18 +2516,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		
 		for (auto& client : g_clients)
 		{
-			//client.state_lock.lock();
 			if (ClientState::INGAME != client._state)
 			{
 				Send_fail_packet(cl._id, MsgType::SC_GAME_START_FAIL);
 				barricade_build = false;
-				//client.state_lock.unlock();
 				break;
 			}
-			//client.state_lock.unlock();
 		}
 		
-		if (barricade_build && !cl.send_start_packet)
+		if (barricade_build && (cl.send_start_packet == false))
 		{
 			Send_barricade_packet(cl._id);
 		}
@@ -2524,9 +2532,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	}
 	case (int)MsgType::CS_GAME_START_REQUEST:
 	{
-		//cl.start_lock.lock();
 		cl.send_start_packet = true;
-		//cl.start_lock.unlock();
 
 		bool game_start = true;
 
@@ -3812,6 +3818,7 @@ void Server::ZombieAttack(int z_id)
 	AddTimer(z_id, EVENT_TYPE::EVENT_NPC_MOVE, 2000);
 }
 
+
 void Server::ZombieSend()
 {
 	for (auto& cl : g_clients)
@@ -3951,20 +3958,19 @@ void Server::Work()
 			break;
 		case IOType::NPC_SEND:
 		{
+			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 50);
+
 			if (g_clients[c_id]._zombie_prev_size == 0)
 			{
 				delete exp_over;
 				exp_over = nullptr;
 
-				AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
 				break;
 			}
 
 			ZombieSend();
 			delete exp_over;
 			exp_over = nullptr;
-
-			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
 		}
 			break;
 		case IOType::NPC_DEAD:
@@ -4565,6 +4571,7 @@ void Server::AddTimer(int z_id, EVENT_TYPE type, int duration)
 	timer_event te{ z_id, chrono::high_resolution_clock::now() + chrono::milliseconds(duration), type, 0 };
 	timer_queue.push(te);
 	timer_lock.unlock();
+
 }
 
 void Server::Do_Timer()

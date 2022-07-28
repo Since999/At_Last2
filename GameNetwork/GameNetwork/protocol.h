@@ -381,6 +381,7 @@ struct sc_login_ok_packet							// 서버에서 클라이언트에게 로그인이 되었다고 전�
 	unsigned short size;
 	MsgType type;										// 메시지 타입 LOGIN_OK
 	char id;													// 클라이언트 ID 전송
+	char select_type;										// 000 NONE, 001 COMMANDER, 010 ENGINEER, 100 MER
 };
 
 struct sc_login_other_packet
@@ -388,6 +389,7 @@ struct sc_login_other_packet
 	unsigned short size;
 	MsgType type;										// 메시지 타입 LOGIN_OK
 	char id;													// 클라이언트 ID 전송
+	char select_type;										// 000 NONE, 001 COMMANDER, 010 ENGINEER, 100 MER
 };
 
 struct sc_fail_packet						 			// 서버에서 클라이언트에게 로그인에 실패하였다고 전송
@@ -407,6 +409,7 @@ struct sc_player_select_packet						// 서버에서 클라이언트에게 캐릭터 선택을 알�
 	short hp, maxhp;
 	char bullet;												// 플레이어 총알 보유 개수
 	float speed;											// 플레이어 이동 속도
+	char select_type;										// 000 NONE, 001 COMMANDER, 010 ENGINEER, 100 MER
 };
 
 struct sc_barricade_packet							// 서버에서 바리케이드 위치 보내주는 패킷

@@ -549,8 +549,21 @@ void Network::ProcessPacket(unsigned char* ptr)
 		g_client[my_id].move_time = chrono::system_clock::now();
 
 		g_client[my_id]._animation = ClientAnimationState::IDLE;
-
+		
 		login_complete = true;
+
+		if ((packet->select_type & 1) == 1)
+		{
+			cout << "1 선택 \n";
+		}
+		if ((packet->select_type & 2) == 2)
+		{
+			cout << "2 선택 \n";
+		}
+		if ((packet->select_type & 4) == 4)
+		{
+			cout << "3 선택 \n";
+		}
 
 		break;
 	}
@@ -656,8 +669,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			other._animation = ClientAnimationState::IDLE;
 		}
 
-		CSoundSystem::GetInstance()->StopBGM();
-		CSoundSystem::GetInstance()->Play(L"in game bgm");
+		CSoundSystem::GetInstance()->PlayBGM(L"in game bgm");
 		AddTimer(my_id, EVENT_TYPE::PLAYER_MOVE, 100);
 		//change to game scene
 		
@@ -782,6 +794,22 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_player_select_packet* packet = reinterpret_cast<sc_player_select_packet*>(ptr);
 
+		if (packet->id != my_id)
+		{
+			if ((packet->select_type & 1) == 1)
+			{
+				cout << "1 선택 \n";
+			}
+			if ((packet->select_type & 2) == 2)
+			{
+				cout << "2 선택 \n";
+			}
+			if ((packet->select_type & 4) == 4)
+			{
+				cout << "3 선택 \n";
+			}
+		}
+
 		int id = packet->id;
 
 		g_client[id]._type = packet->playertype;
@@ -805,7 +833,10 @@ void Network::ProcessPacket(unsigned char* ptr)
 		g_client[id].z = packet->z;
 		g_client[id].bullet = packet->bullet;
 		//g_client[id].speed = packet->speed;
-		g_client[id].max_speed = packet->speed;;
+		g_client[id].max_speed = packet->speed;
+
+		if((packet->select_type & 7) == 7)
+			select_complete = true;
 
 		break;
 	}
@@ -815,6 +846,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 		if(g_client[packet->id]._type == PlayerType::NONE)
 			select_complete = false;
+
+		cout << "야 이미 선택되었다 \n";
 
 		break;
 	}
@@ -1201,13 +1234,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			if (packet->map_type == MapType::FIRST_PATH || packet->map_type == MapType::SECOND_PATH || packet->map_type == MapType::FINAL_PATH)
 			{
-				CSoundSystem::GetInstance()->StopBGM();
-				CSoundSystem::GetInstance()->Play(L"in game bgm");
+				CSoundSystem::GetInstance()->PlayBGM(L"in game bgm");
 			}
 			else if (packet->map_type == MapType::CHECK_POINT_ONE || packet->map_type == MapType::CHECK_POINT_TWO || packet->map_type == MapType::CHECK_POINT_FINAL)
 			{
-				CSoundSystem::GetInstance()->StopBGM();
-				CSoundSystem::GetInstance()->Play(L"wavw");
+				CSoundSystem::GetInstance()->PlayBGM(L"wavw");
 			}
 		}
 
@@ -1794,6 +1825,7 @@ void volatile Network::ProcessData(Exp_Over& exp_over, int& size)
 			packet_size = temp;
 			if (packet_size > 850)
 			{
+				cout << "마! \n";
 				packet_size = 0;
 				remain_data = 0;
 				_prev_size = 0;
@@ -1908,9 +1940,7 @@ void Network::Player_Select(PlayerType type)
 void Network::Work()
 {
 	Login();
-	//int select;
-	//PlayerType type = PlayerType::NONE;
-	//select_complete = false;
+
 	while (1)
 	{
 		HANDLE t_iocp = _socket.ReturnHandle();
@@ -1949,25 +1979,6 @@ void Network::Work()
 		}
 			break;
 		}
-
-		//// 2. 플레이어 캐릭터 선택
-		//if (select_complete == false)
-		//{
-		//	cout << "플레이어 선택 \n";
-		//	cout << "1. 지휘관, 2. 엔지니어 3. 용병 \n";
-		//	cin >> select;
-		//	select_complete = true;
-		//	if (select == 1)
-		//		type = PlayerType::COMMANDER;
-		//	else if (select == 2)
-		//		type = PlayerType::ENGINEER;
-		//	else if (select == 3)
-		//		type = PlayerType::MERCENARY;
-		//
-		//	Player_Select(type);
-		//	this_thread::sleep_for(10ms);
-		//	continue;
-		//}
 	}
 	
 }

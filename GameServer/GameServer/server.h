@@ -67,6 +67,7 @@ public:
 	static int door_num;
 	static int remain_zombie_num;
 
+	static char select_type;
 	static CGameTimer game_timer;
 public:
 	Server();
@@ -79,10 +80,10 @@ public:
 	static bool NCDis_check(int c_id,  NPC& npc);
 	static void Disconnect(int c_id);
 	static void ProcessPacket(int client_id, unsigned char* p);
-	static void Send_login_ok_packet(int c_id);
+	static void Send_login_ok_packet(int c_id, char s_type);
 	static void Send_barricade_packet(int c_id);
 	static void Send_game_start_packet(int c_id);
-	static void Send_select_packet(int c_id, int s_id);
+	static void Send_select_packet(int c_id, int s_id, char s_type);
 	static void Send_player_move_packet(int c_id, int s_id, float x, float z,  float t_x, float t_z, float speed, float rotation, bool input);
 	static void Send_player_attack_packet(int c_id, int a_id, float mx, float mz);
 	static void Send_player_dead_packet(int c_id, int d_id);
