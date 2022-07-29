@@ -50,12 +50,33 @@ void AStarAI::Init()
 	{
 		for (int j = start_x; j <= start_x + map_width; ++j)
 		{
-			as_node[i][j] = new AS_Node;
+			if (as_node[i][j] == nullptr)
+			{
+				as_node[i][j] = new AS_Node;
+				as_node[i][j]->Set_Start_Cost(0.0f);
+				as_node[i][j]->Set_End_Cost(0.0f);
+				as_node[i][j]->Set_X(j);
+				as_node[i][j]->Set_Y(i);
+				as_node[i][j]->Set_Map_Type(as_map.GetMapInfo(j, i));
+				as_node[i][j]->Set_Parent(nullptr);
+				memset(as_node[i][j]->near_node, NULL, (sizeof(AS_Node*) * 8));
+			}
+		}
+	}
+
+	Near_Node_Connect();
+}
+
+void AStarAI::New_Init()
+{
+	open_list.Init();
+
+	for (int i = start_y; i <= start_y + map_height; ++i)
+	{
+		for (int j = start_x; j <= start_x + map_width; ++j)
+		{
 			as_node[i][j]->Set_Start_Cost(0.0f);
 			as_node[i][j]->Set_End_Cost(0.0f);
-			as_node[i][j]->Set_X(j);
-			as_node[i][j]->Set_Y(i);
-			as_node[i][j]->Set_Map_Type(as_map.GetMapInfo(j, i));
 			as_node[i][j]->Set_Parent(nullptr);
 			memset(as_node[i][j]->near_node, NULL, (sizeof(AS_Node*) * 8));
 		}
@@ -70,6 +91,8 @@ void AStarAI::Near_Node_Connect()
 	{
 		for (int j = start_x; j < start_x + map_width; ++j)
 		{
+			if (as_node[i][j] == nullptr) continue;
+
 			if (i > start_y)
 				as_node[i][j]->near_node[(int)Direction::UP] = as_node[i - 1][j];
 			if (j > start_x)
@@ -101,6 +124,7 @@ int AStarAI::Distance(int x1, int x2, int y1, int y2)
 stack<AS_Node*> AStarAI::AstartSearch(int s_x, int s_y, int e_x, int e_y)
 {
 	Init();
+	//New_Init();
 
 	AS_Node* node = nullptr;
 

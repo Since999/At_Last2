@@ -98,6 +98,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(temp.z - One_Road_Pos.z);
 		npc.zombie->astar.Set_Map_Width(temp.x - One_Road_Pos.x);
 		npc.zombie->astar.Map(as_map);
+		//npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -112,6 +113,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(temp.z - Two_Road_Pos.z);
 		npc.zombie->astar.Set_Map_Width(temp.x - Two_Road_Pos.x);
 		npc.zombie->astar.Map(as_map);
+		//npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -126,6 +128,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(temp.z - Three_Road_Pos.z);
 		npc.zombie->astar.Set_Map_Width(temp.x - Three_Road_Pos.x);
 		npc.zombie->astar.Map(as_map);
+		//npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -137,6 +140,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(One_Base_End_Pos.z - One_Base_Pos.z);
 		npc.zombie->astar.Set_Map_Width(One_Base_End_Pos.x - One_Base_Pos.x);
 		npc.zombie->astar.Map(as_map);
+		//npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -148,6 +152,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(TWO_Base_End_Pos.z - TWO_Base_Pos.z);
 		npc.zombie->astar.Set_Map_Width(TWO_Base_End_Pos.x - TWO_Base_Pos.x);
 		npc.zombie->astar.Map(as_map);
+		//npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -159,6 +164,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(THREE_Base_End_Pos2.z - THREE_Base_Pos.z);
 		npc.zombie->astar.Set_Map_Width(THREE_Base_End_Pos2.x - THREE_Base_Pos.x);
 		npc.zombie->astar.Map(as_map);
+		//npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 }
@@ -984,8 +990,6 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 
 	if (collied_zombie)
 	{
-		cout << npc._id << "가 공격당했다 \n";
-
 		//zom.zombie->z_attack_lock.lock();
 		hp -= cl.player->attack;
 		if (hp <= 0)
@@ -4260,6 +4264,8 @@ void Server::SearchZombieAstar(int col, int row, Client& cl, NPC& npc)
 
 void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 {
+	auto s_time = chrono::system_clock::now();
+
 	// 좀비가 SPAWN 상태가 아니라면 움직일 수 없으니 돌아가라
 	if (npc._state != ZombieState::SPAWN)
 	{
@@ -4349,7 +4355,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			else
 			{
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+			//	npc.zombie->astar.Delete();
 			}
 		}
 		else
@@ -4396,7 +4402,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			if (move_check != MoveResult::MOVE)
 			{
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+			//	npc.zombie->astar.Delete();
 			}
 		}
 		else
@@ -4581,8 +4587,12 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 		npc.attack_delay_time += 10ms;
 	}
 
+	auto e_time = chrono::system_clock::now() - s_time;
+
+	int p_time = 100 - chrono::duration_cast<chrono::milliseconds>(e_time).count();
+
 	// 30fps에 맞게 1초에 10번 이동
-	AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_MOVE, 100);
+	AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_MOVE, p_time);
 }
 
 void Server::ZombieMove(int z_id)
