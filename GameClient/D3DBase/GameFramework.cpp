@@ -591,6 +591,7 @@ void CGameFramework::AnimateObjects()
 
 	particle_system->AnimateObjects(m_GameTimer.GetTimeElapsed());
 	ui_system->AnimateObjects(m_GameTimer.GetTimeElapsed());
+	CSoundSystem::GetInstance()->Update();
 }
 
 void CGameFramework::UpdateShaderVariables()

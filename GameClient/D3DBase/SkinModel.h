@@ -24,6 +24,7 @@ public:
 	virtual array<XMMATRIX, 96>&		GetBoneMat(float& animation_time, float time_elapsed);
 	virtual array<XMMATRIX, 96>&		GetBoneMat();
 	virtual array<XMMATRIX, 96>&		GetBoneMat(float& animation_time, float time_elapsed, Animation* anim);
+	virtual array<XMMATRIX, 96>&		GetBoneMatLastFrame(int ani_index = -1);
 
 	void					Render(ID3D12GraphicsCommandList* commandList);
 	void					ShadowRender(ID3D12GraphicsCommandList* commandList);
@@ -39,6 +40,7 @@ public:
 	void					StopAni()			{	_aniList[_playAniIdx].Stop();	}
 	void					PauseAni()			{	_aniList[_playAniIdx].Pause();	}
 
+	void					SetAniRepeat(unsigned int model_index, bool is_repeat);
 
 	//when Completed Load
 	virtual void					CompleteLoad();

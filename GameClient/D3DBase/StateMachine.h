@@ -57,6 +57,16 @@ public:
 
 	virtual void Update(float time_elapsed);
 	virtual const array<XMMATRIX, 96>& GetBoneMat();
+	void PrintAnim();
+
+	enum ANIMATION_INDEX {
+		SPAWN = 0,
+		WALK = 1,
+		ATTACK = 2,
+		ATTACKED = 3,
+		DEAD = 4,
+		IDLE = 5
+	};
 // Node Functions
 public:
 	static bool DoAttack(CStateMachine*);
@@ -67,6 +77,7 @@ private:
 	ClientAnimationState anim_state;
 	float speed;
 	float angle;
+	bool is_dead = false;
 public:
 	CPlayerStateMachine(CPlayer* object);
 

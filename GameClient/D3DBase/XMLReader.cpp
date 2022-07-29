@@ -14,7 +14,9 @@ const map<wstring, int*>& CXMLReader::GetVariableMap()
     if (!variable_map.empty()) return variable_map;
     variable_map.emplace(L"skill", &(Network::g_client[Network::my_id].special_skill));
     variable_map.emplace(L"left bullet", &(Network::g_client[Network::my_id].left_bullet));
-    
+    variable_map.emplace(L"kill", &CGameFramework::GetInstance()->zombie_killed);
+    variable_map.emplace(L"left zombies", &CGameFramework::GetInstance()->left_zombie);
+
     return variable_map;
 }
 const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()

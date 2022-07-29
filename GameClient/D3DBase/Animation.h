@@ -57,7 +57,8 @@ public:
 	float GetTickPerSecond() { return _tickPerSecond; }
 
 	//Update AniTM
-	bool				UpdateAnimation(float& t, float time_elapsed);																//애니메이션을 업데이트한다.
+	bool				UpdateAnimation(float& t, float time_elapsed);					//애니메이션을 업데이트한다.
+	bool				UpdateAnimationLastFrame();
 
 
 //*************************************** 멤버 변수 ***********************************************//

@@ -131,5 +131,8 @@ public:
 
 	UISystem* ui_system = NULL;
 	ParticleSystem* particle_system = NULL;
+
+	int left_zombie = 0;
+	int zombie_killed = 0;
 };
 

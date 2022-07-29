@@ -23,14 +23,20 @@ public:
 private:
 	FMOD::System* system;
 	map<wstring, CSound> sound_pool;
+	vector<FMOD::Channel*> channels;
+	unsigned int channel_idx = 0;
 	map<wstring, FMOD::Channel*> channel_pool;
 
 public:
 	CSoundSystem();
 	~CSoundSystem();
+	void Update();
 	void SetSound(const wstring& name, const string& file_name, const wstring& channel, bool loop = false);
 	void Play(const wstring& name);
 	void PlayBGM(const wstring& name);
 	void StopBGM();
+	
+private:
+	//FMOD::Channel*& GetNextChannel();
 };
 

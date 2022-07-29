@@ -86,6 +86,19 @@ bool Animation::UpdateAnimation(float& time, float time_elapsed)
 	return result;
 }
 
+bool Animation::UpdateAnimationLastFrame()
+{
+	XMVECTOR Z = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	for (auto& node : _aniNode) {
+		XMVECTOR T = XMLoadFloat3(&node.keyFrame.back().trans);
+		XMVECTOR S = XMLoadFloat3(&node.keyFrame.back().scale);
+		XMVECTOR R = XMLoadFloat4(&node.keyFrame.back().rotation);
+
+		node.aniTM = XMMatrixAffineTransformation(S, Z, R, T);
+	}
+	return true;
+}
+
 #include <algorithm>
 //노드 정보에 맞는 ANI 행렬 정보 반환
 void Animation::GetAniTM(wstring nodeName, XMMATRIX &tm)
