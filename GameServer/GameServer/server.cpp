@@ -86,6 +86,81 @@ void Server::Initialize()
 	PlaceZombie(MapType::CHECK_POINT_FINAL);
 
 	door_num = 0;
+
+	iPos temp = { One_Road_Pos3.x + 23 , One_Base_Pos.z };
+
+	// 좀비 최초 위치에 다른 AS_MAP 설정
+	for (auto& npc : r_zombie1)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(One_Road_Pos.x);
+		npc.zombie->astar.Set_Start_Y(One_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Height(temp.z - One_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Width(temp.x - One_Road_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	temp.x = TWO_Base_Pos.x - 1;
+	temp.z = Two_Road_Pos.z + ROAD_SIZE;
+
+	for (auto& npc : r_zombie2)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(Two_Road_Pos.x);
+		npc.zombie->astar.Set_Start_Y(Two_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Height(temp.z - Two_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Width(temp.x - Two_Road_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	temp.x = THREE_Base_Pos.x;
+	temp.z = Three_Road_Pos.z + ROAD_SIZE;
+
+	for (auto& npc : r_zombie3)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(Three_Road_Pos.x);
+		npc.zombie->astar.Set_Start_Y(Three_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Height(temp.z - Three_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Width(temp.x - Three_Road_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	for (auto& npc : b_zombie1)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(One_Base_Pos.x);
+		npc.zombie->astar.Set_Start_Y(One_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Height(One_Base_End_Pos.z - One_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Width(One_Base_End_Pos.x - One_Base_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	for (auto& npc : b_zombie2)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(TWO_Base_Pos.x);
+		npc.zombie->astar.Set_Start_Y(TWO_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Height(TWO_Base_End_Pos.z - TWO_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Width(TWO_Base_End_Pos.x - TWO_Base_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	for (auto& npc : b_zombie3)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(THREE_Base_Pos.x);
+		npc.zombie->astar.Set_Start_Y(THREE_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Height(THREE_Base_End_Pos2.z - THREE_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Width(THREE_Base_End_Pos2.x - THREE_Base_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
 }
 
 float Server::Distance(float s_x, float s_z, float e_x, float e_z)
@@ -909,6 +984,8 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 
 	if (collied_zombie)
 	{
+		cout << npc._id << "가 공격당했다 \n";
+
 		//zom.zombie->z_attack_lock.lock();
 		hp -= cl.player->attack;
 		if (hp <= 0)
@@ -927,8 +1004,13 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 		}
 
 		//zom.zombie->z_attack_lock.unlock();
+		
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
 
-		Send_zombie_info_packet(cl._id, npc._id, hp, m_type);
+			Send_zombie_info_packet(a_cl._id, npc._id, hp, m_type);
+		}
 	}
 
 	if(npc._state == ZombieState::SPAWN)
@@ -3818,7 +3900,6 @@ void Server::ZombieAttack(int z_id)
 	AddTimer(z_id, EVENT_TYPE::EVENT_NPC_MOVE, 2000);
 }
 
-
 void Server::ZombieSend()
 {
 	for (auto& cl : g_clients)
@@ -4177,27 +4258,12 @@ void Server::SearchZombieAstar(int col, int row, Client& cl, NPC& npc)
 	npc.zombie->z_move_lock.unlock();
 }
 
-void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_pos)
+void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 {
 	// 좀비가 SPAWN 상태가 아니라면 움직일 수 없으니 돌아가라
 	if (npc._state != ZombieState::SPAWN)
 	{
 		return;
-	}
-
-	// 좀비가 다른 행동을 하고 Move로 온시간체크
-
-	// 좀비 최초 위치에 다른 AS_MAP 설정
-	if (npc.map_check == false)
-	{
-		npc.zombie->z_move_lock.lock();
-		npc.zombie->astar.Set_Start_X(start_pos.x);
-		npc.zombie->astar.Set_Start_Y(start_pos.z);
-		npc.zombie->astar.Set_Map_Height(end_pos.z - start_pos.z);
-		npc.zombie->astar.Set_Map_Width(end_pos.x - start_pos.x);
-		npc.zombie->astar.Map(as_map);
-		npc.map_check = true;
-		npc.zombie->z_move_lock.unlock();
 	}
 
 	// Astar 알고리즘을 돌리지 않았다면 npc의 Astar 알고리즘 돌려서 스택 집어 넣기
@@ -4525,40 +4591,37 @@ void Server::ZombieMove(int z_id)
 	{
 	case MapType::FIRST_PATH:
 	{
-		iPos temp = { One_Road_Pos3.x + 23 , One_Base_Pos.z };
-		ZombieAstarMove(r_zombie1[z_id], MapType::FIRST_PATH, One_Road_Pos, temp);
+		ZombieAstarMove(r_zombie1[z_id], MapType::FIRST_PATH);
 
 		break;
 	}
 	case MapType::SECOND_PATH:
 	{
-		iPos temp = { TWO_Base_Pos.x-1, Two_Road_Pos.z+ ROAD_SIZE };
-		ZombieAstarMove(r_zombie2[z_id], MapType::SECOND_PATH, Two_Road_Pos, temp);
+		ZombieAstarMove(r_zombie2[z_id], MapType::SECOND_PATH);
 
 		break;
 	}
 	case MapType::FINAL_PATH:
 	{
-		iPos temp = { THREE_Base_Pos.x, Three_Road_Pos.z + ROAD_SIZE };
-		ZombieAstarMove(r_zombie3[z_id], MapType::FINAL_PATH, Three_Road_Pos, temp);
+		ZombieAstarMove(r_zombie3[z_id], MapType::FINAL_PATH);
 
 		break;
 	}
 	case MapType::CHECK_POINT_ONE:
 	{
-		ZombieAstarMove(b_zombie1[z_id], MapType::CHECK_POINT_ONE, One_Base_Pos, One_Base_End_Pos);
+		ZombieAstarMove(b_zombie1[z_id], MapType::CHECK_POINT_ONE);
 
 		break;
 	}
 	case MapType::CHECK_POINT_TWO:
 	{
-		ZombieAstarMove(b_zombie2[z_id], MapType::CHECK_POINT_TWO, TWO_Base_Pos, TWO_Base_End_Pos);
+		ZombieAstarMove(b_zombie2[z_id], MapType::CHECK_POINT_TWO);
 
 		break;
 	}
 	case MapType::CHECK_POINT_FINAL:
 	{
-		ZombieAstarMove(b_zombie3[z_id], MapType::CHECK_POINT_FINAL, THREE_Base_Pos, THREE_Base_End_Pos2);
+		ZombieAstarMove(b_zombie3[z_id], MapType::CHECK_POINT_FINAL);
 
 		break;
 	}
@@ -4571,7 +4634,6 @@ void Server::AddTimer(int z_id, EVENT_TYPE type, int duration)
 	timer_event te{ z_id, chrono::high_resolution_clock::now() + chrono::milliseconds(duration), type, 0 };
 	timer_queue.push(te);
 	timer_lock.unlock();
-
 }
 
 void Server::Do_Timer()
@@ -4659,6 +4721,8 @@ void Server::Update()
 	_socket.Accept_Ex(p_over);
 
 	Initialize();
+
+	cout << "initialize complete \n";
 
 	thread Timer_thread{ Do_Timer };
 	

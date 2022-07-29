@@ -48,7 +48,6 @@ public:
 	//mutex search_lock;
 	mutex time_lock;
 
-	atomic_bool map_check;
 	atomic_bool astar_check;
 	atomic_bool search_check;
 

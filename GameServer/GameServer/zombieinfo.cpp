@@ -933,7 +933,6 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 
 NPC::NPC()
 {
-	map_check = false;
 	attack_delay_time = chrono::system_clock::now();
 }
 
