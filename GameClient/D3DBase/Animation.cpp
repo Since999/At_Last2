@@ -17,19 +17,19 @@ bool Animation::UpdateAnimation(float& time, float time_elapsed)
 	if (_playState == PLAY_STATE::STOP) {
 		return true;
 	}
-
+	float pre_time = time;
 	//float _playTime = fmod(time, _duration);
 	time += _tickPerSecond * time_elapsed;
 
 	if (abs(time - curr_node_time) < 0.00001f) return false;
 	//프레임 시간 초기화
 	while (time > _duration) {
-		time -= _duration;
 		if (!_isRepeat) {
-			time = _duration -0.1f;
-			//_playState = PLAY_STATE::STOP;
-			//return true;
+			time = pre_time;
+			result = true;
+			break;
 		}
+		time -= _duration;
 		result = true;
 	}
 	
@@ -84,6 +84,19 @@ bool Animation::UpdateAnimation(float& time, float time_elapsed)
 	}
 	curr_node_time = _playTime;
 	return result;
+}
+
+bool Animation::UpdateAnimationLastFrame()
+{
+	XMVECTOR Z = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	for (auto& node : _aniNode) {
+		XMVECTOR T = XMLoadFloat3(&node.keyFrame.back().trans);
+		XMVECTOR S = XMLoadFloat3(&node.keyFrame.back().scale);
+		XMVECTOR R = XMLoadFloat4(&node.keyFrame.back().rotation);
+
+		node.aniTM = XMMatrixAffineTransformation(S, Z, R, T);
+	}
+	return true;
 }
 
 #include <algorithm>

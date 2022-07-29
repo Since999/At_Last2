@@ -81,6 +81,29 @@ array<XMMATRIX, 96>& SkinModel::GetBoneMat(float& animation_time, float time_ela
 	return GetBoneMat();
 }
 
+array<XMMATRIX, 96>& SkinModel::GetBoneMatLastFrame(int ani_index)
+{
+	bool result = false;
+
+	if (ani_index == -1) ani_index = _playAniIdx;
+
+	if (ani_index >= 0) {
+		result = _aniList[ani_index].UpdateAnimationLastFrame();
+	}
+
+	for (auto& nodeItem : _nodeList) {
+		nodeItem->worldTM = nodeItem->localTM;
+
+		if (ani_index >= 0)
+			_aniList[ani_index].GetAniTM(nodeItem->name, nodeItem->worldTM);
+
+		if (nodeItem->parent)
+			nodeItem->worldTM = nodeItem->worldTM * nodeItem->parent->worldTM;
+	}
+
+	return GetBoneMat();
+}
+
 void SkinModel::PlayAni(int idx)
 {
 	if (_playAniIdx != idx) {
@@ -89,6 +112,12 @@ void SkinModel::PlayAni(int idx)
 	}
 
 	_aniList[idx].Play();
+}
+
+void SkinModel::SetAniRepeat(unsigned int model_index, bool is_repeat)
+{
+	if (_aniList.size() >= model_index) return;
+	_aniList[model_index].SetRepeat(is_repeat);
 }
 
 

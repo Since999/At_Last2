@@ -110,6 +110,5 @@ public:
 	static void ChangeWall(iPos pos, ANGLE angle);
 	template<typename Arr>
 	static void UpdateZombies(Arr& arr, float time_elapsed);
-	template<typename Arr>
-	static void SetZombieInfo(Arr& arr, unsigned int id, sc_zombie_move_packet* packet);
+	static void SetZombieInfo(Zombie* zombie, sc_zombie_move_packet* packet);
 };

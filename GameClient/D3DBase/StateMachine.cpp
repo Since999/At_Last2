@@ -55,15 +55,6 @@ CZombieStateMachine::CZombieStateMachine(CPlayer* object)
 	
 }
 
-enum ANIMATION_INDEX {
-	SPAWN = 0,
-	WALK = 1,
-	ATTACK = 2,
-	ATTACKED = 3,
-	DEAD = 4,
-	IDLE = 5
-};
-
 void CZombieStateMachine::Update(float time_elapsed)
 {
 	if (is_dead) {
@@ -85,22 +76,26 @@ void CZombieStateMachine::Update(float time_elapsed)
 	auto object_info = ((CZombie*)object)->GetZombie();
 	float dead_time = 29.999f;
 
-	switch (object_info->_animation) {
+	switch (anim_state) {
 	case ZombieAnimationState::ATTACK:
+	case ZombieAnimationState::ATTACKED:
+	case ZombieAnimationState::SPAWN:
 		if (!is_anim_ended) {
 			return;
 		}
-		break;
-	case ZombieAnimationState::SPAWN:
+		else {
+			object_info->_animation = ZombieAnimationState::WALK;
+		}
 		break;
 	case ZombieAnimationState::DEAD:
 		if (is_anim_ended) {
 			is_dead = true;
-			model->UpdateNodeTM(dead_time, 0.0f, _playAniIdx);
-			blend_mat = model->GetBoneMat();
+			//model->UpdateNodeTM(dead_time, 0.0f, _playAniIdx);
+			blend_mat = model->GetBoneMatLastFrame(ANIMATION_INDEX::DEAD);
+			//blend_mat = model->GetBoneMat();
 		}
 		break;
-	case ZombieAnimationState::ATTACKED:
+
 		//if (!is_anim_ended) return;
 		break;
 	default:
@@ -125,13 +120,35 @@ void CZombieStateMachine::Update(float time_elapsed)
 		ChangeAniWithBlend(ANIMATION_INDEX::DEAD, model->GetBoneMat());
 		break;
 	case ZombieAnimationState::IDLE:
-		ChangeAniWithBlend(ANIMATION_INDEX::DEAD, model->GetBoneMat());
+		ChangeAniWithBlend(ANIMATION_INDEX::WALK, model->GetBoneMat());
 		break;
 	case ZombieAnimationState::WALK:
 		ChangeAniWithBlend(ANIMATION_INDEX::WALK, model->GetBoneMat());
 		break;
 	}
 
+}
+
+void CZombieStateMachine::PrintAnim()
+{
+	map<ZombieAnimationState, string> anim_map;
+	anim_map.emplace(ZombieAnimationState::ATTACK, "ATTACK");
+	anim_map.emplace(ZombieAnimationState::ATTACKED, "ATTACKED");
+	anim_map.emplace(ZombieAnimationState::SPAWN, "SPAWN");
+	anim_map.emplace(ZombieAnimationState::DEAD, "DEAD");
+	anim_map.emplace(ZombieAnimationState::WALK, "WALK");
+	anim_map.emplace(ZombieAnimationState::IDLE, "IDLE");
+
+	{
+		auto& found = anim_map.find(anim_state);
+		if (found == anim_map.end()) return;
+		cout << "anim state: " << (*found).second << endl;
+	}
+	{
+		auto& found = anim_map.find(((CZombie*)object)->GetZombie()->_animation);
+		if (found == anim_map.end()) return;
+		cout << "server anim state: " << (*found).second << endl;
+	}
 }
 
 const array<XMMATRIX, 96>& CZombieStateMachine::GetBoneMat()
@@ -180,6 +197,7 @@ void CPlayerStateMachine::Update(float time_elapsed)
 	speed = object->speed;
 	angle = object->move_angle;
 	float anim_time = time_elapsed;
+	if (is_dead) anim_time = 0.f;
 
 	if (anim_state == ClientAnimationState::WALK) {
 		anim_time = time_elapsed * (speed / 1000.f);
@@ -190,22 +208,33 @@ void CPlayerStateMachine::Update(float time_elapsed)
 
 	auto object_info = ((CMainGamePlayer*)object)->GetPlayerInfo();
 
-	if (anim_state == ClientAnimationState::ATTACKED
-		&& is_anim_ended) {
-		object_info->_animation = anim_state = ClientAnimationState::WALK;
-	}
-
-	if (anim_state == object_info->_animation) return;
-
 	switch (anim_state) {
+	case ClientAnimationState::IDLE:
+		object_info->_animation = ClientAnimationState::WALK;
+		break;
 	case ClientAnimationState::ATTACKED:
-	case ClientAnimationState::WALK_AND_RELOAD:
+		if (is_anim_ended) {
+			object_info->_animation = anim_state = ClientAnimationState::WALK;
+		}
+		break;
 	case ClientAnimationState::DEAD:
-		if (!is_anim_ended) return;
+		if (is_anim_ended) {
+			is_dead = true;
+		}
+		if (object_info->hp > 0) {
+			object_info->_animation = ClientAnimationState::WALK;
+			is_dead = false;
+		}
 		break;
 	default:
 		break;
 	}
+
+	if (object_info->hp <= 0) {
+		object_info->_animation = ClientAnimationState::DEAD;
+	}
+
+	if (anim_state == object_info->_animation) return;
 
 	anim_state = object_info->_animation;
 	switch (anim_state) {
@@ -222,7 +251,8 @@ void CPlayerStateMachine::Update(float time_elapsed)
 		PlayAni(PLAYER::DYING);
 		break;
 	case ClientAnimationState::IDLE:
-		PlayAni(PLAYER::IDLE);
+		//anim_state = ClientAnimationState::WALK;
+		object_info->_animation = ClientAnimationState::WALK;
 		break;
 	case ClientAnimationState::WALK:
 		//model->PlayAni(PLAYER::WALK);

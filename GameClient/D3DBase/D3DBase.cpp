@@ -70,7 +70,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 					gGameFramework->FrameAdvance();
 				}
 			}
-			return 0;
 		}
 		catch (DxException& e)
 		{
@@ -79,11 +78,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		}
 		
 #ifdef ENABLE_NETWORK
-		Timer_thread.join();
+		/*Timer_thread.join();
 
 		for (auto& th : network.worker_threads) {
 			th.join();
-		}
+		}*/
 #endif
 		gGameFramework->OnDestroy();
 
