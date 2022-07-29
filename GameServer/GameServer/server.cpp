@@ -34,6 +34,8 @@ int Server::door_num;
 bool Server::game_start;
 int Server::remain_zombie_num;
 
+char Server::select_type;
+
 Server::Server()
 {
 	wcout.imbue(locale("korean"));
@@ -61,6 +63,8 @@ void Server::Initialize()
 {
 	game_timer.Start();
 
+	select_type = 0;
+
 	zombie_send = false;
 	game_start = false;
 	remain_zombie_num = 0;
@@ -82,6 +86,81 @@ void Server::Initialize()
 	PlaceZombie(MapType::CHECK_POINT_FINAL);
 
 	door_num = 0;
+
+	iPos temp = { One_Road_Pos3.x + 23 , One_Base_Pos.z };
+
+	// 좀비 최초 위치에 다른 AS_MAP 설정
+	for (auto& npc : r_zombie1)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(One_Road_Pos.x);
+		npc.zombie->astar.Set_Start_Y(One_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Height(temp.z - One_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Width(temp.x - One_Road_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	temp.x = TWO_Base_Pos.x - 1;
+	temp.z = Two_Road_Pos.z + ROAD_SIZE;
+
+	for (auto& npc : r_zombie2)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(Two_Road_Pos.x);
+		npc.zombie->astar.Set_Start_Y(Two_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Height(temp.z - Two_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Width(temp.x - Two_Road_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	temp.x = THREE_Base_Pos.x;
+	temp.z = Three_Road_Pos.z + ROAD_SIZE;
+
+	for (auto& npc : r_zombie3)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(Three_Road_Pos.x);
+		npc.zombie->astar.Set_Start_Y(Three_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Height(temp.z - Three_Road_Pos.z);
+		npc.zombie->astar.Set_Map_Width(temp.x - Three_Road_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	for (auto& npc : b_zombie1)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(One_Base_Pos.x);
+		npc.zombie->astar.Set_Start_Y(One_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Height(One_Base_End_Pos.z - One_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Width(One_Base_End_Pos.x - One_Base_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	for (auto& npc : b_zombie2)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(TWO_Base_Pos.x);
+		npc.zombie->astar.Set_Start_Y(TWO_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Height(TWO_Base_End_Pos.z - TWO_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Width(TWO_Base_End_Pos.x - TWO_Base_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
+
+	for (auto& npc : b_zombie3)
+	{
+		npc.zombie->z_move_lock.lock();
+		npc.zombie->astar.Set_Start_X(THREE_Base_Pos.x);
+		npc.zombie->astar.Set_Start_Y(THREE_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Height(THREE_Base_End_Pos2.z - THREE_Base_Pos.z);
+		npc.zombie->astar.Set_Map_Width(THREE_Base_End_Pos2.x - THREE_Base_Pos.x);
+		npc.zombie->astar.Map(as_map);
+		npc.zombie->z_move_lock.unlock();
+	}
 }
 
 float Server::Distance(float s_x, float s_z, float e_x, float e_z)
@@ -126,16 +205,17 @@ int Server::NewID()
 	return -1;
 }
 
-void Server::Send_login_ok_packet(int c_id)
+void Server::Send_login_ok_packet(int c_id, char s_type)
 {
 	sc_login_ok_packet packet;
 	packet.size = sizeof(packet);
 	packet.id = c_id;
 	packet.type = MsgType::SC_LOGIN_OK;
+	packet.select_type = s_type;
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
-void Server::Send_select_packet(int c_id, int s_id)
+void Server::Send_select_packet(int c_id, int s_id, char s_type)
 {
 	sc_player_select_packet packet;
 	packet.id = c_id;
@@ -148,6 +228,7 @@ void Server::Send_select_packet(int c_id, int s_id)
 	packet.z = g_clients[c_id].player->z;
 	packet.bullet = 30;
 	packet.speed = g_clients[c_id].player->speed;
+	packet.select_type = s_type;
 	g_clients[s_id].do_send(sizeof(packet), &packet);
 }
 
@@ -903,6 +984,8 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 
 	if (collied_zombie)
 	{
+		cout << npc._id << "가 공격당했다 \n";
+
 		//zom.zombie->z_attack_lock.lock();
 		hp -= cl.player->attack;
 		if (hp <= 0)
@@ -921,8 +1004,13 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 		}
 
 		//zom.zombie->z_attack_lock.unlock();
+		
+		for (auto& a_cl : g_clients)
+		{
+			if (a_cl._state != ClientState::INGAME) continue;
 
-		Send_zombie_info_packet(cl._id, npc._id, hp, m_type);
+			Send_zombie_info_packet(a_cl._id, npc._id, hp, m_type);
+		}
 	}
 
 	if(npc._state == ZombieState::SPAWN)
@@ -1712,7 +1800,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	case (int)MsgType::CS_LOGIN_REQUEST:
 	{
 		cs_login_packet* packet = reinterpret_cast<cs_login_packet*>(p);
-		Send_login_ok_packet(client_id);
+		Send_login_ok_packet(client_id, select_type);
 
 		// 클라이언트가 접속하였으므로 INGAME 상태로 변환
 		Client& cl = g_clients[client_id];
@@ -1737,6 +1825,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			login_packet.id = client_id;
 			login_packet.size = sizeof(login_packet);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
+			login_packet.select_type = select_type;
 			other.do_send(sizeof(login_packet), &login_packet);
 		}
 
@@ -1755,6 +1844,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			login_packet.id = other._id;
 			login_packet.size = sizeof(login_packet);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
+			login_packet.select_type = select_type;
 			cl.do_send(sizeof(login_packet), &login_packet);
 		}
 
@@ -2352,16 +2442,19 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		{
 		case PlayerType::COMMANDER:
 		{
+			select_type += 1;
 			cl.player = new Commander;
 			break;
 		}
 		case PlayerType::ENGINEER:
 		{
+			select_type += 2;
 			cl.player = new Engineer;
 			break;
 		}
 		case PlayerType::MERCENARY:
 		{
+			select_type += 4;
 			cl.player = new Mercynary;
 			break;
 		}
@@ -2371,7 +2464,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		}
 		}
 
-		Send_select_packet(cl._id, cl._id);
+		Send_select_packet(cl._id, cl._id, select_type);
 
 		// 다른 플레이어에게 자신이 선택한 캐릭터 보내기
 		for (auto& other : g_clients)
@@ -2387,7 +2480,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			}
 			//other.state_lock.unlock();
 
-			Send_select_packet(cl._id, other._id);
+			Send_select_packet(cl._id, other._id, select_type);
 		}
 
 		// 다른 플레이어가 선택한 거 자신에게 보내기
@@ -2407,7 +2500,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			if (other._type == PlayerType::NONE)
 				continue;
 
-			Send_select_packet(other._id, cl._id);
+			Send_select_packet(other._id, cl._id, select_type);
 		}
 		break;
 	}
@@ -2505,18 +2598,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		
 		for (auto& client : g_clients)
 		{
-			//client.state_lock.lock();
 			if (ClientState::INGAME != client._state)
 			{
 				Send_fail_packet(cl._id, MsgType::SC_GAME_START_FAIL);
 				barricade_build = false;
-				//client.state_lock.unlock();
 				break;
 			}
-			//client.state_lock.unlock();
 		}
 		
-		if (barricade_build && !cl.send_start_packet)
+		if (barricade_build && (cl.send_start_packet == false))
 		{
 			Send_barricade_packet(cl._id);
 		}
@@ -2524,9 +2614,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	}
 	case (int)MsgType::CS_GAME_START_REQUEST:
 	{
-		//cl.start_lock.lock();
 		cl.send_start_packet = true;
-		//cl.start_lock.unlock();
 
 		bool game_start = true;
 
@@ -3951,20 +4039,19 @@ void Server::Work()
 			break;
 		case IOType::NPC_SEND:
 		{
+			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 50);
+
 			if (g_clients[c_id]._zombie_prev_size == 0)
 			{
 				delete exp_over;
 				exp_over = nullptr;
 
-				AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
 				break;
 			}
 
 			ZombieSend();
 			delete exp_over;
 			exp_over = nullptr;
-
-			AddTimer(c_id, EVENT_TYPE::EVENT_NPC_SEND, 100);
 		}
 			break;
 		case IOType::NPC_DEAD:
@@ -4171,27 +4258,12 @@ void Server::SearchZombieAstar(int col, int row, Client& cl, NPC& npc)
 	npc.zombie->z_move_lock.unlock();
 }
 
-void Server::ZombieAstarMove(NPC& npc, MapType m_type, iPos start_pos, iPos end_pos)
+void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 {
 	// 좀비가 SPAWN 상태가 아니라면 움직일 수 없으니 돌아가라
 	if (npc._state != ZombieState::SPAWN)
 	{
 		return;
-	}
-
-	// 좀비가 다른 행동을 하고 Move로 온시간체크
-
-	// 좀비 최초 위치에 다른 AS_MAP 설정
-	if (npc.map_check == false)
-	{
-		npc.zombie->z_move_lock.lock();
-		npc.zombie->astar.Set_Start_X(start_pos.x);
-		npc.zombie->astar.Set_Start_Y(start_pos.z);
-		npc.zombie->astar.Set_Map_Height(end_pos.z - start_pos.z);
-		npc.zombie->astar.Set_Map_Width(end_pos.x - start_pos.x);
-		npc.zombie->astar.Map(as_map);
-		npc.map_check = true;
-		npc.zombie->z_move_lock.unlock();
 	}
 
 	// Astar 알고리즘을 돌리지 않았다면 npc의 Astar 알고리즘 돌려서 스택 집어 넣기
@@ -4519,40 +4591,37 @@ void Server::ZombieMove(int z_id)
 	{
 	case MapType::FIRST_PATH:
 	{
-		iPos temp = { One_Road_Pos3.x + 23 , One_Base_Pos.z };
-		ZombieAstarMove(r_zombie1[z_id], MapType::FIRST_PATH, One_Road_Pos, temp);
+		ZombieAstarMove(r_zombie1[z_id], MapType::FIRST_PATH);
 
 		break;
 	}
 	case MapType::SECOND_PATH:
 	{
-		iPos temp = { TWO_Base_Pos.x-1, Two_Road_Pos.z+ ROAD_SIZE };
-		ZombieAstarMove(r_zombie2[z_id], MapType::SECOND_PATH, Two_Road_Pos, temp);
+		ZombieAstarMove(r_zombie2[z_id], MapType::SECOND_PATH);
 
 		break;
 	}
 	case MapType::FINAL_PATH:
 	{
-		iPos temp = { THREE_Base_Pos.x, Three_Road_Pos.z + ROAD_SIZE };
-		ZombieAstarMove(r_zombie3[z_id], MapType::FINAL_PATH, Three_Road_Pos, temp);
+		ZombieAstarMove(r_zombie3[z_id], MapType::FINAL_PATH);
 
 		break;
 	}
 	case MapType::CHECK_POINT_ONE:
 	{
-		ZombieAstarMove(b_zombie1[z_id], MapType::CHECK_POINT_ONE, One_Base_Pos, One_Base_End_Pos);
+		ZombieAstarMove(b_zombie1[z_id], MapType::CHECK_POINT_ONE);
 
 		break;
 	}
 	case MapType::CHECK_POINT_TWO:
 	{
-		ZombieAstarMove(b_zombie2[z_id], MapType::CHECK_POINT_TWO, TWO_Base_Pos, TWO_Base_End_Pos);
+		ZombieAstarMove(b_zombie2[z_id], MapType::CHECK_POINT_TWO);
 
 		break;
 	}
 	case MapType::CHECK_POINT_FINAL:
 	{
-		ZombieAstarMove(b_zombie3[z_id], MapType::CHECK_POINT_FINAL, THREE_Base_Pos, THREE_Base_End_Pos2);
+		ZombieAstarMove(b_zombie3[z_id], MapType::CHECK_POINT_FINAL);
 
 		break;
 	}
@@ -4652,6 +4721,8 @@ void Server::Update()
 	_socket.Accept_Ex(p_over);
 
 	Initialize();
+
+	cout << "initialize complete \n";
 
 	thread Timer_thread{ Do_Timer };
 	

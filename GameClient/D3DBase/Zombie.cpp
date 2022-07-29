@@ -22,11 +22,16 @@ void Zombie::SetInfo(sc_zombie_move_packet* packet)
 	//arr[id].z = packet->z;
 	//	cout << "ÁÂÇ¥ ¹Ù²ñ" << endl;
 	//}
+
 	speed = packet->speed;
 	t_x = packet->t_x;
 	t_z = packet->t_z;
 	dir = packet->dir;
 	arrive = false;
+
+	if (packet->x < 50 || packet->x > 1100 || packet->z < 50 || packet->z > 420)
+		return;
+
 	AddMove(packet->x, packet->z);
 }
 
