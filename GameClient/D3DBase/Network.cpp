@@ -1033,6 +1033,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 		case MapType::FIRST_PATH:
 		{
+			if (r_zombie1[packet->id]._state != ZombieState::SPAWN) break;
+
 			r_zombie1[id].hp = packet->hp;
 			r_zombie1[id]._animation = ZombieAnimationState::ATTACKED;
 			CSoundSystem::GetInstance()->Play(L"zombie-hit");
@@ -1040,6 +1042,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::SECOND_PATH:
 		{
+			if (r_zombie2[packet->id]._state != ZombieState::SPAWN) break;
+
 			r_zombie2[id].hp = packet->hp;
 			r_zombie2[id]._animation = ZombieAnimationState::ATTACKED;
 			CSoundSystem::GetInstance()->Play(L"zombie-hit");
@@ -1047,6 +1051,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::FINAL_PATH:
 		{
+			if (r_zombie3[packet->id]._state != ZombieState::SPAWN) break;
+
 			r_zombie3[id].hp = packet->hp;
 			r_zombie3[id]._animation = ZombieAnimationState::ATTACKED;
 			CSoundSystem::GetInstance()->Play(L"zombie-hit");
@@ -1054,6 +1060,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
+			if (b_zombie1[packet->id]._state != ZombieState::SPAWN) break;
+
 			b_zombie1[id].hp = packet->hp;
 			b_zombie1[id]._animation = ZombieAnimationState::ATTACKED;
 			CSoundSystem::GetInstance()->Play(L"zombie-hit");
@@ -1061,6 +1069,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
+			if (b_zombie2[packet->id]._state != ZombieState::SPAWN) break;
+
 			b_zombie2[id].hp = packet->hp;
 			b_zombie2[id]._animation = ZombieAnimationState::ATTACKED;
 			CSoundSystem::GetInstance()->Play(L"zombie-hit");
@@ -1068,6 +1078,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
+			if (b_zombie3[packet->id]._state != ZombieState::SPAWN) break;
+
 			b_zombie3[id].hp = packet->hp;
 			b_zombie3[id]._animation = ZombieAnimationState::ATTACKED;
 			CSoundSystem::GetInstance()->Play(L"zombie-hit");
@@ -1089,31 +1101,43 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 		case MapType::FIRST_PATH:
 		{
+			if (r_zombie1[packet->id]._state != ZombieState::SPAWN) break;
+
 			r_zombie1[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::SECOND_PATH:
 		{
+			if (r_zombie2[packet->id]._state != ZombieState::SPAWN) break;
+
 			r_zombie2[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::FINAL_PATH:
 		{
+			if (r_zombie3[packet->id]._state != ZombieState::SPAWN) break;
+
 			r_zombie3[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
+			if (b_zombie1[packet->id]._state != ZombieState::SPAWN) break;
+
 			b_zombie1[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
+			if (b_zombie2[packet->id]._state != ZombieState::SPAWN) break;
+
 			b_zombie2[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
+			if (b_zombie3[packet->id]._state != ZombieState::SPAWN) break;
+
 			b_zombie3[packet->id]._animation = ZombieAnimationState::ATTACK;
 			break;
 		}
@@ -1134,60 +1158,55 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 		case MapType::FIRST_PATH:
 		{
-			//move_lock.lock();
+			if (r_zombie1[packet->id]._state != ZombieState::SPAWN) break;
+
+			r_zombie1[packet->id]._animation = ZombieAnimationState::WALK;
 			SetZombieInfo(&r_zombie1[id], packet);
 			
-			//r_zombie1[id]._animation = ZombieAnimationState::WALK;
-			//move_lock.unlock();
-
-			//cout << id << "ÀÇ ÁÂÇ¥ x : " << packet->x << ", z : " << packet->z << "\n";
 			break;
 		}
 		case MapType::SECOND_PATH:
 		{
-			//move_lock.lock();
+			if (r_zombie2[packet->id]._state != ZombieState::SPAWN) break;
+
+			r_zombie2[packet->id]._animation = ZombieAnimationState::WALK;
 			SetZombieInfo(&r_zombie2[id], packet);
-			//r_zombie2[id]._animation = ZombieAnimationState::WALK;
-			//move_lock.unlock();
-			//cout << id << "ÀÇ ÁÂÇ¥ x : " << packet->x << ", z : " << packet->z << "\n";
 
 			break;
 		}
 		case MapType::FINAL_PATH:
 		{
-			//move_lock.lock();
+			if (r_zombie3[packet->id]._state != ZombieState::SPAWN) break;
+
+			r_zombie3[packet->id]._animation = ZombieAnimationState::WALK;
 			SetZombieInfo(&r_zombie3[id], packet);
-			//r_zombie3[id]._animation = ZombieAnimationState::WALK;
-			//move_lock.unlock();
 
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
-			//move_lock.lock();
-			SetZombieInfo(&b_zombie1[id], packet);
-		//	b_zombie1[id]._animation = ZombieAnimationState::WALK;
-			//move_lock.unlock();
+			if (b_zombie1[packet->id]._state != ZombieState::SPAWN) break;
 
-			//cout << id << "ÀÇ ÁÂÇ¥ x : " << packet->x << ", z : " << packet->z << "\n";
+			b_zombie1[packet->id]._animation = ZombieAnimationState::WALK;
+			SetZombieInfo(&b_zombie1[id], packet);
 
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
-			//move_lock.lock();
+			if (b_zombie2[packet->id]._state != ZombieState::SPAWN) break;
+
+			b_zombie2[packet->id]._animation = ZombieAnimationState::WALK;
 			SetZombieInfo(&b_zombie2[id], packet);
-			//b_zombie2[id]._animation = ZombieAnimationState::WALK;
-			//move_lock.unlock();
 
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
-			//move_lock.lock();
+			if (b_zombie3[packet->id]._state != ZombieState::SPAWN) break;
+
+			b_zombie3[packet->id]._animation = ZombieAnimationState::WALK;
 			SetZombieInfo(&b_zombie3[id], packet);
-			//b_zombie3[id]._animation = ZombieAnimationState::WALK;
-			//move_lock.unlock();
 
 			break;
 		}
