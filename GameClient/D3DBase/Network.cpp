@@ -1004,6 +1004,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		CSoundSystem::GetInstance()->Play(L"P_Death");
 		
 		g_client[packet->id]._state = ClientState::DEAD;
+		g_client[packet->id]._animation = ClientAnimationState::DEAD;
 		
 		break;
 	}
