@@ -340,7 +340,7 @@ bool Server::MapCheck(MapType map_type)
 
 void Server::InitZombie(NPC& npc, int &i, float &PosX, float &PosZ)
 {
-	int random_zombie_type = rand() % 4;
+	int random_zombie_type = rand() % 3;
 	switch (random_zombie_type)
 	{
 	case 0:
@@ -361,12 +361,12 @@ void Server::InitZombie(NPC& npc, int &i, float &PosX, float &PosZ)
 		npc.zombie->SetX(PosX);
 		npc.zombie->SetZ(PosZ);
 		break;
-	case 3:
-		npc.zombie = new DogZombie;
-		npc._id = i;
-		npc.zombie->SetX(PosX);
-		npc.zombie->SetZ(PosZ);
-		break;
+	//case 3:
+	//	npc.zombie = new DogZombie;
+	//	npc._id = i;
+	//	npc.zombie->SetX(PosX);
+	//	npc.zombie->SetZ(PosZ);
+	//	break;
 	}
 
 	//cout << npc.zombie->GetX() - 30 << ", " << npc.zombie->GetZ() - 30 << "\n";
