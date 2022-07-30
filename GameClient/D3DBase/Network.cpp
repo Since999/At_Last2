@@ -1502,7 +1502,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 			}
 			case MsgType::SC_ZOMBIE_SPAWN:
 			{
-				cout << z_id << "½ºÆù ÇÔ \n";
 				b_zombie1[z_id]._animation = ZombieAnimationState::SPAWN;
 				break;
 			}

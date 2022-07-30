@@ -676,7 +676,6 @@ struct sc_win_state_packet							// 서버에서 클라이언트에게 게임 결과 상태 알려�
 {
 	unsigned short size;
 	MsgType type;										// 메시지 타입 WIN_STATE
-	WinGameState state;								// 게임 상태 확인
 };
 
 struct sc_search_packet								// 서버에서 클라이언트가 문 또는 오브젝트 등을 발견했을 때 내용 전달

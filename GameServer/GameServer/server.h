@@ -112,6 +112,7 @@ public:
 	static void Send_zombie_all_kill_packet(int c_id, MapType m_type);
 	static void Send_gm_change_map_packet(int c_id, int s_id, int x, int z);
 	static void Send_gm_hp_packet(int c_id, int s_id);
+	static void Send_game_end_packet(int c_id);
 	static void AddTimer(int z_id, EVENT_TYPE type, int duration);
 	static void Do_Timer();
 	static void ChangeMapType(Client& cl);

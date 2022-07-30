@@ -42,6 +42,11 @@ void AStarAI::Delete()
 	close_list.NodeDelete();
 }
 
+void AStarAI::New_Delete()
+{
+	close_list.NodeDelete();
+}
+
 void AStarAI::Init()
 {
 	open_list.Init();
@@ -77,7 +82,13 @@ void AStarAI::New_Init()
 		{
 			as_node[i][j]->Set_Start_Cost(0.0f);
 			as_node[i][j]->Set_End_Cost(0.0f);
+			as_node[i][j]->Set_X(j);
+			as_node[i][j]->Set_Y(i);
+			as_node[i][j]->Set_Map_Type(as_map.GetMapInfo(j, i));
 			as_node[i][j]->Set_Parent(nullptr);
+			as_node[i][j]->Set_Total_Distance(0.0f);
+			as_node[i][j]->Set_Open_List(false);
+			as_node[i][j]->Set_Close_List(false);
 			memset(as_node[i][j]->near_node, NULL, (sizeof(AS_Node*) * 8));
 		}
 	}
@@ -123,8 +134,8 @@ int AStarAI::Distance(int x1, int x2, int y1, int y2)
 
 stack<AS_Node*> AStarAI::AstartSearch(int s_x, int s_y, int e_x, int e_y)
 {
-	Init();
-	//New_Init();
+	//Init();
+	New_Init();
 
 	AS_Node* node = nullptr;
 

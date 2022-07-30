@@ -98,7 +98,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(temp.z - One_Road_Pos.z);
 		npc.zombie->astar.Set_Map_Width(temp.x - One_Road_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -113,7 +113,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(temp.z - Two_Road_Pos.z);
 		npc.zombie->astar.Set_Map_Width(temp.x - Two_Road_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -128,7 +128,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(temp.z - Three_Road_Pos.z);
 		npc.zombie->astar.Set_Map_Width(temp.x - Three_Road_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -140,7 +140,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(One_Base_End_Pos.z - One_Base_Pos.z);
 		npc.zombie->astar.Set_Map_Width(One_Base_End_Pos.x - One_Base_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -152,7 +152,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(TWO_Base_End_Pos.z - TWO_Base_Pos.z);
 		npc.zombie->astar.Set_Map_Width(TWO_Base_End_Pos.x - TWO_Base_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -164,7 +164,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(THREE_Base_End_Pos2.z - THREE_Base_Pos.z);
 		npc.zombie->astar.Set_Map_Width(THREE_Base_End_Pos2.x - THREE_Base_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 }
@@ -339,7 +339,7 @@ bool Server::MapCheck(MapType map_type)
 
 void Server::InitZombie(NPC& npc, int &i, float &PosX, float &PosZ)
 {
-	int random_zombie_type = rand() % 3;
+	int random_zombie_type = rand() % 1;
 	switch (random_zombie_type)
 	{
 	case 0:
@@ -1726,7 +1726,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 				npc.zombie->astar.Map(as_map);
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 		else if (map_type == MapType::CHECK_POINT_TWO)
@@ -1737,7 +1737,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 				npc.zombie->astar.Map(as_map);
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 		else if (map_type == MapType::CHECK_POINT_FINAL)
@@ -1748,7 +1748,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 				npc.zombie->astar.Map(as_map);
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 
@@ -3114,6 +3114,8 @@ void Server::Send_zombie_spawn_packet(int c_id, int z_id, float x, float z, Zomb
 
 bool Server::NCDis_check(int c_id,  NPC& npc)
 {
+	if (npc._state != ZombieState::SPAWN) return false;
+
 	if (CAMERA_WIDTH < abs(g_clients[c_id].player->x - npc.zombie->x)) return false;
 	if (CAMERA_HEIGHT < abs(g_clients[c_id].player->z - npc.zombie->z)) return false;
 
@@ -3491,7 +3493,7 @@ void Server::Send_zombie_all_kill_packet(int c_id, MapType m_type)
 void Server::ZombieAllKill(NPC& npc)
 {
 	npc._state = ZombieState::DEAD;
-	npc.zombie->astar.Delete();
+	npc.zombie->astar.New_Delete();
 
 	delete npc.zombie;
 	npc.zombie = nullptr;
@@ -3517,10 +3519,18 @@ void Server::ZombieAllKill(NPC& npc)
 	}
 }
 
+void Server::Send_game_end_packet(int c_id)
+{
+	sc_win_state_packet packet;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_WIN_STATE;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
 void Server::ZombieDead(NPC& npc, MapType m_type)
 {
 	npc._state = ZombieState::DEAD;
-	npc.zombie->astar.Delete();
+	npc.zombie->astar.New_Delete();
 	remain_zombie_num--;
 
 	delete npc.zombie;
@@ -3546,6 +3556,19 @@ void Server::ZombieDead(NPC& npc, MapType m_type)
 			//Send_viewlist_remove_packet(cl._id, npc._id, map_type);
 		}
 		Send_zombie_number_packet(cl._id, remain_zombie_num);
+
+		if (map_type == MapType::CHECK_POINT_FINAL)
+		{
+			if (remain_zombie_num == 0)
+			{
+				for (auto& all : g_clients)
+				{
+					if (all._state != ClientState::INGAME) continue;
+
+					Send_game_end_packet(all._id);
+				}
+			}
+		}
 	}
 }
 
@@ -4298,7 +4321,6 @@ void Server::SearchZombieAstar(int col, int row, Client& cl, NPC& npc)
 	cl.move_lock.unlock();
 
 	stack<AS_Node*> temp;
-
 	temp = npc.zombie->astar.AstartSearch(col, row, player_x, player_z);
 
 	npc.zombie->z_move_lock.lock();
@@ -4353,7 +4375,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 				if (npc.zombie->root.size() == 0)
 				{
 					npc.astar_check = false;
-					npc.zombie->astar.Delete();
+					npc.zombie->astar.New_Delete();
 				}
 				else
 					npc.astar_check = true;
@@ -4361,7 +4383,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			else
 			{
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 		else if (root_path[1] < root_path[0] && root_path[1] < root_path[2])
@@ -4372,7 +4394,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 				if (npc.zombie->root.size() == 0)
 				{
 					npc.astar_check = false;
-					npc.zombie->astar.Delete();
+					npc.zombie->astar.New_Delete();
 				}
 				else
 					npc.astar_check = true;
@@ -4380,7 +4402,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			else
 			{
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 		else if (root_path[2] < root_path[1] && root_path[2] < root_path[0])
@@ -4391,7 +4413,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 				if (npc.zombie->root.size() == 0)
 				{
 					npc.astar_check = false;
-					npc.zombie->astar.Delete();
+					npc.zombie->astar.New_Delete();
 				}
 				else
 					npc.astar_check = true;
@@ -4399,7 +4421,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			else
 			{
 				npc.astar_check = false;
-			//	npc.zombie->astar.Delete();
+			//	npc.zombie->astar.New_Delete();
 			}
 		}
 		else
@@ -4412,7 +4434,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 
 	if (npc.zombie->root.size() == 1)
 	{
-		npc.zombie->astar.Delete();
+		npc.zombie->astar.New_Delete();
 		npc.astar_check = false;
 	}
 
@@ -4446,13 +4468,13 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			if (move_check != MoveResult::MOVE)
 			{
 				npc.astar_check = false;
-			//	npc.zombie->astar.Delete();
+			//	npc.zombie->astar.New_Delete();
 			}
 		}
 		else
 		{
 			npc.astar_check = false;
-			npc.zombie->astar.Delete();
+			npc.zombie->astar.New_Delete();
 		}
 
 		// Astar대로 이동에 성공
@@ -4545,7 +4567,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 						{
 							//npc.search_lock.lock();
 							npc.astar_check = false;
-							npc.zombie->astar.Delete();
+							npc.zombie->astar.New_Delete();
 							npc.search_check = true;
 							//npc.search_lock.unlock();
 
