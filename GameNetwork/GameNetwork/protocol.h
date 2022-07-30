@@ -201,13 +201,6 @@ enum class ObjectState : char						// 오브젝트 상태
 	BREAK													// 부서진 오브젝트
 };
 
-enum class WinGameState : char
-{
-	NONE,													// 게임이 진행 중
-	WIN_PLAYER,											// 플레이어가 탈출에 성공하면
-	LOSE_PLAYER										// 모든 플레이어가 죽거나, 탈출에 실패하면
-};
-
 enum class Direction : char
 {
 	UP,														// 위

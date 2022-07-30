@@ -132,47 +132,47 @@ BarricadePos Network::Change_Client_Pos(iPos pos)
 	}
 	else if (pos.angle == ANGLE::FIFTEEN)
 	{
-		temp.angle = 75;
+		temp.angle = 105;
 	}
 	else if (pos.angle == ANGLE::THIRTY)
 	{
-		temp.angle = 60;
+		temp.angle = 120;
 	}
 	else if (pos.angle == ANGLE::FORTY_FIVE)
 	{
-		temp.angle = 45;
+		temp.angle = 135;
 	}
 	else if (pos.angle == ANGLE::SIXTY)
 	{
-		temp.angle = 30;
+		temp.angle = 150;
 	}
 	else if (pos.angle == ANGLE::SEVENTY_FIVE)
 	{
-		temp.angle = 15;
+		temp.angle = 165;
 	}
 	else if (pos.angle == ANGLE::NINETY)
 	{
-		temp.angle = 0;
+		temp.angle = 180;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_FIVE)
 	{
-		temp.angle = 345;
+		temp.angle = 195;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_TWENTY)
 	{
-		temp.angle = 330;
+		temp.angle = 210;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_THIRTY_FIVE)
 	{
-		temp.angle = 315;
+		temp.angle = 225;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDERED_FIFTY)
 	{
-		temp.angle = 300;
+		temp.angle = 240;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_SIXTY_FIVE)
 	{
-		temp.angle = 285;
+		temp.angle = 255;
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_EIGHTY)
 	{
@@ -180,47 +180,47 @@ BarricadePos Network::Change_Client_Pos(iPos pos)
 	}
 	else if (pos.angle == ANGLE::ONE_HUNDRED_NINETY_FIVE)
 	{
-		temp.angle = 255;
+		temp.angle = 285;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_TEN)
 	{
-		temp.angle = 240;
+		temp.angle = 300;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_TWENTY_FIVE)
 	{
-		temp.angle = 225;
+		temp.angle = 315;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_FORTY)
 	{
-		temp.angle = 210;
+		temp.angle = 330;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_FIFTY_FIVE)
 	{
-		temp.angle = 195;
+		temp.angle = 345;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_SEVENTY)
 	{
-		temp.angle = 180;
+		temp.angle = 0;
 	}
 	else if (pos.angle == ANGLE::TWO_HUNDRED_EIGHTY_FIVE)
 	{
-		temp.angle = 165;
+		temp.angle = 15;
 	}
 	else if (pos.angle == ANGLE::THREE_HUNDRED)
 	{
-		temp.angle = 150;
+		temp.angle = 30;
 	}
 	else if (pos.angle == ANGLE::THREE_HUNDRED_FIFTEEN)
 	{
-		temp.angle = 135;
+		temp.angle = 45;
 	}
 	else if (pos.angle == ANGLE::THREE_HUNDRED_THIRD)
 	{
-		temp.angle = 120;
+		temp.angle = 60;
 	}
 	else if (pos.angle == ANGLE::THREE_HUNDRED_FORTY_FIVE)
 	{
-		temp.angle = 105;
+		temp.angle = 75;
 	}
 	temp.b_type = pos.b_type;
 	return temp;
@@ -776,7 +776,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_PLAYER_MOVE_FAIL:
 	{
-		cout << "움직이는데에 실패하였습니다 \n";
 
 		break;
 	}
@@ -836,22 +835,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_commander_special_packet* packet = reinterpret_cast<sc_commander_special_packet*>(ptr);
 
-		if (packet->id == my_id)
-		{
-			cout << "부활하였습니다 \n";
-		}
-		else
-		{
-			if (g_client[packet->id]._type == PlayerType::ENGINEER)
-			{
-				cout << "엔지니어가 부활하였습니다. \n";
-			}
-			else
-			{
-				cout << "용병이 부활하였습니다. \n";
-			}
-		}
-
 		g_client[packet->id]._state = ClientState::INGAME;
 		g_client[packet->id].hp = packet->hp;
 		g_client[packet->id].bullet = packet->bullet;
@@ -862,15 +845,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	case (int)MsgType::SC_COMMANDER_SPECIAL_CHECK:
 	{
 		sc_player_co_special_check_packet* packet = reinterpret_cast<sc_player_co_special_check_packet*>(ptr);
-
-		if (g_client[packet->id]._type == PlayerType::ENGINEER)
-		{
-			//cout << "엔지니어를 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
-		}
-		else
-		{
-		//	cout << "용병을 부활 시키겠습니까? 바꾸려면 C, 부활시키려면 V를 눌러주세요. \n";
-		}
 
 		g_client[my_id].special_skill_key = true;
 		g_client[my_id].special_id = packet->id;
@@ -1254,7 +1228,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie1[id]._id = id;
 			r_zombie1[id]._state = packet->state;
 			r_zombie1[id]._type = packet->zomtype;
-			r_zombie1[id]._animation = ZombieAnimationState::SPAWN;
+			//r_zombie1[id]._animation = ZombieAnimationState::SPAWN;
 			r_zombie1[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie1[id]);
 
@@ -1274,7 +1248,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie2[id]._id = packet->id;
 			r_zombie2[id]._state = packet->state;
 			r_zombie2[id]._type = packet->zomtype;
-			r_zombie2[id]._animation = ZombieAnimationState::SPAWN;
+			//r_zombie2[id]._animation = ZombieAnimationState::SPAWN;
 			r_zombie2[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie2[id]);
 
@@ -1293,7 +1267,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie3[id]._id = packet->id;
 			r_zombie3[id]._state = packet->state;
 			r_zombie3[id]._type = packet->zomtype;
-			r_zombie3[id]._animation = ZombieAnimationState::SPAWN;
+			//r_zombie3[id]._animation = ZombieAnimationState::SPAWN;
 			r_zombie3[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie3[id]);
 
@@ -1310,7 +1284,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie1[id]._id = packet->id;
 			b_zombie1[id]._state = packet->state;
 			b_zombie1[id]._type = packet->zomtype;
-			b_zombie1[id]._animation = ZombieAnimationState::SPAWN;
+			//b_zombie1[id]._animation = ZombieAnimationState::SPAWN;
 			b_zombie1[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie1[id]);
 
@@ -1330,7 +1304,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie2[id]._id = packet->id;
 			b_zombie2[id]._state = packet->state;
 			b_zombie2[id]._type = packet->zomtype;
-			b_zombie2[id]._animation = ZombieAnimationState::SPAWN;
+			//b_zombie2[id]._animation = ZombieAnimationState::SPAWN;
 			b_zombie2[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie2[id]);
 
@@ -1347,7 +1321,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie3[id]._id = packet->id;
 			b_zombie3[id]._state = packet->state;
 			b_zombie3[id]._type = packet->zomtype;
-			b_zombie3[id]._animation = ZombieAnimationState::SPAWN;
+			//b_zombie3[id]._animation = ZombieAnimationState::SPAWN;
 			b_zombie3[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie3[id]);
 
@@ -1528,6 +1502,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			}
 			case MsgType::SC_ZOMBIE_SPAWN:
 			{
+				cout << z_id << "스폰 함 \n";
 				b_zombie1[z_id]._animation = ZombieAnimationState::SPAWN;
 				break;
 			}
@@ -1605,36 +1580,72 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 		case MapType::FIRST_PATH:
 		{
+			if (r_zombie1[packet->z_id]._state == ZombieState::DEAD)
+			{
+				AddTimer(packet->z_id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
+				break;
+			}
+
 			r_zombie1[packet->z_id].view = false;
 
 			break;
 		}
 		case MapType::SECOND_PATH:
 		{
+			if (r_zombie2[packet->z_id]._state == ZombieState::DEAD)
+			{
+				AddTimer(packet->z_id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
+				break;
+			}
+
 			r_zombie2[packet->z_id].view = false;
 
 			break;
 		}
 		case MapType::FINAL_PATH:
 		{
+			if (r_zombie3[packet->z_id]._state == ZombieState::DEAD)
+			{
+				AddTimer(packet->z_id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
+				break;
+			}
+
 			r_zombie3[packet->z_id].view = false;
 
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
+			if (b_zombie1[packet->z_id]._state == ZombieState::DEAD)
+			{
+				AddTimer(packet->z_id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
+				break;
+			}
+
 			b_zombie1[packet->z_id].view = false;
 
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
+			if (b_zombie2[packet->z_id]._state == ZombieState::DEAD)
+			{
+				AddTimer(packet->z_id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
+				break;
+			}
+
 			b_zombie2[packet->z_id].view = false;
 
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
+			if (b_zombie3[packet->z_id]._state == ZombieState::DEAD)
+			{
+				AddTimer(packet->z_id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
+				break;
+			}
+
 			b_zombie3[packet->z_id].view = false;
 
 			break;
@@ -1653,8 +1664,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			for (auto& zom : r_zombie1)
 			{
+				if (zom._state == ZombieState::DEAD) continue;
+
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
+				AddTimer(zom._id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
 			}
 			break;
 		}
@@ -1662,8 +1676,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			for (auto& zom : r_zombie2)
 			{
+				if (zom._state == ZombieState::DEAD) continue;
+
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
+				AddTimer(zom._id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
 			}
 			break;
 		}
@@ -1671,8 +1688,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			for (auto& zom : r_zombie3)
 			{
+				if (zom._state == ZombieState::DEAD) continue;
+
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
+				AddTimer(zom._id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
 			}
 			break;
 		}
@@ -1680,8 +1700,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			for (auto& zom : b_zombie1)
 			{
+				if (zom._state == ZombieState::DEAD) continue;
+
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
+				AddTimer(zom._id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
 			}
 
 			break;
@@ -1690,8 +1713,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			for (auto& zom : b_zombie2)
 			{
+				if (zom._state == ZombieState::DEAD) continue;
+
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
+				AddTimer(zom._id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
 			}
 
 			break;
@@ -1700,8 +1726,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			for (auto& zom : b_zombie3)
 			{
+				if (zom._state == ZombieState::DEAD) continue;
+
 				zom._state = ZombieState::DEAD;
 				zom._animation = ZombieAnimationState::DEAD;
+				AddTimer(zom._id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
 			}
 
 			break;
@@ -1714,6 +1743,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		sc_zombie_dead_packet* packet = reinterpret_cast<sc_zombie_dead_packet*>(ptr);
 
 		int id = packet->id;
+		AddTimer(id, EVENT_TYPE::ZOMBIE_DEAD, 3000);
 
 		switch (packet->m_type)
 		{
@@ -1951,6 +1981,49 @@ void Network::Player_Select(PlayerType type)
 	Send_request_packet(MsgType::CS_BARRICADE_REQUEST);
 }
 
+void Network::ZombieDead(int z_id)
+{
+	switch (map_type)
+	{
+	case MapType::FIRST_PATH:
+	{
+		r_zombie1[z_id].view = false;
+
+		break;
+	}
+	case MapType::SECOND_PATH:
+	{
+		r_zombie2[z_id].view = false;
+
+		break;
+	}
+	case MapType::FINAL_PATH:
+	{
+		r_zombie3[z_id].view = false;
+
+		break;
+	}
+	case MapType::CHECK_POINT_ONE:
+	{
+		b_zombie1[z_id].view = false;
+
+		break;
+	}
+	case MapType::CHECK_POINT_TWO:
+	{
+		b_zombie2[z_id].view = false;
+
+		break;
+	}
+	case MapType::CHECK_POINT_FINAL:
+	{
+		b_zombie3[z_id].view = false;
+
+		break;
+	}
+	}
+}
+
 void Network::Work()
 {
 	Login();
@@ -1994,6 +2067,15 @@ void Network::Work()
 			exp_over = nullptr;
 		}
 			break;
+		case IOType::NPC_DEAD:
+		{
+			ZombieDead(c_id);
+
+			delete exp_over;
+			exp_over = nullptr;
+
+			break;
+		}
 		}
 
 		//// 2. 플레이어 캐릭터 선택
@@ -2084,6 +2166,14 @@ void Network::Do_Timer()
 			{
 				Exp_Over* over = new Exp_Over;
 				over->_IOType = IOType::PLAYER_MOVE;
+				HANDLE t_iocp = _socket.ReturnHandle();
+				PostQueuedCompletionStatus(t_iocp, 1, te.p_id, &over->_wsa_over);
+				break;
+			}
+			case EVENT_TYPE::ZOMBIE_DEAD:
+			{
+				Exp_Over* over = new Exp_Over;
+				over->_IOType = IOType::NPC_DEAD;
 				HANDLE t_iocp = _socket.ReturnHandle();
 				PostQueuedCompletionStatus(t_iocp, 1, te.p_id, &over->_wsa_over);
 				break;

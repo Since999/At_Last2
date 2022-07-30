@@ -2332,14 +2332,62 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			}
 		}
 
+		bool con = false;
 		// 이동했을 때 기본에 있었는데 가까운데에 없어졌다면
 		for (auto& zom : cl_z_list)	// 전 리스트
 		{
 			if (0 == near_zombie_list.count(zom))	// 근데 지금 없다면?
 			{
+				con = false;
+
 				cl.list_lock.lock();
 				cl.zombie_list.erase(zom);
 				cl.list_lock.unlock();
+
+				switch (map_type)
+				{
+				case MapType::FIRST_PATH:
+				{
+					if (r_zombie1[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::SECOND_PATH:
+				{
+					if (r_zombie2[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::FINAL_PATH:
+				{
+					if (r_zombie3[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::CHECK_POINT_ONE:
+				{
+					if (b_zombie1[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::CHECK_POINT_TWO:
+				{
+					if (b_zombie2[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::CHECK_POINT_FINAL:
+				{
+					if (b_zombie3[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				}
+
+				if (con)
+				{
+					continue;
+				}
 
 				Send_viewlist_remove_packet(cl._id, zom, cl.map_type);
 			}
@@ -3463,8 +3511,8 @@ void Server::ZombieAllKill(NPC& npc)
 			cl.list_lock.lock();
 			cl.zombie_list.erase(npc._id);
 			cl.list_lock.unlock();
-
-			Send_viewlist_remove_packet(cl._id, npc._id, map_type);
+		
+		//	Send_viewlist_remove_packet(cl._id, npc._id, map_type);
 		}
 	}
 }
@@ -3495,7 +3543,7 @@ void Server::ZombieDead(NPC& npc, MapType m_type)
 			cl.zombie_list.erase(npc._id);
 			cl.list_lock.unlock();
 
-			Send_viewlist_remove_packet(cl._id, npc._id, map_type);
+			//Send_viewlist_remove_packet(cl._id, npc._id, map_type);
 		}
 		Send_zombie_number_packet(cl._id, remain_zombie_num);
 	}
