@@ -693,6 +693,7 @@ Commander::Commander()
 	//bullet = 30;
 	special_skill = 1;
 	kill_zombie = 0;
+	special_check = false;
 }
 
 Commander::~Commander()
@@ -714,6 +715,7 @@ Engineer::Engineer()
 	special_skill = 3;
 	special_dir = DIR::HEIGHT;
 	kill_zombie = 0;
+	special_check = false;
 }
 
 Engineer::~Engineer()
@@ -734,6 +736,7 @@ Mercynary::Mercynary()
 	//bullet = 30;
 	special_skill = 3;
 	kill_zombie = 0;
+	special_check = false;
 }
 
 Mercynary::~Mercynary()

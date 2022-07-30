@@ -956,12 +956,24 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 		CStaticObjectShader::GetInstance()->AddBarricade(temp);
 
-		//g_client[packet->id].special_skill -= 1;
+		g_client[packet->id].special_skill -= 1;
 		break;
 	}
 	case (int)MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL:
 	{
 		cout << "해당 지역에 지을 수 없습니다. \n";
+
+		break;
+	}
+	case (int)MsgType::SC_MERCENARY_SPECIAL:
+	{
+		cout << "용병 스킬 시작 \n";
+		g_client[my_id].special_skill -= 1;
+		break;
+	}
+	case (int)MsgType::SC_MERCENARY_SPECIAL_END:
+	{
+		cout << "용병 스킬 끝 \n";
 
 		break;
 	}
@@ -1075,6 +1087,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_WIN_STATE:
 	{
+		cout << "와 이겼다 ㅅㅅㅅㅅ \n";
+
 		break;
 	}
 	case (int)MsgType::SC_ZOMBIE_ATTACK:

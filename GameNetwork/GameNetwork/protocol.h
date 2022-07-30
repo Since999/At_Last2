@@ -35,7 +35,7 @@ const int MAX_NAME_SIZE = 20;					// ÇÃ·¹ÀÌ¾î ÀÌ¸§ ±æÀÌ
 
 const int ROAD_ZOMBIE_NUM = 20;
 
-const int FIRST_CHECK_POINT_ZOMBIE_NUM = 100;
+const int FIRST_CHECK_POINT_ZOMBIE_NUM = 1;
 const int TWO_CHECK_POINT_ZOMBIE_NUM = 150;
 const int THREE_CHECK_POINT_ZOMBIE_NUM = 200;
 
@@ -64,7 +64,8 @@ enum class IOType : char
 	NPC_DEAD,
 	NPC_SEND,
 	DOOR_OPEN,
-	PLAYER_MOVE
+	PLAYER_MOVE,
+	MER_SKILL_END
 };
 
 enum class ClientState : char
@@ -139,7 +140,7 @@ enum class MsgType : char							// ¼­¹ö¿¡¼­ º¸³»´Â ¸Þ¼¼Áö Çü½Ä
 	SC_ENGINEER_SPECIAL_CHECK,				// ÇÃ·¹ÀÌ¾î(¿£Áö´Ï¾î) Æ¯¼ö ´É·Â »ç¿ë Ã¼Å©
 	SC_ENGINEER_SPECIAL_BUILD_FAIL,		// ÇÃ·¹ÀÌ¾î(¿£Áö´Ï¾î) Æ¯¼ö ´É·Â ºôµå ½ÇÆÐ
 	SC_MERCENARY_SPECIAL,						// ÇÃ·¹ÀÌ¾î(¿ëº´) Æ¯¼ö ´É·Â »ç¿ë
-	SC_MERCENARY_SPECIAL_CHECK,			// ÇÃ·¹ÀÌ¾î(¿ëº´) Æ¯¼ö ´É·Â »ç¿ë Ã¼Å©
+	SC_MERCENARY_SPECIAL_END,			// ÇÃ·¹ÀÌ¾î(¿ëº´) Æ¯¼ö ´É·Â »ç¿ë Ã¼Å©
 	SC_PLAYER_SPECIAL_NUM_ZERO,			// ÇÃ·¹ÀÌ¾î Æ¯¼ö ´É·Â »ç¿ë·® Á¦·Î ÀÌ¸é
 	SC_PLAYER_DEAD,									// ÇÃ·¹ÀÌ¾î »ç¸Á
 	SC_PLAYER_SEARCH,								// ÇÃ·¹ÀÌ¾î ÁÖº¯ »ç¹° Á¢±Ù È®ÀÎ
@@ -529,6 +530,12 @@ struct sc_engineer_barrigate_build_packet		// ¼­¹ö¿¡¼­ ¿£Áö´Ï¾î°¡ Æ¯¼ö´É·Â »ç¿ëÇ
 	char id;
 	short x, z;												// ¹Ù¸®°ÔÀÌÆ® Áß½É À§Ä¡
 	Direction dir;											// ¹æÇâ
+};
+
+struct sc_mer_attack_packet							// ¼­¹ö¿¡¼­ ¿ëº´ÀÌ °ø°Ý·Â º¯°æ µÇ¾ú´Ù°í ¾Ë·ÁÁÖ´Â ÆÐÅ¶
+{
+	unsigned short size;
+	MsgType type;
 };
 
 struct sc_player_attack_packet						// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ðÆ®¿¡°Ô ´©°¡ °ø°ÝÇÏ°í ÀÖ´ÂÁö ¾Ë·ÁÁÖ±â

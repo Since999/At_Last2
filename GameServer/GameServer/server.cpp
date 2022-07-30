@@ -36,6 +36,8 @@ int Server::remain_zombie_num;
 
 char Server::select_type;
 
+atomic_bool Server::game_end;
+
 Server::Server()
 {
 	wcout.imbue(locale("korean"));
@@ -62,6 +64,7 @@ Server::~Server()
 void Server::Initialize()
 {
 	game_timer.Start();
+	game_end = false;
 
 	select_type = 0;
 
@@ -339,7 +342,7 @@ bool Server::MapCheck(MapType map_type)
 
 void Server::InitZombie(NPC& npc, int &i, float &PosX, float &PosZ)
 {
-	int random_zombie_type = rand() % 1;
+	int random_zombie_type = rand() % 3;
 	switch (random_zombie_type)
 	{
 	case 0:
@@ -1139,6 +1142,7 @@ void Server::Send_commander_skill_check_packet(int c_id, int s_id)
 
 void Server::CommanderSpecialSkill(Client& cl)
 {
+	bool check = false;
 	for (auto& other : g_clients)
 	{
 		if (other._id == cl._id)
@@ -1153,10 +1157,14 @@ void Server::CommanderSpecialSkill(Client& cl)
 
 		if (Distance(cl.player->x, cl.player->z, other.player->x, other.player->z) <= 3.0f)
 		{
+			check = true;
 			ResurrectionPlayer(other);
 		}
 
 	}
+
+	if(check)
+		cl.player->special_skill -= 1;
 }
 
 bool Server::EngineerSpecialSkillZombieCheck(int x, int z, Direction dir, NPC& npc)
@@ -1752,6 +1760,8 @@ void Server::EngineerSpecialSkill(Client& cl)
 			}
 		}
 
+		cl.player->special_skill -= 1;
+
 		for (auto& other : g_clients)
 		{
 			if (other._state != ClientState::INGAME) continue;
@@ -1767,9 +1777,34 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 }
 
+void Server::Send_mer_skill_packet(int c_id)
+{
+	sc_mer_attack_packet packet;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_MERCENARY_SPECIAL;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void Server::Send_mer_skill_end_packet(int c_id)
+{
+	sc_mer_attack_packet packet;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_MERCENARY_SPECIAL_END;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
 void Server::MercenarySpecialSkill(Client& cl)
 {
+	if (cl.player->special_check == false)
+	{
+		cl.player->special_check = true;
 
+		cl.player->attack = 20;
+		Send_mer_skill_packet(cl._id);
+		cl.player->special_skill -= 1;
+
+		AddTimer(cl._id, EVENT_TYPE::EVENT_MER_SKILL_END, 10000);
+	}
 }
 
 void Server::Send_gm_change_map_packet(int c_id, int s_id, int x, int z)
@@ -3114,8 +3149,6 @@ void Server::Send_zombie_spawn_packet(int c_id, int z_id, float x, float z, Zomb
 
 bool Server::NCDis_check(int c_id,  NPC& npc)
 {
-	if (npc._state != ZombieState::SPAWN) return false;
-
 	if (CAMERA_WIDTH < abs(g_clients[c_id].player->x - npc.zombie->x)) return false;
 	if (CAMERA_HEIGHT < abs(g_clients[c_id].player->z - npc.zombie->z)) return false;
 
@@ -3270,9 +3303,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 
 				AddTimer(i, EVENT_TYPE::EVENT_NPC_MOVE, 667);
 			}
-			else
-			{
-			}
 		}
 
 		if (spawn) {
@@ -3339,10 +3369,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 				//cout << i << "번째 거점 좀비가 x : " << b_zombie2[i].zombie->GetX() << ", z : " << b_zombie2[i].zombie->GetZ() << "에 출현하였습니다 \n";
 				AddTimer(i, EVENT_TYPE::EVENT_NPC_MOVE, 667);
 			}
-			else
-			{
-				cout << "이미 스폰되어 있거나 죽어 있습니다.(그럴 수 없는데?) \n";
-			}
 		}
 
 		if (spawn) {
@@ -3407,10 +3433,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 				}
 				//cout << i << "번째 거점 좀비가 x : " << b_zombie3[i].zombie->GetX() << ", z : " << b_zombie3[i].zombie->GetZ() << "에 출현하였습니다 \n";
 				AddTimer(i, EVENT_TYPE::EVENT_NPC_MOVE, 667);
-			}
-			else
-			{
-				cout << "이미 스폰되어 있거나 죽어 있습니다.(그럴 수 없는데?) \n";
 			}
 		}
 
@@ -3494,9 +3516,9 @@ void Server::ZombieAllKill(NPC& npc)
 {
 	npc._state = ZombieState::DEAD;
 	npc.zombie->astar.New_Delete();
-
-	delete npc.zombie;
-	npc.zombie = nullptr;
+	remain_zombie_num = 0;
+	//delete npc.zombie;
+	//npc.zombie = nullptr;
 
 	for (auto& cl : g_clients)
 	{
@@ -3516,6 +3538,21 @@ void Server::ZombieAllKill(NPC& npc)
 		
 		//	Send_viewlist_remove_packet(cl._id, npc._id, map_type);
 		}
+		Send_zombie_number_packet(cl._id, remain_zombie_num);
+	}
+
+	if (map_type == MapType::CHECK_POINT_FINAL)
+	{
+		if (remain_zombie_num == 0 && game_end == false)
+		{
+			game_end = true;
+			for (auto& all : g_clients)
+			{
+				if (all._state != ClientState::INGAME) continue;
+
+				Send_game_end_packet(all._id);
+			}
+		}
 	}
 }
 
@@ -3533,8 +3570,8 @@ void Server::ZombieDead(NPC& npc, MapType m_type)
 	npc.zombie->astar.New_Delete();
 	remain_zombie_num--;
 
-	delete npc.zombie;
-	npc.zombie = nullptr;
+	//delete npc.zombie;
+	//npc.zombie = nullptr;
 	
 	//r_zombie1[z_id].state_lock.unlock();
 
@@ -3556,17 +3593,18 @@ void Server::ZombieDead(NPC& npc, MapType m_type)
 			//Send_viewlist_remove_packet(cl._id, npc._id, map_type);
 		}
 		Send_zombie_number_packet(cl._id, remain_zombie_num);
+	}
 
-		if (map_type == MapType::CHECK_POINT_FINAL)
+	if (map_type == MapType::CHECK_POINT_FINAL)
+	{
+		if (remain_zombie_num == 0 && game_end == false)
 		{
-			if (remain_zombie_num == 0)
+			game_end = true;
+			for (auto& all : g_clients)
 			{
-				for (auto& all : g_clients)
-				{
-					if (all._state != ClientState::INGAME) continue;
+				if (all._state != ClientState::INGAME) continue;
 
-					Send_game_end_packet(all._id);
-				}
+				Send_game_end_packet(all._id);
 			}
 		}
 	}
@@ -4247,11 +4285,23 @@ void Server::Work()
 			exp_over = nullptr;
 		}
 			break;
+		case IOType::MER_SKILL_END:
+		{
+			g_clients[c_id].player->special_check = false;
+			g_clients[c_id].player->attack = 7;
+
+			Send_mer_skill_end_packet(c_id);
+
+			delete exp_over;
+			exp_over = nullptr;
+		}
+		break;
 		default:
 			cout << "이건 아무것도 아님 \n";
 		}
 	}
 }
+
 
 void Server::Send_zombie_search_packet(int c_id, int s_id, int z_id, MapType m_type)
 {
@@ -4331,6 +4381,8 @@ void Server::SearchZombieAstar(int col, int row, Client& cl, NPC& npc)
 void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 {
 	auto s_time = chrono::system_clock::now();
+
+	//cout << "좀비의 위치는 x : " << npc.zombie->GetX() << ", z : " << npc.zombie->GetZ() << "\n";
 
 	// 좀비가 SPAWN 상태가 아니라면 움직일 수 없으니 돌아가라
 	if (npc._state != ZombieState::SPAWN)
@@ -4784,7 +4836,16 @@ void Server::Do_Timer()
 				PostQueuedCompletionStatus(t_iocp, 1, te.obj_id, &over->_wsa_over);
 			}
 				break;
+			case EVENT_TYPE::EVENT_MER_SKILL_END:
+			{
+				Exp_Over* over = new Exp_Over;
+				over->_IOType = IOType::MER_SKILL_END;
+				HANDLE& t_iocp = _socket.ReturnHandle();
+				PostQueuedCompletionStatus(t_iocp, 1, te.obj_id, &over->_wsa_over);
 			}
+			break;
+			}
+
 		}
 	}
 }

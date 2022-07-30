@@ -10,7 +10,8 @@ enum class EVENT_TYPE : char
 	EVENT_NPC_MOVE,
 	EVENT_NPC_ATTACK,
 	EVENT_NPC_SEND,
-	EVENT_NPC_DEAD
+	EVENT_NPC_DEAD,
+	EVENT_MER_SKILL_END
 };
 
 struct timer_event {
@@ -69,6 +70,8 @@ public:
 
 	static char select_type;
 	static CGameTimer game_timer;
+
+	static atomic_bool game_end;
 public:
 	Server();
 	~Server();
@@ -96,6 +99,8 @@ public:
 	static void Send_commander_skill_check_packet(int c_id, int s_id);
 	static void Send_engineer_skill_packet(int c_id,int s_id, int t_x, int t_z);
 	static void Send_engineer_skill_check_packet(int c_id, int x, int z);
+	static void Send_mer_skill_packet(int c_id);
+	static void Send_mer_skill_end_packet(int c_id);
 	static void Send_viewlist_put_packet(int c_id, int z_id, MapType m_type, float z_x, float z_z, MsgType msg, ZombieType z_type);
 	static void Send_viewlist_remove_packet(int c_id, int z_id, MapType m_type);
 	static void Send_search_packet(int c_id, int x, int z, ObjectType _type);
