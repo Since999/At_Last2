@@ -705,7 +705,7 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 
 void CMainGameScene::StartEvent()
 {
-	CSoundSystem::GetInstance()->PlayBGM(L"main game bgm");
+	//CSoundSystem::GetInstance()->PlayBGM(L"main game bgm");
 }
 
 void CMainGameScene::StopEvent()
