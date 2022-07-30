@@ -231,7 +231,7 @@ const map<ZombieType, ZombieInfo>& CAnimationObjectShader::GetModelMap()
 	info.model = "Z1.fbx"; info.texture = L"Zombie.png"; info.size = 1.0f;
 	zombie_model_map.emplace(ZombieType::NORMAL, info);
 	//Test
-	info.model = "Z2.fbx"; info.texture = L"zombie_goul_nomal.png"; info.size = 1.0f;
+	info.model = "Z2.fbx"; info.texture = L"zombie_goul_nomal.png"; info.size = 3.0f;
 	zombie_model_map.emplace(ZombieType::SOLIDEIR, info);
 	//Test
 	info.model = "Z3.fbx"; info.texture = L"pumpkinHulk_diffuse.png"; info.size = 0.5f;
