@@ -44,8 +44,6 @@ void CScene::ReleaseObjects()
 		for (int i = 0; i < m_nShaders; i++)
 		{
 			if (m_ppShaders[i]) {
-				m_ppShaders[i]->ReleaseShaderVariables();
-				m_ppShaders[i]->ReleaseObjects();
 				m_ppShaders[i]->Release();
 			}
 		}

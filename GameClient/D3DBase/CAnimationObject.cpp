@@ -255,8 +255,10 @@ void CZombie::Animate(float fTimeElapsed)
 {
 #ifdef ENABLE_NETWORK
 	if (!zombie) return;
-	if (!zombie->view.load()) return;
-
+	if (!(zombie->view.load())) {
+		CAnimationObjectShader::GetInstance()->DeleteZombie(this);
+		return;
+	}
 	SetPosition((zombie->x - 550.0f) * (-100.0f), GetPosition().y, (zombie->z - 210.0f) * (-100.0f));
 
 	SetYaw(XMConvertToRadians(zombie->angle.load()));

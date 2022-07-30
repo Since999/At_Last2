@@ -1256,6 +1256,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie1[id]._type = packet->zomtype;
 			r_zombie1[id]._animation = ZombieAnimationState::SPAWN;
 			r_zombie1[id].angle = packet->angle;
+			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie1[id]);
 
 			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			//CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie1[id]);
@@ -1275,6 +1276,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie2[id]._type = packet->zomtype;
 			r_zombie2[id]._animation = ZombieAnimationState::SPAWN;
 			r_zombie2[id].angle = packet->angle;
+			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie2[id]);
 
 			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			//cout << "r_zombie2 [ " << id << "] ÀÇ ÁÂÇ¥ x : " << packet->x << ", z : " << packet->z << ", Ã¼·Â hp : " << packet->hp << "\n";
@@ -1293,6 +1295,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie3[id]._type = packet->zomtype;
 			r_zombie3[id]._animation = ZombieAnimationState::SPAWN;
 			r_zombie3[id].angle = packet->angle;
+			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie3[id]);
 
 			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			break;
@@ -1309,6 +1312,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie1[id]._type = packet->zomtype;
 			b_zombie1[id]._animation = ZombieAnimationState::SPAWN;
 			b_zombie1[id].angle = packet->angle;
+			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie1[id]);
 
 			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			//cout << "b_zombie1 [" << id << "] ÀÇ ÁÂÇ¥ x : " << packet->x << ", z : " << packet->z << ", Ã¼·Â hp : " << packet->hp << "\n";
@@ -1328,6 +1332,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie2[id]._type = packet->zomtype;
 			b_zombie2[id]._animation = ZombieAnimationState::SPAWN;
 			b_zombie2[id].angle = packet->angle;
+			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie2[id]);
 
 			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			break;
@@ -1344,6 +1349,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie3[id]._type = packet->zomtype;
 			b_zombie3[id]._animation = ZombieAnimationState::SPAWN;
 			b_zombie3[id].angle = packet->angle;
+			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie3[id]);
 
 			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
 			break;
@@ -1430,6 +1436,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie1[z_id].x = packet->x;
 			r_zombie1[z_id].z = packet->z;
 			r_zombie1[z_id]._type = packet->z_type;
+
+			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie1[z_id]);
 			switch (packet->animation)
 			{
 			case MsgType::SC_ZOMBIE_MOVE:
@@ -1456,6 +1464,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie2[z_id].x = packet->x;
 			r_zombie2[z_id].z = packet->z;
 			r_zombie2[z_id]._type = packet->z_type;
+			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie2[z_id]);
 			switch (packet->animation)
 			{
 			case MsgType::SC_ZOMBIE_MOVE:
@@ -1482,6 +1491,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie3[z_id].x = packet->x;
 			r_zombie3[z_id].z = packet->z;
 			r_zombie3[z_id]._type = packet->z_type;
+			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie3[z_id]);
 			switch (packet->animation)
 			{
 			case MsgType::SC_ZOMBIE_MOVE:
@@ -1508,6 +1518,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie1[z_id].x = packet->x;
 			b_zombie1[z_id].z = packet->z;
 			b_zombie1[z_id]._type = packet->z_type;
+			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie1[z_id]);
 			switch (packet->animation)
 			{
 			case MsgType::SC_ZOMBIE_MOVE:
@@ -1534,6 +1545,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie2[z_id].x = packet->x;
 			b_zombie2[z_id].z = packet->z;
 			b_zombie2[z_id]._type = packet->z_type;
+			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie2[z_id]);
 			switch (packet->animation)
 			{
 			case MsgType::SC_ZOMBIE_MOVE:
@@ -1560,6 +1572,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie3[z_id].x = packet->x;
 			b_zombie3[z_id].z = packet->z;
 			b_zombie3[z_id]._type = packet->z_type;
+			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie3[z_id]);
 			switch (packet->animation)
 			{
 			case MsgType::SC_ZOMBIE_MOVE:

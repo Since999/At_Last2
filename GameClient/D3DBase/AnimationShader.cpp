@@ -141,19 +141,19 @@ void CAnimationObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graphi
 		model->SetAniRepeat(CZombieStateMachine::ANIMATION_INDEX::DEAD, false);
 		model->SetAniRepeat(CZombieStateMachine::ANIMATION_INDEX::SPAWN, false);
 	}
-	for (int i = 0; i < ROAD_ZOMBIE_NUM + FIRST_CHECK_POINT_ZOMBIE_NUM; ++i)
-	//for (int i = 0; i < 3; ++i)
-	{
-		Zombie* zom = NULL;
-		if(i < ROAD_ZOMBIE_NUM) zom = &Network::r_zombie1[i];
-		else {
-			int n = i - ROAD_ZOMBIE_NUM;
-			if(n <= FIRST_CHECK_POINT_ZOMBIE_NUM) zom = &Network::b_zombie1[n];
-		}
-		//zom->_id = i;
-		//zom->_type = (ZombieType)(((int)zom->_type + i) % 5);
-		AddZombie(zom);
-	}
+	//for (int i = 0; i < ROAD_ZOMBIE_NUM + FIRST_CHECK_POINT_ZOMBIE_NUM; ++i)
+	////for (int i = 0; i < 3; ++i)
+	//{
+	//	Zombie* zom = NULL;
+	//	if(i < ROAD_ZOMBIE_NUM) zom = &Network::r_zombie1[i];
+	//	else {
+	//		int n = i - ROAD_ZOMBIE_NUM;
+	//		if(n <= FIRST_CHECK_POINT_ZOMBIE_NUM) zom = &Network::b_zombie1[n];
+	//	}
+	//	//zom->_id = i;
+	//	//zom->_type = (ZombieType)(((int)zom->_type + i) % 5);
+	//	AddZombie(zom);
+	//}
 }
 
 void CAnimationObjectShader::ReleaseObjects()
