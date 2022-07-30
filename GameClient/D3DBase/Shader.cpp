@@ -53,6 +53,17 @@ D3D12_SHADER_BYTECODE CShader::CompileShaderFromFile(WCHAR* pszFileName, LPCSTR 
 	return(d3dShaderByteCode);
 }
 
+D3D12_SHADER_BYTECODE CShader::LoadShader(const wstring& file_name, ID3DBlob** ppd3dShaderBlob)
+{
+	LoadBinary(file_name, ppd3dShaderBlob);
+	//ppd3dShaderBlob = blob.GetAddressOf();
+	D3D12_SHADER_BYTECODE d3dShaderByteCode;
+
+	d3dShaderByteCode.BytecodeLength = (*ppd3dShaderBlob)->GetBufferSize();
+	d3dShaderByteCode.pShaderBytecode = (*ppd3dShaderBlob)->GetBufferPointer();
+	return d3dShaderByteCode;
+}
+
 D3D12_INPUT_LAYOUT_DESC CShader::CreateInputLayout()
 {
 	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
@@ -270,12 +281,14 @@ D3D12_INPUT_LAYOUT_DESC CPlayerShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CPlayerShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSPlayer", "vs_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/Player_vs.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSPlayer", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CPlayerShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSPlayer", "ps_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/Player_ps.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSPlayer", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CPlayerShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -321,12 +334,14 @@ D3D12_INPUT_LAYOUT_DESC CTexturedShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CTexturedShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSTextured", "vs_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/Textured_vs.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSTextured", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CTexturedShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSTextured", "ps_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/Textured_ps.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSTextured", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CTexturedShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -463,12 +478,14 @@ D3D12_INPUT_LAYOUT_DESC ShadowMapDebugShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE ShadowMapDebugShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"debug.hlsl", "VS", "vs_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/debug_vs.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"debug.hlsl", "VS", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE ShadowMapDebugShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"debug.hlsl", "PS", "ps_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/debug_ps.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"debug.hlsl", "PS", "ps_5_1", ppd3dShaderBlob));
 }
 
 void ShadowMapDebugShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -477,4 +494,20 @@ void ShadowMapDebugShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dComman
 	//pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
 
 	//UpdateShaderVariables(pd3dCommandList);
+}
+
+ID3DBlob** LoadBinary(const std::wstring& filename, ID3DBlob** blob)
+{
+	std::ifstream fin(filename, std::ios::binary);
+
+	fin.seekg(0, std::ios_base::end);
+	std::ifstream::pos_type size = (int)fin.tellg();
+	fin.seekg(0, std::ios_base::beg);
+
+	ThrowIfFailed(D3DCreateBlob(size, blob));
+
+	fin.read((char*)(*blob)->GetBufferPointer(), size);
+	fin.close();
+
+	return blob;
 }

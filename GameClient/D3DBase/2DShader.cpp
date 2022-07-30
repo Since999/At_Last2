@@ -5,12 +5,14 @@
 
 D3D12_SHADER_BYTECODE C2DShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSParticle", "vs_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/Shader_vs.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSParticle", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE C2DShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSParticle", "ps_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/Shader_ps.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSParticle", "ps_5_1", ppd3dShaderBlob));
 }
 
 D3D12_BLEND_DESC C2DShader::CreateBlendState()

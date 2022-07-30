@@ -42,22 +42,20 @@ D3D12_INPUT_LAYOUT_DESC CAnimationShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CAnimationShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	//return(CShader::CompileShaderFromFile(L"Animation.hlsl", "VSAnimated", "vs_5_1", ppd3dShaderBlob));
-	return(CShader::CompileShaderFromFile(L"PlayerShader.hlsl", "PlayerVS", "vs_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/player_vs.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"PlayerShader.hlsl", "PlayerVS", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CAnimationShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	//return(CShader::CompileShaderFromFile(L"Animation.hlsl", "PSAnimated", "ps_5_1", ppd3dShaderBlob));
-	return(CShader::CompileShaderFromFile(L"PlayerShader.hlsl", "PlayerPS", "ps_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/player_ps.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"PlayerShader.hlsl", "PlayerPS", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CAnimationShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }
-
-
 
 //-----------------------------------------------------------------------------------------------------------------------
 
@@ -81,14 +79,14 @@ void CAnimationObjectShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSi
 
 D3D12_SHADER_BYTECODE CAnimationObjectShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
+	return LoadShader(L"shader/Animation_vs.cso", ppd3dShaderBlob);
 	//return(CShader::CompileShaderFromFile(L"Animation.hlsl", "VSAnimated", "vs_5_1", ppd3dShaderBlob));
-	return(CShader::CompileShaderFromFile(L"Animation.hlsl", "VSAnimated", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CAnimationObjectShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
+	return LoadShader(L"shader/Animation_ps.cso", ppd3dShaderBlob);
 	//return(CShader::CompileShaderFromFile(L"Animation.hlsl", "PSAnimated", "ps_5_1", ppd3dShaderBlob));
-	return(CShader::CompileShaderFromFile(L"Animation.hlsl", "PSAnimated", "ps_5_1", ppd3dShaderBlob));
 }
 
 void CAnimationObjectShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)

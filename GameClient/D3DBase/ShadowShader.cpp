@@ -48,12 +48,11 @@ D3D12_RASTERIZER_DESC CShadowShader::CreateRasterizerState()
 	return(d3dRasterizerDesc);
 }
 
-
 D3D12_SHADER_BYTECODE CShadowShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"ShadowMapShader.hlsl", "Shadow_VS", "vs_5_1", ppd3dShaderBlob));
+	return CShader::LoadShader(L"shader/shadow_vs.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"ShadowMapShader.hlsl", "Shadow_VS", "vs_5_1", ppd3dShaderBlob));
 }
-
 
 D3D12_INPUT_LAYOUT_DESC CShadowShader::CreateInputLayout()
 {
@@ -82,7 +81,8 @@ void CShadowShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 D3D12_SHADER_BYTECODE CAnimationShadowShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"ShadowMapShader.hlsl", "ShadowAnimation_VS", "vs_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/shadow_anim_vs.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"ShadowMapShader.hlsl", "ShadowAnimation_VS", "vs_5_1", ppd3dShaderBlob));
 }
 
 
@@ -107,5 +107,6 @@ D3D12_INPUT_LAYOUT_DESC CAnimationShadowShader::CreateInputLayout()
 
 D3D12_SHADER_BYTECODE CPlayerShadowShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"ShadowMapShader.hlsl", "ShadowPlayer_VS", "vs_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/shadow_player_vs.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"ShadowMapShader.hlsl", "ShadowPlayer_VS", "vs_5_1", ppd3dShaderBlob));
 }
