@@ -117,9 +117,12 @@ class CButtonUI : public CUIObject {
 private:
     CCollisionRect collision_rect;
     function<void()> button_func;
+    bool is_enable = true;
 public:
     CButtonUI(float width, float height, float x, float y, function<void()> func, CMaterial* material = NULL);
     ~CButtonUI();
 
     virtual bool CheckMouseCollision(float x, float y);
+    void Enable(bool is_enable = true) { this->is_enable = is_enable; }
+    void Disable() { this->is_enable = false; }
 };

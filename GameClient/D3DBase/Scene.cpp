@@ -343,6 +343,28 @@ void CSelectScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandL
 	CGameFramework::GetInstance()->ChangeUI(new UISystem(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), "Resources/UI/lobby_UI_2.xml"));
 }
 
+void CSelectScene::PlayerSelected(int id)
+{
+	auto& g_client = Network::g_client;
+	if (g_client[id]._type == PlayerType::COMMANDER)
+	{
+		auto ui = CGameFramework::GetInstance()->ui_system;
+		ui->AddUISetting("Resources/UI/lobby_UI_2 - P1.xml");
+		ui->EnableButton(L"select player 1", false);
+	}
+	else if (g_client[id]._type == PlayerType::ENGINEER)
+	{
+		auto ui = CGameFramework::GetInstance()->ui_system;
+		ui->AddUISetting("Resources/UI/lobby_UI_2 - P2.xml");
+		ui->EnableButton(L"select player 2", false);
+	}
+	else if (g_client[id]._type == PlayerType::MERCENARY)
+	{
+		auto ui = CGameFramework::GetInstance()->ui_system;
+		ui->AddUISetting("Resources/UI/lobby_UI_2 - P3.xml");
+		ui->EnableButton(L"select player 3", false);
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //MainGameScene
 

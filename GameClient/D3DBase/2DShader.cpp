@@ -238,7 +238,7 @@ void UISystem::AddProgressBar(float width, float height, float x, float y, const
 	AddObject(object);
 }
 
-void UISystem::AddButtonUI(float width, float height, float x, float y, const wstring& image_file_name, function<void()> func)
+void UISystem::AddButtonUI(float width, float height, float x, float y, const wstring& image_file_name, function<void()> func, const wstring& name)
 {
 	CTexture* texture = GetTexture(image_file_name);
 	CMaterial* material = new CMaterial();
@@ -246,6 +246,12 @@ void UISystem::AddButtonUI(float width, float height, float x, float y, const ws
 	CGameObject* object = new CButtonUI(width, height, x, y, func, material);
 	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
 	AddObject(object);
+	variable_ui_map.emplace(name, object);
+}
+
+void UISystem::AddUISetting(const string& file_name)
+{
+	CXMLReader::GetUISetting(file_name, this);
 }
 
 void UISystem::CheckMouseCollision(float x, float y)
@@ -257,6 +263,16 @@ void UISystem::CheckMouseCollision(float x, float y)
 			return;
 		}
 	}
+}
+
+void UISystem::EnableButton(const wstring& name, bool is_enable)
+{
+	auto& found = variable_ui_map.find(name);
+	if (found == variable_ui_map.end()) return;
+
+	CButtonUI* button = dynamic_cast<CButtonUI*>((*found).second);
+	if (!button) return;
+	button->Enable(is_enable);
 }
 
 void UISystem::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)

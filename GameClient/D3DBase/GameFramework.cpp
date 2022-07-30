@@ -518,8 +518,9 @@ void CGameFramework::BuildObjects()
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	*/
 	auto lobby = new CLobbyScene();
-	lobby->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	m_pScene = lobby;
+	lobby->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	
 
 	particle_system = ParticleSystem::InitInstance(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature());
 
@@ -634,22 +635,21 @@ void CGameFramework::FrameAdvance()
 
 	ProcessInput();
 
-	AnimateObjects();
-
-
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+
+	AnimateObjects();
 
 	m_pScene->SetGraphicsRootSignature(m_pd3dCommandList);
 
 	UpdateShaderVariables();
-	
+
 	ShadowMapRender();
 	Render();
 
 	hResult = m_pd3dCommandList->Close();
 
-	ID3D12CommandList *ppd3dCommandLists[] ={ m_pd3dCommandList };
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
@@ -672,14 +672,15 @@ void CGameFramework::FrameAdvance()
 	//	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
 	MoveToNextFrame();
 
-	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
-	::SetWindowText(m_hWnd, m_pszFrameRate);
 	EnterCriticalSection(&crit);
 	while (!func_queue.empty()) {
 		func_queue.front()();
 		func_queue.pop();
 	}
 	LeaveCriticalSection(&crit);
+
+	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
+	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
 
 void CGameFramework::ShadowMapRender()
@@ -783,6 +784,21 @@ void CGameFramework::AddCommand(const function<void()>& func)
 	EnterCriticalSection(&crit);
 	func_queue.push(func);
 	LeaveCriticalSection(&crit);
+}
+
+void CGameFramework::GpuCommand(const function<void()>&func)
+{
+	m_pd3dCommandAllocator->Reset();
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+
+	func();
+
+	m_pd3dCommandList->Close();
+
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+
+	WaitForGpuComplete();
 }
 
 float CGameFramework::GetTotalTime()
