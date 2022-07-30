@@ -199,6 +199,8 @@ void CPlayerStateMachine::Update(float time_elapsed)
 	float anim_time = time_elapsed;
 	if (is_dead) anim_time = 0.f;
 
+	float pre_time = animation_time;
+
 	if (anim_state == ClientAnimationState::WALK) {
 		anim_time = time_elapsed * (speed / 1000.f);
 	}
@@ -220,6 +222,8 @@ void CPlayerStateMachine::Update(float time_elapsed)
 	case ClientAnimationState::DEAD:
 		if (is_anim_ended) {
 			is_dead = true;
+			animation_time = pre_time;
+			CStateMachine::Update(0.f);
 		}
 		if (object_info->hp > 0) {
 			object_info->_animation = ClientAnimationState::WALK;
