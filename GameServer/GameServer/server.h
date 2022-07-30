@@ -80,7 +80,7 @@ public:
 	static bool NCDis_check(int c_id,  NPC& npc);
 	static void Disconnect(int c_id);
 	static void ProcessPacket(int client_id, unsigned char* p);
-	static void Send_login_ok_packet(int c_id, char s_type);
+	static void Send_login_ok_packet(int c_id);
 	static void Send_barricade_packet(int c_id);
 	static void Send_game_start_packet(int c_id);
 	static void Send_select_packet(int c_id, int s_id, char s_type);

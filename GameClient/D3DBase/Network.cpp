@@ -1770,7 +1770,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_ZOMBIE_REMAIN:
 	{
-
+		
 		break;
 	}
 	case (int)MsgType::SC_WAIT:

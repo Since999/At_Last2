@@ -211,13 +211,12 @@ int Server::NewID()
 	return -1;
 }
 
-void Server::Send_login_ok_packet(int c_id, char s_type)
+void Server::Send_login_ok_packet(int c_id)
 {
 	sc_login_ok_packet packet;
 	packet.size = sizeof(packet);
 	packet.id = c_id;
 	packet.type = MsgType::SC_LOGIN_OK;
-	packet.select_type = s_type;
 	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -995,7 +994,7 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 		if (hp <= 0)
 		{
 			hp = 0;
-			AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_DEAD, 0);
+			AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_DEAD, 1000);
 			
 			//ZombieDead(npc, m_type);
 			cl.player->kill_zombie += 1;
@@ -1004,6 +1003,7 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 				if (other._state != ClientState::INGAME) continue;
 
 				Send_player_zombie_kill_num_packet(other._id, cl._id, cl.player->kill_zombie);
+				Send_zombie_dead_packet(cl._id, npc._id, m_type);
 			}
 		}
 
@@ -1804,7 +1804,7 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 	case (int)MsgType::CS_LOGIN_REQUEST:
 	{
 		cs_login_packet* packet = reinterpret_cast<cs_login_packet*>(p);
-		Send_login_ok_packet(client_id, select_type);
+		Send_login_ok_packet(client_id);
 
 		// 클라이언트가 접속하였으므로 INGAME 상태로 변환
 		Client& cl = g_clients[client_id];
@@ -1829,7 +1829,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			login_packet.id = client_id;
 			login_packet.size = sizeof(login_packet);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
-			login_packet.select_type = select_type;
 			other.do_send(sizeof(login_packet), &login_packet);
 		}
 
@@ -1848,7 +1847,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			login_packet.id = other._id;
 			login_packet.size = sizeof(login_packet);
 			login_packet.type = MsgType::SC_LOGIN_OTHER;
-			login_packet.select_type = select_type;
 			cl.do_send(sizeof(login_packet), &login_packet);
 		}
 
@@ -3491,7 +3489,6 @@ void Server::ZombieDead(NPC& npc, MapType m_type)
 			continue;
 		}
 		//cl.state_lock.unlock();
-
 		if (cl.zombie_list.count(npc._id) != 0)
 		{
 			cl.list_lock.lock();
@@ -3501,7 +3498,6 @@ void Server::ZombieDead(NPC& npc, MapType m_type)
 			Send_viewlist_remove_packet(cl._id, npc._id, map_type);
 		}
 		Send_zombie_number_packet(cl._id, remain_zombie_num);
-		Send_zombie_dead_packet(cl._id, npc._id, m_type);
 	}
 }
 

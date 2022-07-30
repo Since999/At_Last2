@@ -381,7 +381,6 @@ struct sc_login_ok_packet							// 서버에서 클라이언트에게 로그인이 되었다고 전�
 	unsigned short size;
 	MsgType type;										// 메시지 타입 LOGIN_OK
 	char id;													// 클라이언트 ID 전송
-	char select_type;										// 000 NONE, 001 COMMANDER, 010 ENGINEER, 100 MER
 };
 
 struct sc_login_other_packet
