@@ -24,7 +24,7 @@ width ="300"
 height ="300"
 x = "330"
 y ="660"
-image="Resources/UI/B_back.png"
+image="Resources/UI/B_back2.png"
 action="select player 1"/>
   <UI
 width ="300"
@@ -40,7 +40,7 @@ width ="300"
 height ="300"
 x = "980"
 y ="660"
-image="Resources/UI/B_back.png"
+image="Resources/UI/B_back2.png"
 action="select player 2"/>
   <UI
 width ="300"
@@ -54,7 +54,7 @@ width ="300"
 height ="300"
 x = "1650"
 y ="660"
-image="Resources/UI/B_back.png"
+image="Resources/UI/B_back2.png"
 action="select player 3"/>
   <UI
 width ="300"

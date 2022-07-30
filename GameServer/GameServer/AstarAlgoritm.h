@@ -25,6 +25,7 @@ public:
 	stack<AS_Node*> AstartSearch(int start_x, int start_y, int end_x, int end_y);
 
 	void Init();
+	void New_Init();
 	void Delete();
 	void Close_List_Delete() { close_list.NodeDelete(); };
 	void Near_Node_Connect();
