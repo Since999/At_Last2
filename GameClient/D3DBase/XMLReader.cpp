@@ -25,8 +25,6 @@ const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
     auto framework = CGameFramework::GetInstance();
     auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
     auto scene = framework->GetCurruntScene();
-    auto ui = framework->ui_system;
-
     
     CSelectScene* sel_scene = dynamic_cast<CSelectScene*>(scene);
     function_map.emplace(L"login", [framework, sig]() {
@@ -36,19 +34,25 @@ const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
     function_map.emplace(L"game start", [framework, sig]() {
         framework->ChangeScene(new CMainGameScene(sig));
     });
-    function_map.emplace(L"select player 1", [ui]() {
+    function_map.emplace(L"select player 1", []() {
+        auto framework = CGameFramework::GetInstance();
+        auto ui = framework->ui_system;
         network.Player_Select(PlayerType::COMMANDER);
         ui->EnableButton(L"select player 1", false);
         ui->EnableButton(L"select player 2", false);
         ui->EnableButton(L"select player 3", false);
     });
-    function_map.emplace(L"select player 2", [ui]() {
+    function_map.emplace(L"select player 2", []() {
+        auto framework = CGameFramework::GetInstance();
+        auto ui = framework->ui_system;
         network.Player_Select(PlayerType::ENGINEER);
         ui->EnableButton(L"select player 1", false);
         ui->EnableButton(L"select player 2", false);
         ui->EnableButton(L"select player 3", false);    
     });
-    function_map.emplace(L"select player 3", [ui]() {
+    function_map.emplace(L"select player 3", []() {
+        auto framework = CGameFramework::GetInstance();
+        auto ui = framework->ui_system;
         network.Player_Select(PlayerType::MERCENARY);
         ui->EnableButton(L"select player 1", false);
         ui->EnableButton(L"select player 2", false);
