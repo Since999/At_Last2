@@ -29,7 +29,7 @@ void Zombie::SetInfo(sc_zombie_move_packet* packet)
 	dir = packet->dir;
 	arrive = false;
 
-	if (packet->x < 50 || packet->x > 1100 || packet->z < 50 || packet->z > 420)
+	if (abs(packet->x - x) > 10 || abs(packet->z - z) > 10)
 		return;
 
 	AddMove(packet->x, packet->z);
