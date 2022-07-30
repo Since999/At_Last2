@@ -26,6 +26,14 @@
     y ="50"
     image="Resources/UI/Bclose.png"/>
 
+      <Number
+width ="50"
+height ="50"
+x = "1900"
+y ="50"
+digit ="3"
+variable ="left bullet"/>
+
     <UI
     width ="50"
     height ="50"
@@ -40,6 +48,15 @@
     y ="125"
     image="Resources/UI/Bclose.png"/>
 
+
+
+      <Number
+width ="50"
+height ="50"
+x = "1900"
+y ="125"
+digit ="3"
+variable ="kill zombie"/>
     <UI
     width ="50"
     height ="50"
@@ -54,6 +71,15 @@
     y ="200"
     image="Resources/UI/Bclose.png"/>
 
+    
+      <Number
+width ="50"
+height ="50"
+x = "1900"
+y ="200"
+digit ="1"
+variable ="left skil"/>
+
     <UI
     width ="50"
     height ="50"
@@ -67,6 +93,14 @@
     x ="1840"
     y ="1000"
     image="Resources/UI/Bclose.png"/>
+    
+      <Number
+width ="50"
+height ="50"
+x = "1900"
+y ="1000"
+digit ="3"
+variable ="left zombie"/>
 
   <!-- <UI
   width ="200"
@@ -94,13 +128,9 @@ x = "960"
 y ="440"
 image="Resources/UI/HP_BAR.png"/>
 
-  <Number
-width ="50"
-height ="50"
-x = "1900"
-y ="50"
-digit ="3"
-variable ="left bullet"/>
+
+
+
       <!-- <UI
     width ="50"
     height ="50"
