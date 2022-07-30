@@ -56,15 +56,19 @@ public:
 	void AddUI(float width, float height, float x, float y, const wstring& image_file_name);
 	void AddProgressBar(float width, float height, float x, float y, const wstring& image_file_name);
 	void AddNumberUI(float width, float height, float x, float y, int digit, int* value_ptr = NULL);
-	void AddButtonUI(float width, float height, float x, float y, const wstring& image_file_name, function<void()> func);
+	void AddButtonUI(float width, float height, float x, float y, const wstring& image_file_name, function<void()> func, const wstring& name);
+	void AddUISetting(const string& file_name);
 
 	void CheckMouseCollision(float x, float y);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
+	void EnableButton(const wstring& name, bool is_enable);
 private:
 	ID3D12RootSignature* root_signagture = NULL;
 	CCamera* camera = NULL;
+
+	map<wstring, CGameObject*> variable_ui_map;
 };
 
 class ParticleSystem : public C2DShader {

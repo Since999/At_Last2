@@ -22,25 +22,37 @@ const map<wstring, int*>& CXMLReader::GetVariableMap()
 const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
 {
     if (!function_map.empty()) return function_map;
-    function_map.emplace(L"login", []() {
+    auto framework = CGameFramework::GetInstance();
+    auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
+    auto scene = framework->GetCurruntScene();
+    auto ui = framework->ui_system;
+
+    
+    CSelectScene* sel_scene = dynamic_cast<CSelectScene*>(scene);
+    function_map.emplace(L"login", [framework, sig]() {
        // network.Login();
-        auto framework = CGameFramework::GetInstance();
-        auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
         framework->ChangeScene(new CSelectScene(sig));
     });
-    function_map.emplace(L"game start", []() {
-        auto framework = CGameFramework::GetInstance();
-        auto sig = framework->GetCurruntScene()->GetGraphicsRootSignature();
+    function_map.emplace(L"game start", [framework, sig]() {
         framework->ChangeScene(new CMainGameScene(sig));
     });
-    function_map.emplace(L"select player 1", []() {
+    function_map.emplace(L"select player 1", [ui]() {
         network.Player_Select(PlayerType::COMMANDER);
+        ui->EnableButton(L"select player 1", false);
+        ui->EnableButton(L"select player 2", false);
+        ui->EnableButton(L"select player 3", false);
     });
-    function_map.emplace(L"select player 2", []() {
+    function_map.emplace(L"select player 2", [ui]() {
         network.Player_Select(PlayerType::ENGINEER);
+        ui->EnableButton(L"select player 1", false);
+        ui->EnableButton(L"select player 2", false);
+        ui->EnableButton(L"select player 3", false);    
     });
-    function_map.emplace(L"select player 3", []() {
+    function_map.emplace(L"select player 3", [ui]() {
         network.Player_Select(PlayerType::MERCENARY);
+        ui->EnableButton(L"select player 1", false);
+        ui->EnableButton(L"select player 2", false);
+        ui->EnableButton(L"select player 3", false);    
     });
     
     return function_map;
@@ -137,10 +149,10 @@ void CXMLReader::GetButtonUI(CMarkup& xml, UISystem* ui)
             cout << "Error (GetButtonUI): no such function in map." << endl;
             wcout << "\tstring: " << func_name << endl;
 #endif
-            ui->AddButtonUI(width, height, x, y, image_file_name, []() {});
+            ui->AddButtonUI(width, height, x, y, image_file_name, []() {}, func_name);
             continue;
         }
-        ui->AddButtonUI(width, height, x, y, image_file_name, (*found).second);
+        ui->AddButtonUI(width, height, x, y, image_file_name, (*found).second, func_name);
     }
 }
 

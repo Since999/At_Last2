@@ -68,6 +68,8 @@ public:
 	~CSelectScene(){}
 
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+
+	void PlayerSelected(int id);
 };
 
 class CMainGameScene : public CScene {

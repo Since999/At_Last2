@@ -65,6 +65,7 @@ public:
 	void StartEvent();
 
 	void AddCommand(const function<void()>& func);
+	void GpuCommand(const function<void()>& func);
 
 	float GetTotalTime();
 private:

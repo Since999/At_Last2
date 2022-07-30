@@ -787,7 +787,15 @@ void Network::ProcessPacket(unsigned char* ptr)
 		int id = packet->id;
 
 		g_client[id]._type = packet->playertype;
-
+		auto framework = CGameFramework::GetInstance();
+		framework->AddCommand([framework, id]() {
+			CScene* scene = framework->GetCurruntScene();
+			CSelectScene* select = dynamic_cast<CSelectScene*> (scene);
+			if (!select) return;
+			framework->GpuCommand([select, id]() {
+				select->PlayerSelected(id);
+			});
+		});
 		if (g_client[id]._type == PlayerType::COMMANDER)
 		{
 			g_client[id].special_skill = 1;

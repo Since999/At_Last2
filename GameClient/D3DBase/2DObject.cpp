@@ -391,6 +391,7 @@ CButtonUI::~CButtonUI()
 
 bool CButtonUI::CheckMouseCollision(float x, float y)
 {
+	if (!is_enable) return false;
 	if (collision_rect.CheckCollision(x, y)) {
 		button_func();
 		return true;
