@@ -56,7 +56,7 @@ height ="50"
 x = "1900"
 y ="125"
 digit ="3"
-variable ="kill zombie"/>
+variable ="kill"/>
     <UI
     width ="50"
     height ="50"
@@ -78,7 +78,7 @@ height ="50"
 x = "1900"
 y ="200"
 digit ="1"
-variable ="left skil"/>
+variable ="skil"/>
 
     <UI
     width ="50"
@@ -100,7 +100,7 @@ height ="50"
 x = "1900"
 y ="1000"
 digit ="3"
-variable ="left zombie"/>
+variable ="left zombies"/>
 
   <!-- <UI
   width ="200"
