@@ -405,13 +405,6 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		float y = (float)(m_ptOldCursorPos.y) / height;
 		y = 1 - y;
 		ui_system->CheckMouseCollision(x, y);
-
-		//Test
-		auto framework = CGameFramework::GetInstance();
-		framework->AddGpuCommand([framework]() {
-			framework->ui_system->AddUISetting("Resources/UI/popup_test.xml");
-		});
-		//Test
 	}
 		break;
 	case WM_RBUTTONDOWN:

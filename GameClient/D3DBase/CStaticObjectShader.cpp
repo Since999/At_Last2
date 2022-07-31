@@ -107,7 +107,7 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	textures.push_back(tex);
 	tex = CTexturePool::GetInstance()->GetTexture(L"UVmap.jpg");
 	textures.push_back(tex);
-	tex = CTexturePool::GetInstance()->GetTexture(L"no_texture.png");
+	tex = CTexturePool::GetInstance()->GetTexture(L"Mat_1.png");
 	textures.push_back(tex);
 	
 
@@ -151,7 +151,12 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		else {
 			static_object->Rotate(0.0f, bar_info.angle, 0.0f);
 		}
-		static_object->Scale(0.1f);
+		if (bar_info.b_type == BarricadeType::TREE) {
+			static_object->Scale(1.0f);
+		}
+		else {
+			static_object->Scale(0.1f);
+		}
 		//pRotatingObject->SetRotationAxis(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		//pRotatingObject->SetRotationSpeed(10.0f * (i % 10));
 		static_object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * cb_size));
@@ -211,30 +216,21 @@ void CStaticObjectShader::AddBarricade(const BarricadePos& barricade)
 {
 	CStaticObject* static_object = NULL;
 
-	auto tex = CTexturePool::GetInstance()->GetTexture(L"no_texture.png");
+	auto tex = CTexturePool::GetInstance()->GetTexture(L"Mat_1.png");
 
 	CMaterial* material = new CMaterial();
 	material->SetTexture(tex);
 
-	float bottom = -500.0f;
-	static_object = new CStaticObject(mesh.size());
-	static_object->SetNumberOfMeshes(mesh.size());
-	for (int j = 0; j < mesh.size(); ++j) {
-		static_object->SetMesh(j, mesh[j]);
-	}
+	static_object = new CStaticObject(1);
+	static_object->SetMesh(0, mesh[2]);
 
-	//pRotatingObject->SetMesh(0, pCubeMesh);
+	float bottom = -500.0f;
+
 	static_object->SetMaterial(material);
 	static_object->SetPosition(barricade.x, bottom, barricade.z);
 	static_object->Scale(0.1f);
 
 	static_object->Rotate(0.0f, barricade.angle, 0.0f);
-	//if (barricade.dir == DIR::WIDTH) {
-	//	static_object->Rotate(0.0f, 0.0f, 0.0f);
-	//}
-	//else {
-	//	static_object->Rotate(0.0f, 90.0f, 0.0f);
-	//}
 
 	static_object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * cb_size));
 	objects.push_back(static_object);
