@@ -152,7 +152,7 @@ void CStaticObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 			static_object->Rotate(0.0f, bar_info.angle, 0.0f);
 		}
 		if (bar_info.b_type == BarricadeType::TREE) {
-			static_object->Scale(1.0f);
+			static_object->Scale(0.3f);
 		}
 		else {
 			static_object->Scale(0.1f);
