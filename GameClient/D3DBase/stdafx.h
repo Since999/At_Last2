@@ -41,7 +41,6 @@
 
 extern Network network;
 
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 
 #include "d3dUtil.h"
 using namespace DirectX;
