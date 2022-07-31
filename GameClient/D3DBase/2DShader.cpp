@@ -5,12 +5,14 @@
 
 D3D12_SHADER_BYTECODE C2DShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSParticle", "vs_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/Shader_vs.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSParticle", "vs_5_1", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE C2DShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSParticle", "ps_5_1", ppd3dShaderBlob));
+	return LoadShader(L"shader/Shader_ps.cso", ppd3dShaderBlob);
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSParticle", "ps_5_1", ppd3dShaderBlob));
 }
 
 D3D12_BLEND_DESC C2DShader::CreateBlendState()
@@ -247,6 +249,14 @@ void UISystem::AddButtonUI(float width, float height, float x, float y, const ws
 	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
 	AddObject(object);
 	variable_ui_map.emplace(name, object);
+}
+
+void UISystem::AddPopupUI(float width, float height, float x, float y, const wstring& image_file_name, float time)
+{
+	CTexture* texture = GetTexture(image_file_name);
+	CMaterial* material = new CMaterial();
+	material->SetTexture(texture);
+	CGameObject* object;
 }
 
 void UISystem::AddUISetting(const string& file_name)

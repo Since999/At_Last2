@@ -126,3 +126,14 @@ public:
     void Enable(bool is_enable = true) { this->is_enable = is_enable; }
     void Disable() { this->is_enable = false; }
 };
+
+class CPopupUI : public CUIObject {
+private:
+    float duration;
+    float remain_time;
+    
+public:
+    CPopupUI(float width, float height, float x, float y, float duration, CMaterial* material = NULL);
+
+    virtual void Animate(float fTimeElapsed);
+};

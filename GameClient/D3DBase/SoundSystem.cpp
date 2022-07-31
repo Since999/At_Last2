@@ -28,6 +28,12 @@ CSoundSystem::CSoundSystem()
 	for (int i = 0; i < CHANNEL_VECTOR_SIZE; ++i) {
 		channels.push_back(channel);
 	}
+	system->createChannelGroup("bgm", &bgm_channel_group);
+	
+	system->getMasterChannelGroup(&master_group);
+	master_group->addGroup(bgm_channel_group);
+	master_group->setVolume(0.1f);
+	se_channel_group->setVolume(1.0f);
 	//iter = channels.begin();
 }
 
@@ -71,40 +77,26 @@ void CSoundSystem::Play(const wstring& name)
 	if (channels.size() <= channel_idx) {
 		channel_idx = 0;
 	}
-	system->playSound(sound.sound, 0, false, &channels[channel_idx++]);
+	system->playSound(sound.sound, se_channel_group, false, &channels[channel_idx++]);
 }
 
 void CSoundSystem::PlayBGM(const wstring& name)
 {
 	StopBGM();
 	auto& found = sound_pool.find(name);
-	if (found == sound_pool.end()) {
-#ifdef _DEBUG
-		wcout << "Error (CSoundSystem::Play): no such sound: " << name << endl;
-#endif
-		return;
-	}
-	CSound& sound = (*found).second;
-	auto& found_channel = channel_pool.find(L"bgm");
-	if (found_channel == channel_pool.end()) {
-#ifdef _DEBUG
-		wcout << "Error (CSoundSystem::Play): no such channel: " << sound.channel << endl;
-#endif
-		return;
-	}
-	system->playSound(sound.sound, 0, false, &((*found_channel).second));
+		if (found == sound_pool.end()) {
+	#ifdef _DEBUG
+			wcout << "Error (CSoundSystem::Play): no such sound: " << name << endl;
+	#endif
+			return;
+		}
+		CSound& sound = (*found).second;
+	system->playSound(sound.sound, bgm_channel_group, false, &bgm_channel);
 }
 
 void CSoundSystem::StopBGM()
 {
-	auto& found = channel_pool.find(L"bgm");
-	if (found == channel_pool.end()) {
-#ifdef _DEBUG
-		wcout << "Error (CSoundSystem::stopBGM): no bgm channel " << endl;
-#endif
-		return;
-	}
-	(*found).second->stop();
+	bgm_channel->stop();
 }
 
 //FMOD::Channel*& CSoundSystem::GetNextChannel()

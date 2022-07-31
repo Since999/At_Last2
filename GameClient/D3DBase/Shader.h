@@ -62,6 +62,9 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUSrvDescriptorStartHandle() { return(m_d3dSrvGPUDescriptorStartHandle); }
 
 protected:
+	D3D12_SHADER_BYTECODE LoadShader(const wstring& file_name, ID3DBlob** ppd3dShaderBlob);
+
+protected:
 	ID3D12PipelineState* m_pd3dPipelineState = NULL;
 
 	ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap = NULL;
@@ -160,3 +163,5 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 };
+
+ID3DBlob** LoadBinary(const std::wstring& filename, ID3DBlob** blob);

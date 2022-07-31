@@ -57,6 +57,7 @@ public:
 	void AddProgressBar(float width, float height, float x, float y, const wstring& image_file_name);
 	void AddNumberUI(float width, float height, float x, float y, int digit, int* value_ptr = NULL);
 	void AddButtonUI(float width, float height, float x, float y, const wstring& image_file_name, function<void()> func, const wstring& name);
+	void AddPopupUI(float width, float height, float x, float y, const wstring& image_file_name, float time);
 	void AddUISetting(const string& file_name);
 
 	void CheckMouseCollision(float x, float y);

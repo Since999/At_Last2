@@ -27,6 +27,11 @@ private:
 	unsigned int channel_idx = 0;
 	map<wstring, FMOD::Channel*> channel_pool;
 
+	FMOD::Channel* bgm_channel = NULL;
+
+	FMOD::ChannelGroup* bgm_channel_group = NULL;
+	FMOD::ChannelGroup* se_channel_group = NULL;
+	FMOD::ChannelGroup* master_group = NULL;
 public:
 	CSoundSystem();
 	~CSoundSystem();
@@ -36,6 +41,7 @@ public:
 	void PlayBGM(const wstring& name);
 	void StopBGM();
 	
+	int in = 0;
 private:
 	//FMOD::Channel*& GetNextChannel();
 };

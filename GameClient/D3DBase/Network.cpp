@@ -77,7 +77,7 @@ void Network::ReadMapFile()
 
 void Network::Initialize()
 {
-	CSoundSystem::GetInstance()->PlayBGM(L"test bgm");
+	Network::PlayBGM(L"test bgm");
 	ReadMapFile();
 
 	map_type = MapType::SPAWN;
@@ -656,7 +656,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			other._animation = ClientAnimationState::IDLE;
 		}
 
-		CSoundSystem::GetInstance()->PlayBGM(L"in game bgm");
+		Network::PlayBGM(L"in game bgm");
 		AddTimer(my_id, EVENT_TYPE::PLAYER_MOVE, 100);
 		//change to game scene
 		
@@ -689,7 +689,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 				new CBullet(pos, dir)); });
 		}
 
-		CSoundSystem::GetInstance()->Play(L"gun fire");
+		Network::PlaySE(L"gun fire");
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_KILL_NUMBER:
@@ -720,7 +720,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	case (int)MsgType::SC_PLAYER_RELOAD:
 	{
 		sc_player_reload_packet* packet = reinterpret_cast<sc_player_reload_packet*>(ptr);
-		CSoundSystem::GetInstance()->Play(L"gun reload");
+		Network::PlaySE(L"gun reload");
 
 		break;
 	}
@@ -1001,7 +1001,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_player_dead_packet* packet = reinterpret_cast<sc_player_dead_packet*>(ptr);
 
-		CSoundSystem::GetInstance()->Play(L"P_Death");
+		Network::PlaySE(L"P_Death");
 		
 		g_client[packet->id].hp = 0;
 		g_client[packet->id]._state = ClientState::DEAD;
@@ -1023,7 +1023,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_player_hp_packet* packet = reinterpret_cast<sc_player_hp_packet*>(ptr);
 
-		CSoundSystem::GetInstance()->Play(L"P_Attacked");
+		Network::PlaySE(L"P_Attacked");
 		
 		g_client[packet->id].hp = packet->hp;
 		g_client[packet->id]._animation = ClientAnimationState::ATTACKED;
@@ -1047,7 +1047,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 			r_zombie1[id].hp = packet->hp;
 			r_zombie1[id]._animation = ZombieAnimationState::ATTACKED;
-			CSoundSystem::GetInstance()->Play(L"zombie-hit");
+			Network::PlaySE(L"zombie-hit");
 			break;
 		}
 		case MapType::SECOND_PATH:
@@ -1056,7 +1056,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 			r_zombie2[id].hp = packet->hp;
 			r_zombie2[id]._animation = ZombieAnimationState::ATTACKED;
-			CSoundSystem::GetInstance()->Play(L"zombie-hit");
+			Network::PlaySE(L"zombie-hit");
 			break;
 		}
 		case MapType::FINAL_PATH:
@@ -1065,7 +1065,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 			r_zombie3[id].hp = packet->hp;
 			r_zombie3[id]._animation = ZombieAnimationState::ATTACKED;
-			CSoundSystem::GetInstance()->Play(L"zombie-hit");
+			Network::PlaySE(L"zombie-hit");
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
@@ -1074,7 +1074,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 			b_zombie1[id].hp = packet->hp;
 			b_zombie1[id]._animation = ZombieAnimationState::ATTACKED;
-			CSoundSystem::GetInstance()->Play(L"zombie-hit");
+			Network::PlaySE(L"zombie-hit");
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
@@ -1083,7 +1083,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 			b_zombie2[id].hp = packet->hp;
 			b_zombie2[id]._animation = ZombieAnimationState::ATTACKED;
-			CSoundSystem::GetInstance()->Play(L"zombie-hit");
+			Network::PlaySE(L"zombie-hit");
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
@@ -1092,7 +1092,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 			b_zombie3[id].hp = packet->hp;
 			b_zombie3[id]._animation = ZombieAnimationState::ATTACKED;
-			CSoundSystem::GetInstance()->Play(L"zombie-hit");
+			Network::PlaySE(L"zombie-hit");
 			break;
 		}
 		}
@@ -1232,11 +1232,11 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			if (packet->map_type == MapType::FIRST_PATH || packet->map_type == MapType::SECOND_PATH || packet->map_type == MapType::FINAL_PATH)
 			{
-				CSoundSystem::GetInstance()->PlayBGM(L"in game bgm");
+				Network::PlayBGM(L"in game bgm");
 			}
 			else if (packet->map_type == MapType::CHECK_POINT_ONE || packet->map_type == MapType::CHECK_POINT_TWO || packet->map_type == MapType::CHECK_POINT_FINAL)
 			{
-				CSoundSystem::GetInstance()->PlayBGM(L"wavw");
+				Network::PlayBGM(L"wavw");
 			}
 		}
 
@@ -1258,7 +1258,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie1[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie1[id]);
 
-			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
+			Network::PlaySE(L"zombie-spawn");
 			//CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie1[id]);
 			//cout << "r_zombie1 [ " << id << "] 의 좌표 x : " << packet->x << ", z : " << packet->z << ", 체력 hp : " << packet->hp << "\n";
 			//cout << "비교하기 위한 [ " << id << "]의 좌표 x : " << r_zombie1[id].x << ", z : " << r_zombie1[id].z << ", hp : " << r_zombie1[id].hp << "\n";
@@ -1278,7 +1278,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie2[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie2[id]);
 
-			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
+			Network::PlaySE(L"zombie-spawn");
 			//cout << "r_zombie2 [ " << id << "] 의 좌표 x : " << packet->x << ", z : " << packet->z << ", 체력 hp : " << packet->hp << "\n";
 			//cout << "비교하기 위한 [ " << id << "]의 좌표 x : " << r_zombie2[id].x << ", z : " << r_zombie2[id].z << ", hp : " << r_zombie2[id].hp << "\n";
 			break;
@@ -1297,7 +1297,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			r_zombie3[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie3[id]);
 
-			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
+			Network::PlaySE(L"zombie-spawn");
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
@@ -1314,7 +1314,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie1[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie1[id]);
 
-			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
+			Network::PlaySE(L"zombie-spawn");
 			//cout << "b_zombie1 [" << id << "] 의 좌표 x : " << packet->x << ", z : " << packet->z << ", 체력 hp : " << packet->hp << "\n";
 			//cout << "비교하기 위한 [ " << id << "]의 좌표 x : " << b_zombie1[id].x << ", z : " << b_zombie1[id].z << ", hp : " << b_zombie1[id].hp << "\n";
 
@@ -1334,7 +1334,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie2[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie2[id]);
 
-			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
+			Network::PlaySE(L"zombie-spawn");
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
@@ -1351,7 +1351,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 			b_zombie3[id].angle = packet->angle;
 			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie3[id]);
 
-			CSoundSystem::GetInstance()->Play(L"zombie-spawn");
+			Network::PlaySE(L"zombie-spawn");
 			break;
 		}
 		}
@@ -1721,42 +1721,42 @@ void Network::ProcessPacket(unsigned char* ptr)
 		{
 			r_zombie1[id]._animation = ZombieAnimationState::DEAD;
 			r_zombie1[id]._state = ZombieState::DEAD;
-			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
+			Network::PlaySE(L"zombie-death-2");
 			break;
 		}
 		case MapType::SECOND_PATH:
 		{
 			r_zombie2[id]._animation = ZombieAnimationState::DEAD;
 			r_zombie2[id]._state = ZombieState::DEAD;
-			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
+			Network::PlaySE(L"zombie-death-2");
 			break;
 		}
 		case MapType::FINAL_PATH:
 		{
 			r_zombie3[id]._animation = ZombieAnimationState::DEAD;
 			r_zombie3[id]._state = ZombieState::DEAD;
-			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
+			Network::PlaySE(L"zombie-death-2");
 			break;
 		}
 		case MapType::CHECK_POINT_ONE:
 		{
 			b_zombie1[id]._animation = ZombieAnimationState::DEAD;
 			b_zombie1[id]._state = ZombieState::DEAD;
-			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
+			Network::PlaySE(L"zombie-death-2");
 			break;
 		}
 		case MapType::CHECK_POINT_TWO:
 		{
 			b_zombie2[id]._animation = ZombieAnimationState::DEAD;
 			b_zombie2[id]._state = ZombieState::DEAD;
-			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
+			Network::PlaySE(L"zombie-death-2");
 			break;
 		}
 		case MapType::CHECK_POINT_FINAL:
 		{
 			b_zombie3[id]._animation = ZombieAnimationState::DEAD;
 			b_zombie3[id]._state = ZombieState::DEAD;
-			CSoundSystem::GetInstance()->Play(L"zombie-death-2");
+			Network::PlaySE(L"zombie-death-2");
 			break;
 		}
 		}
@@ -2401,4 +2401,18 @@ void Network::SetZombieInfo(Zombie* zombie, sc_zombie_move_packet* packet)
 	//CGameFramework::GetInstance()->AddCommand([zombie, packet]() {
 	//	zombie.AddMove(packet->x, packet->z);
 	//});
+}
+
+void Network::PlayBGM(const wstring& name)
+{
+	CGameFramework::GetInstance()->AddCommand([name]() {
+		CSoundSystem::GetInstance()->PlayBGM(name);
+	});
+}
+
+void Network::PlaySE(const wstring& name)
+{
+	CGameFramework::GetInstance()->AddCommand([name]() {
+		CSoundSystem::GetInstance()->Play(name);
+	});
 }
