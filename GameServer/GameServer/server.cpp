@@ -36,6 +36,8 @@ int Server::remain_zombie_num;
 
 char Server::select_type;
 
+atomic_bool Server::game_end;
+
 Server::Server()
 {
 	wcout.imbue(locale("korean"));
@@ -62,6 +64,7 @@ Server::~Server()
 void Server::Initialize()
 {
 	game_timer.Start();
+	game_end = false;
 
 	select_type = 0;
 
@@ -98,7 +101,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(temp.z - One_Road_Pos.z);
 		npc.zombie->astar.Set_Map_Width(temp.x - One_Road_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -113,7 +116,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(temp.z - Two_Road_Pos.z);
 		npc.zombie->astar.Set_Map_Width(temp.x - Two_Road_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -128,7 +131,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(temp.z - Three_Road_Pos.z);
 		npc.zombie->astar.Set_Map_Width(temp.x - Three_Road_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -140,7 +143,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(One_Base_End_Pos.z - One_Base_Pos.z);
 		npc.zombie->astar.Set_Map_Width(One_Base_End_Pos.x - One_Base_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -152,7 +155,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(TWO_Base_End_Pos.z - TWO_Base_Pos.z);
 		npc.zombie->astar.Set_Map_Width(TWO_Base_End_Pos.x - TWO_Base_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 
@@ -164,7 +167,7 @@ void Server::Initialize()
 		npc.zombie->astar.Set_Map_Height(THREE_Base_End_Pos2.z - THREE_Base_Pos.z);
 		npc.zombie->astar.Set_Map_Width(THREE_Base_End_Pos2.x - THREE_Base_Pos.x);
 		npc.zombie->astar.Map(as_map);
-		//npc.zombie->astar.Init();
+		npc.zombie->astar.Init();
 		npc.zombie->z_move_lock.unlock();
 	}
 }
@@ -1139,6 +1142,7 @@ void Server::Send_commander_skill_check_packet(int c_id, int s_id)
 
 void Server::CommanderSpecialSkill(Client& cl)
 {
+	bool check = false;
 	for (auto& other : g_clients)
 	{
 		if (other._id == cl._id)
@@ -1153,10 +1157,14 @@ void Server::CommanderSpecialSkill(Client& cl)
 
 		if (Distance(cl.player->x, cl.player->z, other.player->x, other.player->z) <= 3.0f)
 		{
+			check = true;
 			ResurrectionPlayer(other);
 		}
 
 	}
+
+	if(check)
+		cl.player->special_skill -= 1;
 }
 
 bool Server::EngineerSpecialSkillZombieCheck(int x, int z, Direction dir, NPC& npc)
@@ -1726,7 +1734,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 				npc.zombie->astar.Map(as_map);
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 		else if (map_type == MapType::CHECK_POINT_TWO)
@@ -1737,7 +1745,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 				npc.zombie->astar.Map(as_map);
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 		else if (map_type == MapType::CHECK_POINT_FINAL)
@@ -1748,9 +1756,11 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 				npc.zombie->astar.Map(as_map);
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
+
+		cl.player->special_skill -= 1;
 
 		for (auto& other : g_clients)
 		{
@@ -1767,9 +1777,34 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 }
 
+void Server::Send_mer_skill_packet(int c_id)
+{
+	sc_mer_attack_packet packet;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_MERCENARY_SPECIAL;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void Server::Send_mer_skill_end_packet(int c_id)
+{
+	sc_mer_attack_packet packet;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_MERCENARY_SPECIAL_END;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
+}
+
 void Server::MercenarySpecialSkill(Client& cl)
 {
+	if (cl.player->special_check == false)
+	{
+		cl.player->special_check = true;
 
+		cl.player->attack = 20;
+		Send_mer_skill_packet(cl._id);
+		cl.player->special_skill -= 1;
+
+		AddTimer(cl._id, EVENT_TYPE::EVENT_MER_SKILL_END, 10000);
+	}
 }
 
 void Server::Send_gm_change_map_packet(int c_id, int s_id, int x, int z)
@@ -2332,14 +2367,62 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			}
 		}
 
+		bool con = false;
 		// 이동했을 때 기본에 있었는데 가까운데에 없어졌다면
 		for (auto& zom : cl_z_list)	// 전 리스트
 		{
 			if (0 == near_zombie_list.count(zom))	// 근데 지금 없다면?
 			{
+				con = false;
+
 				cl.list_lock.lock();
 				cl.zombie_list.erase(zom);
 				cl.list_lock.unlock();
+
+				switch (map_type)
+				{
+				case MapType::FIRST_PATH:
+				{
+					if (r_zombie1[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::SECOND_PATH:
+				{
+					if (r_zombie2[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::FINAL_PATH:
+				{
+					if (r_zombie3[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::CHECK_POINT_ONE:
+				{
+					if (b_zombie1[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::CHECK_POINT_TWO:
+				{
+					if (b_zombie2[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				case MapType::CHECK_POINT_FINAL:
+				{
+					if (b_zombie3[zom]._state == ZombieState::DEAD)
+						con = true;
+					break;
+				}
+				}
+
+				if (con)
+				{
+					continue;
+				}
 
 				Send_viewlist_remove_packet(cl._id, zom, cl.map_type);
 			}
@@ -3220,9 +3303,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 
 				AddTimer(i, EVENT_TYPE::EVENT_NPC_MOVE, 667);
 			}
-			else
-			{
-			}
 		}
 
 		if (spawn) {
@@ -3289,10 +3369,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 				//cout << i << "번째 거점 좀비가 x : " << b_zombie2[i].zombie->GetX() << ", z : " << b_zombie2[i].zombie->GetZ() << "에 출현하였습니다 \n";
 				AddTimer(i, EVENT_TYPE::EVENT_NPC_MOVE, 667);
 			}
-			else
-			{
-				cout << "이미 스폰되어 있거나 죽어 있습니다.(그럴 수 없는데?) \n";
-			}
 		}
 
 		if (spawn) {
@@ -3357,10 +3433,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 				}
 				//cout << i << "번째 거점 좀비가 x : " << b_zombie3[i].zombie->GetX() << ", z : " << b_zombie3[i].zombie->GetZ() << "에 출현하였습니다 \n";
 				AddTimer(i, EVENT_TYPE::EVENT_NPC_MOVE, 667);
-			}
-			else
-			{
-				cout << "이미 스폰되어 있거나 죽어 있습니다.(그럴 수 없는데?) \n";
 			}
 		}
 
@@ -3443,10 +3515,10 @@ void Server::Send_zombie_all_kill_packet(int c_id, MapType m_type)
 void Server::ZombieAllKill(NPC& npc)
 {
 	npc._state = ZombieState::DEAD;
-	npc.zombie->astar.Delete();
-
-	delete npc.zombie;
-	npc.zombie = nullptr;
+	npc.zombie->astar.New_Delete();
+	remain_zombie_num = 0;
+	//delete npc.zombie;
+	//npc.zombie = nullptr;
 
 	for (auto& cl : g_clients)
 	{
@@ -3463,20 +3535,43 @@ void Server::ZombieAllKill(NPC& npc)
 			cl.list_lock.lock();
 			cl.zombie_list.erase(npc._id);
 			cl.list_lock.unlock();
+		
+		//	Send_viewlist_remove_packet(cl._id, npc._id, map_type);
+		}
+		Send_zombie_number_packet(cl._id, remain_zombie_num);
+	}
 
-			Send_viewlist_remove_packet(cl._id, npc._id, map_type);
+	if (map_type == MapType::CHECK_POINT_FINAL)
+	{
+		if (remain_zombie_num == 0 && game_end == false)
+		{
+			game_end = true;
+			for (auto& all : g_clients)
+			{
+				if (all._state != ClientState::INGAME) continue;
+
+				Send_game_end_packet(all._id);
+			}
 		}
 	}
+}
+
+void Server::Send_game_end_packet(int c_id)
+{
+	sc_win_state_packet packet;
+	packet.size = sizeof(packet);
+	packet.type = MsgType::SC_WIN_STATE;
+	g_clients[c_id].do_send(sizeof(packet), &packet);
 }
 
 void Server::ZombieDead(NPC& npc, MapType m_type)
 {
 	npc._state = ZombieState::DEAD;
-	npc.zombie->astar.Delete();
+	npc.zombie->astar.New_Delete();
 	remain_zombie_num--;
 
-	delete npc.zombie;
-	npc.zombie = nullptr;
+	//delete npc.zombie;
+	//npc.zombie = nullptr;
 	
 	//r_zombie1[z_id].state_lock.unlock();
 
@@ -3495,9 +3590,23 @@ void Server::ZombieDead(NPC& npc, MapType m_type)
 			cl.zombie_list.erase(npc._id);
 			cl.list_lock.unlock();
 
-			Send_viewlist_remove_packet(cl._id, npc._id, map_type);
+			//Send_viewlist_remove_packet(cl._id, npc._id, map_type);
 		}
 		Send_zombie_number_packet(cl._id, remain_zombie_num);
+	}
+
+	if (map_type == MapType::CHECK_POINT_FINAL)
+	{
+		if (remain_zombie_num == 0 && game_end == false)
+		{
+			game_end = true;
+			for (auto& all : g_clients)
+			{
+				if (all._state != ClientState::INGAME) continue;
+
+				Send_game_end_packet(all._id);
+			}
+		}
 	}
 }
 
@@ -4176,11 +4285,23 @@ void Server::Work()
 			exp_over = nullptr;
 		}
 			break;
+		case IOType::MER_SKILL_END:
+		{
+			g_clients[c_id].player->special_check = false;
+			g_clients[c_id].player->attack = 7;
+
+			Send_mer_skill_end_packet(c_id);
+
+			delete exp_over;
+			exp_over = nullptr;
+		}
+		break;
 		default:
 			cout << "이건 아무것도 아님 \n";
 		}
 	}
 }
+
 
 void Server::Send_zombie_search_packet(int c_id, int s_id, int z_id, MapType m_type)
 {
@@ -4250,7 +4371,6 @@ void Server::SearchZombieAstar(int col, int row, Client& cl, NPC& npc)
 	cl.move_lock.unlock();
 
 	stack<AS_Node*> temp;
-
 	temp = npc.zombie->astar.AstartSearch(col, row, player_x, player_z);
 
 	npc.zombie->z_move_lock.lock();
@@ -4261,6 +4381,8 @@ void Server::SearchZombieAstar(int col, int row, Client& cl, NPC& npc)
 void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 {
 	auto s_time = chrono::system_clock::now();
+
+	//cout << "좀비의 위치는 x : " << npc.zombie->GetX() << ", z : " << npc.zombie->GetZ() << "\n";
 
 	// 좀비가 SPAWN 상태가 아니라면 움직일 수 없으니 돌아가라
 	if (npc._state != ZombieState::SPAWN)
@@ -4305,7 +4427,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 				if (npc.zombie->root.size() == 0)
 				{
 					npc.astar_check = false;
-					npc.zombie->astar.Delete();
+					npc.zombie->astar.New_Delete();
 				}
 				else
 					npc.astar_check = true;
@@ -4313,7 +4435,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			else
 			{
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 		else if (root_path[1] < root_path[0] && root_path[1] < root_path[2])
@@ -4324,7 +4446,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 				if (npc.zombie->root.size() == 0)
 				{
 					npc.astar_check = false;
-					npc.zombie->astar.Delete();
+					npc.zombie->astar.New_Delete();
 				}
 				else
 					npc.astar_check = true;
@@ -4332,7 +4454,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			else
 			{
 				npc.astar_check = false;
-				npc.zombie->astar.Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 		else if (root_path[2] < root_path[1] && root_path[2] < root_path[0])
@@ -4343,7 +4465,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 				if (npc.zombie->root.size() == 0)
 				{
 					npc.astar_check = false;
-					npc.zombie->astar.Delete();
+					npc.zombie->astar.New_Delete();
 				}
 				else
 					npc.astar_check = true;
@@ -4351,7 +4473,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			else
 			{
 				npc.astar_check = false;
-			//	npc.zombie->astar.Delete();
+			//	npc.zombie->astar.New_Delete();
 			}
 		}
 		else
@@ -4364,7 +4486,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 
 	if (npc.zombie->root.size() == 1)
 	{
-		npc.zombie->astar.Delete();
+		npc.zombie->astar.New_Delete();
 		npc.astar_check = false;
 	}
 
@@ -4398,13 +4520,13 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			if (move_check != MoveResult::MOVE)
 			{
 				npc.astar_check = false;
-			//	npc.zombie->astar.Delete();
+			//	npc.zombie->astar.New_Delete();
 			}
 		}
 		else
 		{
 			npc.astar_check = false;
-			npc.zombie->astar.Delete();
+			npc.zombie->astar.New_Delete();
 		}
 
 		// Astar대로 이동에 성공
@@ -4497,7 +4619,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 						{
 							//npc.search_lock.lock();
 							npc.astar_check = false;
-							npc.zombie->astar.Delete();
+							npc.zombie->astar.New_Delete();
 							npc.search_check = true;
 							//npc.search_lock.unlock();
 
@@ -4714,7 +4836,16 @@ void Server::Do_Timer()
 				PostQueuedCompletionStatus(t_iocp, 1, te.obj_id, &over->_wsa_over);
 			}
 				break;
+			case EVENT_TYPE::EVENT_MER_SKILL_END:
+			{
+				Exp_Over* over = new Exp_Over;
+				over->_IOType = IOType::MER_SKILL_END;
+				HANDLE& t_iocp = _socket.ReturnHandle();
+				PostQueuedCompletionStatus(t_iocp, 1, te.obj_id, &over->_wsa_over);
 			}
+			break;
+			}
+
 		}
 	}
 }

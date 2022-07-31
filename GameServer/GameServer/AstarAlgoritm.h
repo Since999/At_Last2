@@ -27,6 +27,7 @@ public:
 	void Init();
 	void New_Init();
 	void Delete();
+	void New_Delete();
 	void Close_List_Delete() { close_list.NodeDelete(); };
 	void Near_Node_Connect();
 	void Map(AS_Map& map) { as_map = map; };

@@ -16,6 +16,7 @@ public:
 	DIR special_dir;
 	Direction dir;
 	int kill_zombie;
+	atomic_bool special_check;
 
 public:
 	Player();
@@ -31,14 +32,6 @@ class Client
 public:
 	char player_name[MAX_NAME_SIZE];
 	int _id;
-	
-	//mutex state_lock;
-	//mutex type_lock;
-	//mutex start_lock;
-	//mutex map_lock;
-	//mutex attack_lock;
-	//mutex bullet_lock;
-	//mutex hp_lock;
 	
 	mutex move_lock;
 	mutex list_lock;

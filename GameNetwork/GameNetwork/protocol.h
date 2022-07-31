@@ -35,7 +35,7 @@ const int MAX_NAME_SIZE = 20;					// ÇÃ·¹ÀÌ¾î ÀÌ¸§ ±æÀÌ
 
 const int ROAD_ZOMBIE_NUM = 20;
 
-const int FIRST_CHECK_POINT_ZOMBIE_NUM = 100;
+const int FIRST_CHECK_POINT_ZOMBIE_NUM = 1;
 const int TWO_CHECK_POINT_ZOMBIE_NUM = 150;
 const int THREE_CHECK_POINT_ZOMBIE_NUM = 200;
 
@@ -64,7 +64,8 @@ enum class IOType : char
 	NPC_DEAD,
 	NPC_SEND,
 	DOOR_OPEN,
-	PLAYER_MOVE
+	PLAYER_MOVE,
+	MER_SKILL_END
 };
 
 enum class ClientState : char
@@ -139,7 +140,7 @@ enum class MsgType : char							// ¼­¹ö¿¡¼­ º¸³»´Â ¸Ş¼¼Áö Çü½Ä
 	SC_ENGINEER_SPECIAL_CHECK,				// ÇÃ·¹ÀÌ¾î(¿£Áö´Ï¾î) Æ¯¼ö ´É·Â »ç¿ë Ã¼Å©
 	SC_ENGINEER_SPECIAL_BUILD_FAIL,		// ÇÃ·¹ÀÌ¾î(¿£Áö´Ï¾î) Æ¯¼ö ´É·Â ºôµå ½ÇÆĞ
 	SC_MERCENARY_SPECIAL,						// ÇÃ·¹ÀÌ¾î(¿ëº´) Æ¯¼ö ´É·Â »ç¿ë
-	SC_MERCENARY_SPECIAL_CHECK,			// ÇÃ·¹ÀÌ¾î(¿ëº´) Æ¯¼ö ´É·Â »ç¿ë Ã¼Å©
+	SC_MERCENARY_SPECIAL_END,			// ÇÃ·¹ÀÌ¾î(¿ëº´) Æ¯¼ö ´É·Â »ç¿ë Ã¼Å©
 	SC_PLAYER_SPECIAL_NUM_ZERO,			// ÇÃ·¹ÀÌ¾î Æ¯¼ö ´É·Â »ç¿ë·® Á¦·Î ÀÌ¸é
 	SC_PLAYER_DEAD,									// ÇÃ·¹ÀÌ¾î »ç¸Á
 	SC_PLAYER_SEARCH,								// ÇÃ·¹ÀÌ¾î ÁÖº¯ »ç¹° Á¢±Ù È®ÀÎ
@@ -199,13 +200,6 @@ enum class ObjectState : char						// ¿ÀºêÁ§Æ® »óÅÂ
 	NORMAL,												// ¸ÖÂÄÇÑ ¿ÀºêÁ§Æ®
 	BIT_BREAK,											// ¾à°£ ºÎ¼­Áø ¿ÀºêÁ§Æ®
 	BREAK													// ºÎ¼­Áø ¿ÀºêÁ§Æ®
-};
-
-enum class WinGameState : char
-{
-	NONE,													// °ÔÀÓÀÌ ÁøÇà Áß
-	WIN_PLAYER,											// ÇÃ·¹ÀÌ¾î°¡ Å»Ãâ¿¡ ¼º°øÇÏ¸é
-	LOSE_PLAYER										// ¸ğµç ÇÃ·¹ÀÌ¾î°¡ Á×°Å³ª, Å»Ãâ¿¡ ½ÇÆĞÇÏ¸é
 };
 
 enum class Direction : char
@@ -538,6 +532,12 @@ struct sc_engineer_barrigate_build_packet		// ¼­¹ö¿¡¼­ ¿£Áö´Ï¾î°¡ Æ¯¼ö´É·Â »ç¿ëÇ
 	Direction dir;											// ¹æÇâ
 };
 
+struct sc_mer_attack_packet							// ¼­¹ö¿¡¼­ ¿ëº´ÀÌ °ø°İ·Â º¯°æ µÇ¾ú´Ù°í ¾Ë·ÁÁÖ´Â ÆĞÅ¶
+{
+	unsigned short size;
+	MsgType type;
+};
+
 struct sc_player_attack_packet						// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ğÆ®¿¡°Ô ´©°¡ °ø°İÇÏ°í ÀÖ´ÂÁö ¾Ë·ÁÁÖ±â
 {
 	unsigned short size;
@@ -683,7 +683,6 @@ struct sc_win_state_packet							// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ğÆ®¿¡°Ô °ÔÀÓ °á°ú »óÅÂ ¾Ë·ÁÁ
 {
 	unsigned short size;
 	MsgType type;										// ¸Ş½ÃÁö Å¸ÀÔ WIN_STATE
-	WinGameState state;								// °ÔÀÓ »óÅÂ È®ÀÎ
 };
 
 struct sc_search_packet								// ¼­¹ö¿¡¼­ Å¬¶óÀÌ¾ğÆ®°¡ ¹® ¶Ç´Â ¿ÀºêÁ§Æ® µîÀ» ¹ß°ßÇßÀ» ¶§ ³»¿ë Àü´Ş

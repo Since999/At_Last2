@@ -13,7 +13,8 @@ struct BarricadePos {
 
 enum class EVENT_TYPE : char
 {
-	PLAYER_MOVE
+	PLAYER_MOVE,
+	ZOMBIE_DEAD
 };
 
 struct Timer_Event
@@ -108,6 +109,7 @@ public:
 	static void ZombieMove(Zombie& zombie, float time_elapsed);
 	static void ZombieAngle(Zombie& zombie, float time_elapsed);
 	static void ChangeWall(iPos pos, ANGLE angle);
+	static void ZombieDead(int z_id);
 	template<typename Arr>
 	static void UpdateZombies(Arr& arr, float time_elapsed);
 	static void SetZombieInfo(Zombie* zombie, sc_zombie_move_packet* packet);
