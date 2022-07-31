@@ -5,6 +5,7 @@
 #include "GameFramework.h"
 #include "Configuration.h"
 #include "Bullet.h"
+#include "2DShader.h"
 
 Socket Network::_socket;
 array<Client, MAX_PLAYER> Network::g_client;
@@ -961,7 +962,10 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL:
 	{
-		cout << "해당 지역에 지을 수 없습니다. \n";
+		auto framework = CGameFramework::GetInstance();
+		framework->AddGpuCommand([framework]() {
+			framework->ui_system->AddUISetting("Resources/UI/build_fail.xml");
+			});
 
 		break;
 	}
@@ -1087,7 +1091,12 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_WIN_STATE:
 	{
-		cout << "와 이겼다 ㅅㅅㅅㅅ \n";
+		Network::PlayBGM(L"ending");
+
+		auto framework = CGameFramework::GetInstance();
+		framework->AddGpuCommand([framework]() {
+			framework->ui_system->AddUISetting("Resources/UI/ending.xml");
+			});
 
 		break;
 	}
