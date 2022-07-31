@@ -2,10 +2,10 @@
 <UISystem>
   
   <Popup
-    width ="50"
-    height ="50"
-    x ="1750"
-    y ="50"
+    width ="1000"
+    height ="70"
+    x ="950"
+    y ="800"
     duration ="1.0"
     image="Resources/UI/build_fail.png"/>
 
