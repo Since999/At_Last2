@@ -76,11 +76,6 @@ void CZombieStateMachine::Update(float time_elapsed)
 	auto object_info = ((CZombie*)object)->GetZombie();
 	float dead_time = 29.999f;
 
-	if (object_info->_animation == ZombieAnimationState::DEAD) {
-		anim_state = object_info->_animation;
-		ChangeAniWithBlend(ANIMATION_INDEX::DEAD, model->GetBoneMat());
-	}
-
 	switch (anim_state) {
 	case ZombieAnimationState::ATTACK:
 	case ZombieAnimationState::ATTACKED:

@@ -679,8 +679,8 @@ void CGameFramework::FrameAdvance()
 	}
 	LeaveCriticalSection(&crit);
 
-	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
-	::SetWindowText(m_hWnd, m_pszFrameRate);
+	//m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
+	//::SetWindowText(m_hWnd, m_pszFrameRate);
 }
 
 void CGameFramework::ShadowMapRender()
