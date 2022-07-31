@@ -142,12 +142,12 @@ void CZombieStateMachine::PrintAnim()
 	{
 		auto& found = anim_map.find(anim_state);
 		if (found == anim_map.end()) return;
-		cout << "anim state: " << (*found).second << endl;
+		//cout << "anim state: " << (*found).second << endl;
 	}
 	{
 		auto& found = anim_map.find(((CZombie*)object)->GetZombie()->_animation);
 		if (found == anim_map.end()) return;
-		cout << "server anim state: " << (*found).second << endl;
+		//cout << "server anim state: " << (*found).second << endl;
 	}
 }
 

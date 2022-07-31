@@ -20,7 +20,8 @@ void Zombie::SetInfo(sc_zombie_move_packet* packet)
 	//if (abs(arr[id].x - packet->x) + abs(arr[id].z - packet->z) > 0.2f) {
 	//arr[id].x = packet->x;
 	//arr[id].z = packet->z;
-	//	cout << "ÁÂÇ¥ ¹Ù²ñ" << endl;
+	//	
+	//  << "ÁÂÇ¥ ¹Ù²ñ" << endl;
 	//}
 
 	speed = packet->speed;

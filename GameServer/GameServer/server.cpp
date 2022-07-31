@@ -622,7 +622,7 @@ void Server::ChangeMapType(Client& cl)
 		change = MapType::CHECK_POINT_ONE;
 		cl.map_type = MapType::CHECK_POINT_ONE;
 		Send_zombie_number_packet(cl._id, FIRST_CHECK_POINT_ZOMBIE_NUM);
-		if (MapCheck(MapType::FIRST_PATH))
+		if (MapCheck(MapType::CHECK_POINT_ONE))
 		{
 			remain_zombie_num = FIRST_CHECK_POINT_ZOMBIE_NUM;
 		}
@@ -633,7 +633,7 @@ void Server::ChangeMapType(Client& cl)
 		change = MapType::CHECK_POINT_TWO;
 		cl.map_type = MapType::CHECK_POINT_TWO;
 		Send_zombie_number_packet(cl._id, TWO_CHECK_POINT_ZOMBIE_NUM);
-		if (MapCheck(MapType::FIRST_PATH))
+		if (MapCheck(MapType::CHECK_POINT_TWO))
 		{
 			remain_zombie_num = TWO_CHECK_POINT_ZOMBIE_NUM;
 		}
@@ -644,7 +644,7 @@ void Server::ChangeMapType(Client& cl)
 		change = MapType::CHECK_POINT_FINAL;
 		cl.map_type = MapType::CHECK_POINT_FINAL;
 		Send_zombie_number_packet(cl._id, THREE_CHECK_POINT_ZOMBIE_NUM);
-		if (MapCheck(MapType::FIRST_PATH))
+		if (MapCheck(MapType::CHECK_POINT_FINAL))
 		{
 			remain_zombie_num = THREE_CHECK_POINT_ZOMBIE_NUM;
 		}
@@ -655,7 +655,7 @@ void Server::ChangeMapType(Client& cl)
 		change = MapType::SECOND_PATH;
 		cl.map_type = MapType::SECOND_PATH;
 		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
-		if (MapCheck(MapType::FIRST_PATH))
+		if (MapCheck(MapType::SECOND_PATH))
 		{
 			remain_zombie_num = ROAD_ZOMBIE_NUM;
 		}
@@ -666,7 +666,7 @@ void Server::ChangeMapType(Client& cl)
 		change = MapType::FINAL_PATH;
 		cl.map_type = MapType::FINAL_PATH;
 		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
-		if (MapCheck(MapType::FIRST_PATH))
+		if (MapCheck(MapType::FINAL_PATH))
 		{
 			remain_zombie_num = ROAD_ZOMBIE_NUM;
 		}
@@ -994,10 +994,10 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 	{
 		//zom.zombie->z_attack_lock.lock();
 		hp -= cl.player->attack;
-		if (hp <= 0)
+		if (hp <= 0 && npc._state == ZombieState::SPAWN)
 		{
 			hp = 0;
-			AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_DEAD, 1000);
+			AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_DEAD, 0);
 			
 			//ZombieDead(npc, m_type);
 			cl.player->kill_zombie += 1;
@@ -2763,8 +2763,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
-		remain_zombie_num = ROAD_ZOMBIE_NUM;
-
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 43.0f;
@@ -2772,12 +2770,12 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		}
 		else if (cl._type == PlayerType::ENGINEER)
 		{
-			cl.player->x = 44.0f;
+			cl.player->x = 45.0f;
 			cl.player->z = 91.0f;
 		}
 		else if (cl._type == PlayerType::MERCENARY)
 		{
-			cl.player->x = 45.0f;
+			cl.player->x = 47.0f;
 			cl.player->z = 91.0f;
 		}
 
@@ -2797,8 +2795,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
-		remain_zombie_num = ROAD_ZOMBIE_NUM;
-
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 323.0f;
@@ -2807,12 +2803,12 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		else if (cl._type == PlayerType::ENGINEER)
 		{
 			cl.player->x = 323.0f;
-			cl.player->z = 339.0f;
+			cl.player->z = 340.0f;
 		}
 		else if (cl._type == PlayerType::MERCENARY)
 		{
 			cl.player->x = 323.0f;
-			cl.player->z = 340.0f;
+			cl.player->z = 342.0f;
 		}
 
 		for (auto& a_cl : g_clients)
@@ -2831,8 +2827,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
-		remain_zombie_num = ROAD_ZOMBIE_NUM;
-
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 634.0f;
@@ -2841,12 +2835,12 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		else if (cl._type == PlayerType::ENGINEER)
 		{
 			cl.player->x = 634.0f;
-			cl.player->z = 339.0f;
+			cl.player->z = 340.0f;
 		}
 		else if (cl._type == PlayerType::MERCENARY)
 		{
 			cl.player->x = 634.0f;
-			cl.player->z = 340.0f;
+			cl.player->z = 342.0f;
 		}
 
 		for (auto& a_cl : g_clients)
@@ -2865,21 +2859,19 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
-		remain_zombie_num = FIRST_CHECK_POINT_ZOMBIE_NUM;
-
 		if (cl._type == PlayerType::COMMANDER)
 		{
-			cl.player->x = 200.0f;
+			cl.player->x = 202.0f;
 			cl.player->z = 244.0f;
 		}
 		else if (cl._type == PlayerType::ENGINEER)
 		{
-			cl.player->x = 201.0f;
+			cl.player->x = 204.0f;
 			cl.player->z = 244.0f;
 		}
 		else if (cl._type == PlayerType::MERCENARY)
 		{
-			cl.player->x = 202.0f;
+			cl.player->x = 206.0f;
 			cl.player->z = 244.0f;
 		}
 
@@ -2899,22 +2891,20 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
-		remain_zombie_num = TWO_CHECK_POINT_ZOMBIE_NUM;
-
 		if (cl._type == PlayerType::COMMANDER)
 		{
-			cl.player->x = 512.0f;
+			cl.player->x = 513.0f;
 			cl.player->z = 338.0f;
 		}
 		else if (cl._type == PlayerType::ENGINEER)
 		{
-			cl.player->x = 512.0f;
-			cl.player->z = 339.0f;
+			cl.player->x = 513.0f;
+			cl.player->z = 340.0f;
 		}
 		else if (cl._type == PlayerType::MERCENARY)
 		{
-			cl.player->x = 512.0f;
-			cl.player->z = 340.0f;
+			cl.player->x = 513.0f;
+			cl.player->z = 342.0f;
 		}
 
 		for (auto& a_cl : g_clients)
@@ -2933,22 +2923,20 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			break;
 		}
 
-		remain_zombie_num = THREE_CHECK_POINT_ZOMBIE_NUM;
-
 		if (cl._type == PlayerType::COMMANDER)
 		{
-			cl.player->x = 823.0f;
+			cl.player->x = 825.0f;
 			cl.player->z = 338.0f;
 		}
 		else if (cl._type == PlayerType::ENGINEER)
 		{
-			cl.player->x = 823.0f;
-			cl.player->z = 339.0f;
+			cl.player->x = 825.0f;
+			cl.player->z = 340.0f;
 		}
 		else if (cl._type == PlayerType::MERCENARY)
 		{
-			cl.player->x = 823.0f;
-			cl.player->z = 340.0f;
+			cl.player->x = 825.0f;
+			cl.player->z = 342.0f;
 		}
 
 		for (auto& a_cl : g_clients)
@@ -3174,6 +3162,8 @@ float Server::ZombieSetAngle(NPC& npc, Client& cl)
 
 void Server::ChangeRoadZombieStateToSpawn(NPC& npc)
 {
+
+
 	bool spawn = false;
 	for (auto& cl : g_clients)
 	{

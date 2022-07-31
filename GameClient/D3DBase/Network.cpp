@@ -1253,8 +1253,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 
 			Network::PlaySE(L"zombie-spawn");
 			//CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie1[id]);
-			//cout << "r_zombie1 [ " << id << "] 의 좌표 x : " << packet->x << ", z : " << packet->z << ", 체력 hp : " << packet->hp << "\n";
-			//cout << "비교하기 위한 [ " << id << "]의 좌표 x : " << r_zombie1[id].x << ", z : " << r_zombie1[id].z << ", hp : " << r_zombie1[id].hp << "\n";
 			break;
 		}
 		case MapType::SECOND_PATH:
@@ -1272,8 +1270,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 			CAnimationObjectShader::GetInstance()->AddZombie(&r_zombie2[id]);
 
 			Network::PlaySE(L"zombie-spawn");
-			//cout << "r_zombie2 [ " << id << "] 의 좌표 x : " << packet->x << ", z : " << packet->z << ", 체력 hp : " << packet->hp << "\n";
-			//cout << "비교하기 위한 [ " << id << "]의 좌표 x : " << r_zombie2[id].x << ", z : " << r_zombie2[id].z << ", hp : " << r_zombie2[id].hp << "\n";
 			break;
 		}
 		case MapType::FINAL_PATH:
@@ -1308,8 +1304,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 			CAnimationObjectShader::GetInstance()->AddZombie(&b_zombie1[id]);
 
 			Network::PlaySE(L"zombie-spawn");
-			//cout << "b_zombie1 [" << id << "] 의 좌표 x : " << packet->x << ", z : " << packet->z << ", 체력 hp : " << packet->hp << "\n";
-			//cout << "비교하기 위한 [ " << id << "]의 좌표 x : " << b_zombie1[id].x << ", z : " << b_zombie1[id].z << ", hp : " << b_zombie1[id].hp << "\n";
 
 			break;
 		}
@@ -1407,8 +1401,8 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		sc_zombie_num_packet* packet = reinterpret_cast<sc_zombie_num_packet*>(ptr);
 
-		remain_zombie = packet->zombie_num;
-		int num = packet->zombie_num;
+		remain_zombie = (int)packet->zombie_num;
+		int num = (int)packet->zombie_num;
 		auto framework = CGameFramework::GetInstance();
 		framework->AddCommand([framework, num]() {
 			framework->left_zombie = num; });
@@ -1855,7 +1849,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	default:
 	{
-		//cout << packet_type << "으로 잘못왔음 \n";
 		break;
 	}
 	}
@@ -2108,24 +2101,6 @@ void Network::Work()
 		}
 		}
 
-		//// 2. 플레이어 캐릭터 선택
-		//if (select_complete == false)
-		//{
-		//	cout << "플레이어 선택 \n";
-		//	cout << "1. 지휘관, 2. 엔지니어 3. 용병 \n";
-		//	cin >> select;
-		//	select_complete = true;
-		//	if (select == 1)
-		//		type = PlayerType::COMMANDER;
-		//	else if (select == 2)
-		//		type = PlayerType::ENGINEER;
-		//	else if (select == 3)
-		//		type = PlayerType::MERCENARY;
-		//
-		//	Player_Select(type);
-		//	this_thread::sleep_for(10ms);
-		//	continue;
-		//}
 	}
 	
 }
@@ -2515,20 +2490,6 @@ void Network::SetZombieInfo(Zombie* zombie, sc_zombie_move_packet* packet)
 	CGameFramework::GetInstance()->AddCommand([packet, zombie]() {
 		zombie->SetInfo(packet);
 	});
-	////if (abs(arr[id].x - packet->x) + abs(arr[id].z - packet->z) > 0.2f) {
-	//	arr[id].x = packet->x;
-	//	arr[id].z = packet->z;
-	////	cout << "좌표 바뀜" << endl;
-	////}
-	//arr[id].speed = packet->speed;
-	//arr[id].t_x = packet->t_x;
-	//arr[id].t_z = packet->t_z;
-	//arr[id].dir = packet->dir;
-	//arr[id].arrive = false;
-	//
-	//CGameFramework::GetInstance()->AddCommand([zombie, packet]() {
-	//	zombie.AddMove(packet->x, packet->z);
-	//});
 }
 
 void Network::PlayBGM(const wstring& name)
