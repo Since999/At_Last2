@@ -597,10 +597,8 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 		network.key_down_state = true;
 		network.Send_request_packet(MsgType::CS_PLAYER_SPECIAL);
 	}
-	else if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && (network.g_client[network.my_id].special_skill == 0) && network.key_down_state == false)
+	else if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && (network.g_client[network.my_id].special_skill == 0))
 	{
-		network.key_down_state = true;
-
 		auto framework = CGameFramework::GetInstance();
 		framework->AddGpuCommand([framework]() {
 			framework->ui_system->AddUISetting("Resources/UI/skill_fail.xml");
