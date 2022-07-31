@@ -398,3 +398,22 @@ bool CButtonUI::CheckMouseCollision(float x, float y)
 	}
 	return false;
 }
+
+#define FADE_TIME 1.0f
+
+CPopupUI::CPopupUI(float width, float height, float x, float y, float duration, CMaterial* material = NULL)
+	: CUIObject(width, height, x, y, material)
+{
+	this->duration = duration;
+	remain_time = duration;
+}
+
+void CPopupUI::Animate(float fTimeElapsed)
+{
+	CUIObject::Animate(fTimeElapsed);
+	remain_time -= fTimeElapsed;
+	transparent = clamp((remain_time + FADE_TIME) / FADE_TIME, 0.0f, 1.0f);
+	if (transparent < 0.f) {
+		CGameFramework::GetInstance()->ui_system->RemoveObject(this);
+	}
+}

@@ -251,6 +251,14 @@ void UISystem::AddButtonUI(float width, float height, float x, float y, const ws
 	variable_ui_map.emplace(name, object);
 }
 
+void UISystem::AddPopupUI(float width, float height, float x, float y, const wstring& image_file_name, float time)
+{
+	CTexture* texture = GetTexture(image_file_name);
+	CMaterial* material = new CMaterial();
+	material->SetTexture(texture);
+	CGameObject* object;
+}
+
 void UISystem::AddUISetting(const string& file_name)
 {
 	CXMLReader::GetUISetting(file_name, this);

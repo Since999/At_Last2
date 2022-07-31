@@ -405,6 +405,10 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		float y = (float)(m_ptOldCursorPos.y) / height;
 		y = 1 - y;
 		ui_system->CheckMouseCollision(x, y);
+
+		//Test
+		ui_system->AddUISetting("");
+		//Test
 	}
 		break;
 	case WM_RBUTTONDOWN:
