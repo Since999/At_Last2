@@ -382,6 +382,7 @@ void Server::PlaceZombie(MapType m_type)
 		switch (m_type)
 		{
 		case MapType::FIRST_PATH:
+		{
 			for (int i = 0; i < ROAD_ZOMBIE_NUM; ++i)
 			{
 				uniform_int_distribution<> random_road1{ One_Road_Pos.x + 1, One_Road_Pos3.x + 22 };
@@ -389,7 +390,7 @@ void Server::PlaceZombie(MapType m_type)
 				float z = 0.0f;
 				if (One_Road_Pos.x + 1 <= x && x < One_Road_Pos.x + 14)
 				{
-					uniform_int_distribution<>random_road2{ One_Road_Pos.z+2, One_Road_Pos2.z + 21 };
+					uniform_int_distribution<>random_road2{ One_Road_Pos.z + 2, One_Road_Pos2.z + 21 };
 					z = (float)random_road2(dre);
 				}
 				else if (One_Road_Pos.x + 14 <= x && x < One_Road_Pos3.x)
@@ -399,7 +400,7 @@ void Server::PlaceZombie(MapType m_type)
 				}
 				else if (One_Road_Pos3.x <= x && x < One_Road_Pos3.x + 23)
 				{
-					uniform_int_distribution<>random_road2{ One_Road_Pos2.z + 1, One_Base_Pos.z-2 };
+					uniform_int_distribution<>random_road2{ One_Road_Pos2.z + 1, One_Base_Pos.z - 2 };
 					z = (float)random_road2(dre);
 				}
 
@@ -438,12 +439,13 @@ void Server::PlaceZombie(MapType m_type)
 					break;
 			}
 			*/
-
+		}
 			break;
 		case MapType::SECOND_PATH:
+		{
 			for (int i = 0; i < ROAD_ZOMBIE_NUM; ++i)
 			{
-				uniform_int_distribution<> random_road_x{ Two_Road_Pos.x + 1, TWO_Base_Pos.x-3 };
+				uniform_int_distribution<> random_road_x{ Two_Road_Pos.x + 1, TWO_Base_Pos.x - 3 };
 				uniform_int_distribution<> random_road_z{ Two_Road_Pos.z, Two_Road_Pos.z + 24 };
 
 				float x = (float)random_road_x(dre);
@@ -458,12 +460,13 @@ void Server::PlaceZombie(MapType m_type)
 				InitZombie(r_zombie2[i], i, x, z);
 				r_zombie2[i]._state = ZombieState::SLEEP;
 			}
-
+		}
 			break;
 		case MapType::FINAL_PATH:
+		{
 			for (int i = 0; i < ROAD_ZOMBIE_NUM; ++i)
 			{
-				uniform_int_distribution<> random_road_x{ Three_Road_Pos.x+1, THREE_Base_Pos.x - 3 };
+				uniform_int_distribution<> random_road_x{ Three_Road_Pos.x + 1, THREE_Base_Pos.x - 3 };
 				uniform_int_distribution<> random_road_z{ Three_Road_Pos.z, Three_Road_Pos.z + 24 };
 
 				float x = (float)random_road_x(dre);
@@ -478,124 +481,256 @@ void Server::PlaceZombie(MapType m_type)
 				InitZombie(r_zombie3[i], i, x, z);
 				r_zombie3[i]._state = ZombieState::SLEEP;
 			}
-
+		}
 			break;
 		case MapType::CHECK_POINT_ONE:
+		{
 			for (int i = 0; i < FIRST_CHECK_POINT_ZOMBIE_NUM; ++i)
 			{
-				uniform_int_distribution<> random_road_x{ One_Base_Pos.x + 1, One_Base_End_Pos.x - 1 };
-				float x = (float)random_road_x(dre);
-				float z = 0;
+				uniform_int_distribution<> random_two{ 0, 1 };
+				int dir = random_two(dre);
 
-				if ((One_Base_Pos.x + 1 <= x && x < One_Base_Pos.x + 5) || (One_Base_End_Pos.x-6 < x && x <= One_Base_End_Pos.x-1))
+				if (dir == 0)
 				{
-					uniform_int_distribution<> random_road_z{ One_Base_Pos.z + 1, One_Base_End_Pos.z-1 };
-					z = (float)random_road_z(dre);
-				}
-				else
-				{
-					uniform_int_distribution<> top_down{ 0,1 };
-					int random = top_down(dre);
-					if (random == 0)
+					uniform_int_distribution<> random_road_x{ One_Base_Pos.x + 1, One_Base_End_Pos.x - 1 };
+					float x = (float)random_road_x(dre);
+					float z = 0;
+
+					if ((One_Base_Pos.x + 1 <= x && x < One_Base_Pos.x + 5) || (One_Base_End_Pos.x - 6 < x && x <= One_Base_End_Pos.x - 1))
 					{
-						uniform_int_distribution<> random_road_z{ One_Base_Pos.z + 1, One_Base_Pos.z + 5 };
+						uniform_int_distribution<> random_road_z{ One_Base_Pos.z + 1, One_Base_End_Pos.z - 1 };
 						z = (float)random_road_z(dre);
 					}
 					else
 					{
-						uniform_int_distribution<> random_road_z{ One_Base_End_Pos.z - 6, One_Base_End_Pos.z-1 };
-						z = (float)random_road_z(dre);
+						uniform_int_distribution<> top_down{ 0,1 };
+						int random = top_down(dre);
+						if (random == 0)
+						{
+							uniform_int_distribution<> random_road_z{ One_Base_Pos.z + 1, One_Base_Pos.z + 5 };
+							z = (float)random_road_z(dre);
+						}
+						else
+						{
+							uniform_int_distribution<> random_road_z{ One_Base_End_Pos.z - 6, One_Base_End_Pos.z - 1 };
+							z = (float)random_road_z(dre);
+						}
 					}
-				}
 
-				if (map.map[(int)z][(int)x] != (char)MazeWall::ROAD)
+					if (map.map[(int)z][(int)x] != (char)MazeWall::ROAD)
+					{
+						i--;
+						continue;
+					}
+
+					InitZombie(b_zombie1[i], i, x, z);
+					b_zombie1[i]._state = ZombieState::SLEEP;
+				}
+				else
 				{
-					i--;
-					continue;
+					uniform_int_distribution<> random_road_z{ One_Base_Pos.z + 1, One_Base_End_Pos.z - 1 };
+					float z = (float)random_road_z(dre);
+					
+					float x = 0;
+
+					if ((One_Base_Pos.z + 1 <= z && z < One_Base_Pos.z + 5) || (One_Base_End_Pos.z - 6 < z && z <= One_Base_End_Pos.z - 1))
+					{
+						uniform_int_distribution<> random_road_x{ One_Base_Pos.x + 1, One_Base_End_Pos.x - 1 };
+						x = (float)random_road_x(dre);
+					}
+					else
+					{
+						uniform_int_distribution<> top_down{ 0,1 };
+						int random = top_down(dre);
+						if (random == 0)
+						{
+							uniform_int_distribution<> random_road_x{ One_Base_Pos.x + 1, One_Base_Pos.x + 5 };
+							x = (float)random_road_x(dre);
+						}
+						else
+						{
+							uniform_int_distribution<> random_road_x{ One_Base_End_Pos.x - 6, One_Base_End_Pos.x - 1 };
+							x = (float)random_road_x(dre);
+						}
+					}
+
+					if (map.map[(int)z][(int)x] != (char)MazeWall::ROAD)
+					{
+						i--;
+						continue;
+					}
+
+					InitZombie(b_zombie1[i], i, x, z);
+					b_zombie1[i]._state = ZombieState::SLEEP;
 				}
-
-				InitZombie(b_zombie1[i], i, x, z);
-				b_zombie1[i]._state = ZombieState::SLEEP;
 			}
-
+		}
 			break;
 		case MapType::CHECK_POINT_TWO:
+		{
 			for (int i = 0; i < TWO_CHECK_POINT_ZOMBIE_NUM; ++i)
 			{
-				uniform_int_distribution<> random_road_x{ TWO_Base_Pos.x + 1, TWO_Base_End_Pos.x-1 };
-				float x = (float)random_road_x(dre);
-				float z = 0;
+				uniform_int_distribution<> random_two{ 0, 1 };
+				int dir = random_two(dre);
 
-				if ((TWO_Base_Pos.x+1 <= x && x < TWO_Base_Pos.x + 5) || (TWO_Base_End_Pos.x - 6 < x && x <= TWO_Base_End_Pos.x-1))
+				if (dir == 0)
 				{
-					uniform_int_distribution<> random_road_z{ TWO_Base_Pos.z+1, TWO_Base_End_Pos.z -1 };
-					z = (float)random_road_z(dre);
-				}
-				else
-				{
-					uniform_int_distribution<> top_down{ 0,1 };
-					int random = top_down(dre);
-					if (random == 0)
+					uniform_int_distribution<> random_road_x{ TWO_Base_Pos.x + 1, TWO_Base_End_Pos.x - 1 };
+					float x = (float)random_road_x(dre);
+					float z = 0;
+
+					if ((TWO_Base_Pos.x + 1 <= x && x < TWO_Base_Pos.x + 5) || (TWO_Base_End_Pos.x - 6 < x && x <= TWO_Base_End_Pos.x - 1))
 					{
-						uniform_int_distribution<> random_road_z{ TWO_Base_Pos.z+1, TWO_Base_Pos.z + 5 };
+						uniform_int_distribution<> random_road_z{ TWO_Base_Pos.z + 1, TWO_Base_End_Pos.z - 1 };
 						z = (float)random_road_z(dre);
 					}
 					else
 					{
-						uniform_int_distribution<> random_road_z{ TWO_Base_End_Pos.z -6, TWO_Base_End_Pos.z - 1 };
-						z = (float)random_road_z(dre);
+						uniform_int_distribution<> top_down{ 0,1 };
+						int random = top_down(dre);
+						if (random == 0)
+						{
+							uniform_int_distribution<> random_road_z{ TWO_Base_Pos.z + 1, TWO_Base_Pos.z + 5 };
+							z = (float)random_road_z(dre);
+						}
+						else
+						{
+							uniform_int_distribution<> random_road_z{ TWO_Base_End_Pos.z - 6, TWO_Base_End_Pos.z - 1 };
+							z = (float)random_road_z(dre);
+						}
 					}
-				}
 
-				if (map.map[(int)z][(int)x] != (char)MazeWall::ROAD)
+					if (map.map[(int)z][(int)x] != (char)MazeWall::ROAD)
+					{
+						i--;
+						continue;
+					}
+
+					InitZombie(b_zombie2[i], i, x, z);
+					b_zombie2[i]._state = ZombieState::SLEEP;
+				}
+				else
 				{
-					i--;
-					continue;
+					uniform_int_distribution<> random_road_z{ TWO_Base_Pos.z + 1, TWO_Base_End_Pos.z - 1 };
+					float z = (float)random_road_z(dre);
+
+					float x = 0;
+
+					if ((TWO_Base_Pos.z + 1 <= z && z < TWO_Base_Pos.z + 5) || (TWO_Base_End_Pos.z - 6 < z && z <= TWO_Base_End_Pos.z - 1))
+					{
+						uniform_int_distribution<> random_road_x{ TWO_Base_Pos.x + 1, TWO_Base_End_Pos.x - 1 };
+						x = (float)random_road_x(dre);
+					}
+					else
+					{
+						uniform_int_distribution<> top_down{ 0,1 };
+						int random = top_down(dre);
+						if (random == 0)
+						{
+							uniform_int_distribution<> random_road_x{ TWO_Base_Pos.x + 1, TWO_Base_Pos.x + 5 };
+							x= (float)random_road_x(dre);
+						}
+						else
+						{
+							uniform_int_distribution<> random_road_x{ TWO_Base_End_Pos.x - 6, TWO_Base_End_Pos.x - 1 };
+							x = (float)random_road_x(dre);
+						}
+					}
+
+					if (map.map[(int)z][(int)x] != (char)MazeWall::ROAD)
+					{
+						i--;
+						continue;
+					}
+
+					InitZombie(b_zombie2[i], i, x, z);
+					b_zombie2[i]._state = ZombieState::SLEEP;
 				}
-
-				InitZombie(b_zombie2[i], i, x, z);
-				b_zombie2[i]._state = ZombieState::SLEEP;
 			}
-
+		}
 			break;
 		case MapType::CHECK_POINT_FINAL:
+		{
 			for (int i = 0; i < THREE_CHECK_POINT_ZOMBIE_NUM; ++i)
 			{
-				uniform_int_distribution<> random_road_x{ THREE_Base_Pos.x+1, THREE_Base_End_Pos2.x-1 };
-				float x = (float)random_road_x(dre);
-				float z = 0;
+				uniform_int_distribution<> random_two{ 0, 2 };
+				int dir = random_two(dre);
 
-				if ((THREE_Base_Pos.x+1 <= x && x < THREE_Base_Pos.x + 6) || (THREE_Base_End_Pos2.x - 6 <= x && x < THREE_Base_End_Pos2.x-1))
+				if (dir == 0 || dir == 1)
 				{
-					uniform_int_distribution<> random_road_z{ THREE_Base_Pos.z+1, THREE_Base_End_Pos.z-1 };
-					z = (float)random_road_z(dre);
-				}
-				else
-				{
-					uniform_int_distribution<> top_down{ 0,1 };
-					int random = top_down(dre);
-					if (random == 0)
+					uniform_int_distribution<> random_road_x{ THREE_Base_Pos.x + 1, THREE_Base_End_Pos2.x - 1 };
+					float x = (float)random_road_x(dre);
+					float z = 0;
+
+					if ((THREE_Base_Pos.x + 1 <= x && x < THREE_Base_Pos.x + 6) || (THREE_Base_End_Pos2.x - 6 <= x && x < THREE_Base_End_Pos2.x - 1))
 					{
-						uniform_int_distribution<> random_road_z{ THREE_Base_Pos.z+1, THREE_Base_Pos.z + 5 };
+						uniform_int_distribution<> random_road_z{ THREE_Base_Pos.z + 1, THREE_Base_End_Pos.z - 1 };
 						z = (float)random_road_z(dre);
 					}
 					else
 					{
-						uniform_int_distribution<> random_road_z{ THREE_Base_End_Pos.z - 6, THREE_Base_End_Pos.z - 1 };
-						z = (float)random_road_z(dre);
+						uniform_int_distribution<> top_down{ 0,1 };
+						int random = top_down(dre);
+						if (random == 0)
+						{
+							uniform_int_distribution<> random_road_z{ THREE_Base_Pos.z + 1, THREE_Base_Pos.z + 5 };
+							z = (float)random_road_z(dre);
+						}
+						else
+						{
+							uniform_int_distribution<> random_road_z{ THREE_Base_End_Pos.z - 6, THREE_Base_End_Pos.z - 1 };
+							z = (float)random_road_z(dre);
+						}
 					}
-				}
 
-				if (map.map[(int)z][(int)x] != (char)MazeWall::ROAD)
+					if (map.map[(int)z][(int)x] != (char)MazeWall::ROAD)
+					{
+						i--;
+						continue;
+					}
+
+					InitZombie(b_zombie3[i], i, x, z);
+					b_zombie3[i]._state = ZombieState::SLEEP;
+				}
+				else
 				{
-					i--;
-					continue;
+					uniform_int_distribution<> random_road_z{ THREE_Base_Pos.z + 1, THREE_Base_End_Pos.z - 1 };
+					float z = (float)random_road_z(dre);
+					
+					float x = 0;
+
+					if ((THREE_Base_Pos.z + 1 <= z && z < THREE_Base_Pos.z + 6) || (THREE_Base_End_Pos2.z - 6 <= z && z < THREE_Base_End_Pos2.z - 1))
+					{
+						uniform_int_distribution<> random_road_x{ THREE_Base_Pos.x + 1, THREE_Base_End_Pos2.x - 1 };
+						x = (float)random_road_x(dre);
+					}
+					else
+					{
+						uniform_int_distribution<> top_down{ 0,1 };
+						int random = top_down(dre);
+						if (random == 0)
+						{
+							uniform_int_distribution<> random_road_x{ THREE_Base_Pos.x + 1, THREE_Base_Pos.x + 5 };
+							x = (float)random_road_x(dre);
+						}
+						else
+						{
+							uniform_int_distribution<> random_road_x{ THREE_Base_End_Pos2.x - 6, THREE_Base_End_Pos2.x - 1 };
+							x = (float)random_road_x(dre);
+						}
+					}
+
+					if (map.map[(int)z][(int)x] != (char)MazeWall::ROAD)
+					{
+						i--;
+						continue;
+					}
+
+					InitZombie(b_zombie3[i], i, x, z);
+					b_zombie3[i]._state = ZombieState::SLEEP;
 				}
-
-				InitZombie(b_zombie3[i], i, x, z);
-				b_zombie3[i]._state = ZombieState::SLEEP;
 			}
-
+		}
 			break;
 		}
 	}
@@ -610,60 +745,36 @@ void Server::ChangeMapType(Client& cl)
 		cl.zombie_list.clear();
 		change = MapType::FIRST_PATH;
 		cl.map_type = MapType::FIRST_PATH;
-		if (MapCheck(MapType::FIRST_PATH))
-		{
-			remain_zombie_num = ROAD_ZOMBIE_NUM;
-		}
 	}
 	else if ((cl.map_type != MapType::CHECK_POINT_ONE) && ((One_Base_Pos.x <= cl.player->x && cl.player->x <= One_Base_End_Pos.x) && (One_Base_Pos.z <= cl.player->z && cl.player->z <= One_Base_End_Pos.z)))
 	{
 		cl.zombie_list.clear();
 		change = MapType::CHECK_POINT_ONE;
 		cl.map_type = MapType::CHECK_POINT_ONE;
-		if (MapCheck(MapType::CHECK_POINT_ONE))
-		{
-			remain_zombie_num = FIRST_CHECK_POINT_ZOMBIE_NUM;
-		}
 	}
 	else if ((cl.map_type != MapType::CHECK_POINT_TWO) && ((TWO_Base_Pos.x <= cl.player->x && cl.player->x <= TWO_Base_End_Pos.x) && (TWO_Base_Pos.z <= cl.player->z && cl.player->z <= TWO_Base_End_Pos.z)))
 	{
 		cl.zombie_list.clear();
 		change = MapType::CHECK_POINT_TWO;
 		cl.map_type = MapType::CHECK_POINT_TWO;
-		if (MapCheck(MapType::CHECK_POINT_TWO))
-		{
-			remain_zombie_num = TWO_CHECK_POINT_ZOMBIE_NUM;
-		}
 	}
 	else if ((cl.map_type != MapType::CHECK_POINT_FINAL) && ((THREE_Base_Pos.x <= cl.player->x && cl.player->x <= THREE_Base_End_Pos2.x) && (THREE_Base_Pos.z <= cl.player->z && cl.player->z <= THREE_Base_End_Pos.z)))
 	{
 		cl.zombie_list.clear();
 		change = MapType::CHECK_POINT_FINAL;
 		cl.map_type = MapType::CHECK_POINT_FINAL;
-		if (MapCheck(MapType::CHECK_POINT_FINAL))
-		{
-			remain_zombie_num = THREE_CHECK_POINT_ZOMBIE_NUM;
-		}
 	}
 	else if((cl.map_type != MapType::SECOND_PATH) && ((Two_Road_Pos.x <= cl.player->x&& cl.player->x <= TWO_Base_Pos.x) && (Two_Road_Pos.z <= cl.player->z&& cl.player->z <= Two_Road_Pos.z + ROAD_SIZE)))
 	{
 		cl.zombie_list.clear();
 		change = MapType::SECOND_PATH;
 		cl.map_type = MapType::SECOND_PATH;
-		if (MapCheck(MapType::SECOND_PATH))
-		{
-			remain_zombie_num = ROAD_ZOMBIE_NUM;
-		}
 	}
 	else if ((cl.map_type != MapType::FINAL_PATH) && ((Three_Road_Pos.x <= cl.player->x && cl.player->x <= THREE_Base_Pos.x) && (Three_Road_Pos.z <= cl.player->z && cl.player->z <= Three_Road_Pos.z + ROAD_SIZE)))
 	{
 		cl.zombie_list.clear();
 		change = MapType::FINAL_PATH;
 		cl.map_type = MapType::FINAL_PATH;
-		if (MapCheck(MapType::FINAL_PATH))
-		{
-			remain_zombie_num = ROAD_ZOMBIE_NUM;
-		}
 	}
 	else if ((cl.map_type != MapType::EXIT) && ((Exit_Pos.x <= cl.player->x && cl.player->x <= Exit_End_Pos.x) && (Exit_Pos.z <= cl.player->z && cl.player->z <= Exit_End_Pos.z)))
 	{
@@ -693,6 +804,12 @@ void Server::ChangeMapType(Client& cl)
 		//cout << "좀비를 스폰시킵니다 \n";
 		switch (change)
 		{
+			case MapType::FIRST_PATH:
+			{
+				remain_zombie_num = ROAD_ZOMBIE_NUM;
+
+				break;
+			}
 			case MapType::SECOND_PATH:
 			{
 				for (auto& zom : b_zombie1)
@@ -709,6 +826,8 @@ void Server::ChangeMapType(Client& cl)
 
 					Send_zombie_all_kill_packet(s_cl._id, MapType::CHECK_POINT_ONE);
 				}
+
+				remain_zombie_num = ROAD_ZOMBIE_NUM;
 
 				break;
 			}
@@ -729,6 +848,8 @@ void Server::ChangeMapType(Client& cl)
 					Send_zombie_all_kill_packet(s_cl._id, MapType::CHECK_POINT_TWO);
 				}
 
+				remain_zombie_num = ROAD_ZOMBIE_NUM;
+
 				break;
 			}
 			case MapType::CHECK_POINT_ONE:
@@ -747,6 +868,8 @@ void Server::ChangeMapType(Client& cl)
 
 					Send_zombie_all_kill_packet(s_cl._id, MapType::FIRST_PATH);
 				}
+
+				remain_zombie_num = FIRST_CHECK_POINT_ZOMBIE_NUM;
 
 				break;
 			}
@@ -767,6 +890,8 @@ void Server::ChangeMapType(Client& cl)
 					Send_zombie_all_kill_packet(s_cl._id, MapType::SECOND_PATH);
 				}
 
+				remain_zombie_num = TWO_CHECK_POINT_ZOMBIE_NUM;
+
 				break;
 			}
 			case MapType::CHECK_POINT_FINAL:
@@ -785,6 +910,8 @@ void Server::ChangeMapType(Client& cl)
 
 					Send_zombie_all_kill_packet(s_cl._id, MapType::FINAL_PATH);
 				}
+
+				remain_zombie_num = THREE_CHECK_POINT_ZOMBIE_NUM;
 
 				break;
 			}
@@ -3163,8 +3290,6 @@ float Server::ZombieSetAngle(NPC& npc, Client& cl)
 
 void Server::ChangeRoadZombieStateToSpawn(NPC& npc)
 {
-
-
 	bool spawn = false;
 	for (auto& cl : g_clients)
 	{

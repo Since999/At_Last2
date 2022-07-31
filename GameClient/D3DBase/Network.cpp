@@ -696,7 +696,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		sc_player_zombie_klil_packet* packet = reinterpret_cast<sc_player_zombie_klil_packet*>(ptr);
 
 		g_client[packet->id].zombie_kill_num = packet->zom_num;
-		int num = packet->zom_num;
+		int num = g_client[my_id].zombie_kill_num;
 		auto framework = CGameFramework::GetInstance();
 		framework->AddCommand([framework, num]() {
 			framework->zombie_killed = num; });
