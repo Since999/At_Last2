@@ -407,7 +407,10 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		ui_system->CheckMouseCollision(x, y);
 
 		//Test
-		ui_system->AddUISetting("");
+		auto framework = CGameFramework::GetInstance();
+		framework->AddGpuCommand([framework]() {
+			framework->ui_system->AddUISetting("Resources/UI/popup_test.xml");
+		});
 		//Test
 	}
 		break;
@@ -803,6 +806,13 @@ void CGameFramework::GpuCommand(const function<void()>&func)
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
+}
+
+void CGameFramework::AddGpuCommand(const function<void()>& func)
+{
+	AddCommand([this, func]() {
+		GpuCommand(func);
+	});
 }
 
 float CGameFramework::GetTotalTime()

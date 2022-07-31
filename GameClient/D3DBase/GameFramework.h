@@ -66,7 +66,7 @@ public:
 
 	void AddCommand(const function<void()>& func);
 	void GpuCommand(const function<void()>& func);
-
+	void AddGpuCommand(const function<void()>& func);
 	float GetTotalTime();
 private:
 	HINSTANCE					m_hInstance;

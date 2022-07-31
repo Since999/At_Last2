@@ -98,6 +98,7 @@ bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
     }
     GetNumberUI(xml, ui);
     GetButtonUI(xml, ui);
+    GetPopupUI(xml, ui);
     
     return true;
 }
@@ -244,4 +245,21 @@ void CXMLReader::LoadPlayerModelName(const wstring& file_name)
         CConfiguration::SetModel(model, texture);
     }
     return;
+}
+
+void CXMLReader::GetPopupUI(CMarkup& xml, UISystem* ui)
+{
+    xml.ResetPos();
+    xml.FindElem(L"UISystem");
+    xml.IntoElem();
+    const auto& map = GetVariableMap();
+    while (xml.FindElem(L"Popup")) {
+        float width = _wtof(xml.GetAttrib(L"width"));
+        float height = _wtof(xml.GetAttrib(L"height"));
+        float x = _wtof(xml.GetAttrib(L"x"));
+        float y = _wtof(xml.GetAttrib(L"y"));
+        float duration = _wtof(xml.GetAttrib(L"duration"));
+        wstring image_file_name = std::wstring(xml.GetAttrib(L"image").operator LPCWSTR());
+        ui->AddPopupUI(width, height, x, y, image_file_name, duration);
+    }
 }

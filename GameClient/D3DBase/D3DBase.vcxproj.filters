@@ -381,5 +381,8 @@
     <Xml Include="Resources\Model\PlayerModel.xml">
       <Filter>리소스 파일</Filter>
     </Xml>
+    <Xml Include="Resources\UI\popup_test.xml">
+      <Filter>리소스 파일\UI</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

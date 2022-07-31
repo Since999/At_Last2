@@ -401,7 +401,7 @@ bool CButtonUI::CheckMouseCollision(float x, float y)
 
 #define FADE_TIME 1.0f
 
-CPopupUI::CPopupUI(float width, float height, float x, float y, float duration, CMaterial* material = NULL)
+CPopupUI::CPopupUI(float width, float height, float x, float y, float duration, CMaterial* material)
 	: CUIObject(width, height, x, y, material)
 {
 	this->duration = duration;

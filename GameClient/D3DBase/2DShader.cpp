@@ -256,7 +256,8 @@ void UISystem::AddPopupUI(float width, float height, float x, float y, const wst
 	CTexture* texture = GetTexture(image_file_name);
 	CMaterial* material = new CMaterial();
 	material->SetTexture(texture);
-	CGameObject* object;
+	CGameObject* object = new CPopupUI(width, height, x, y, time, material);
+	AddObject(object);
 }
 
 void UISystem::AddUISetting(const string& file_name)
