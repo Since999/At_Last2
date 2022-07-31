@@ -610,7 +610,6 @@ void Server::ChangeMapType(Client& cl)
 		cl.zombie_list.clear();
 		change = MapType::FIRST_PATH;
 		cl.map_type = MapType::FIRST_PATH;
-		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
 		if (MapCheck(MapType::FIRST_PATH))
 		{
 			remain_zombie_num = ROAD_ZOMBIE_NUM;
@@ -621,7 +620,6 @@ void Server::ChangeMapType(Client& cl)
 		cl.zombie_list.clear();
 		change = MapType::CHECK_POINT_ONE;
 		cl.map_type = MapType::CHECK_POINT_ONE;
-		Send_zombie_number_packet(cl._id, FIRST_CHECK_POINT_ZOMBIE_NUM);
 		if (MapCheck(MapType::CHECK_POINT_ONE))
 		{
 			remain_zombie_num = FIRST_CHECK_POINT_ZOMBIE_NUM;
@@ -632,7 +630,6 @@ void Server::ChangeMapType(Client& cl)
 		cl.zombie_list.clear();
 		change = MapType::CHECK_POINT_TWO;
 		cl.map_type = MapType::CHECK_POINT_TWO;
-		Send_zombie_number_packet(cl._id, TWO_CHECK_POINT_ZOMBIE_NUM);
 		if (MapCheck(MapType::CHECK_POINT_TWO))
 		{
 			remain_zombie_num = TWO_CHECK_POINT_ZOMBIE_NUM;
@@ -643,7 +640,6 @@ void Server::ChangeMapType(Client& cl)
 		cl.zombie_list.clear();
 		change = MapType::CHECK_POINT_FINAL;
 		cl.map_type = MapType::CHECK_POINT_FINAL;
-		Send_zombie_number_packet(cl._id, THREE_CHECK_POINT_ZOMBIE_NUM);
 		if (MapCheck(MapType::CHECK_POINT_FINAL))
 		{
 			remain_zombie_num = THREE_CHECK_POINT_ZOMBIE_NUM;
@@ -654,7 +650,6 @@ void Server::ChangeMapType(Client& cl)
 		cl.zombie_list.clear();
 		change = MapType::SECOND_PATH;
 		cl.map_type = MapType::SECOND_PATH;
-		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
 		if (MapCheck(MapType::SECOND_PATH))
 		{
 			remain_zombie_num = ROAD_ZOMBIE_NUM;
@@ -665,7 +660,6 @@ void Server::ChangeMapType(Client& cl)
 		cl.zombie_list.clear();
 		change = MapType::FINAL_PATH;
 		cl.map_type = MapType::FINAL_PATH;
-		Send_zombie_number_packet(cl._id, ROAD_ZOMBIE_NUM);
 		if (MapCheck(MapType::FINAL_PATH))
 		{
 			remain_zombie_num = ROAD_ZOMBIE_NUM;
@@ -794,6 +788,13 @@ void Server::ChangeMapType(Client& cl)
 
 				break;
 			}
+		}
+
+		for (auto& s_cl : g_clients)
+		{
+			if (s_cl._state != ClientState::INGAME) continue;
+
+			Send_zombie_number_packet(cl._id, remain_zombie_num);
 		}
 
 		map_type = cl.map_type;
