@@ -109,12 +109,12 @@ variable ="left zombie"/>
   y ="950"
   image="Resources/UI/background.png"/> -->
 
-  <UI
+  <!-- <UI
   width ="250"
   height ="75"
   x ="995"
   y ="1055"
-  image="Resources/UI/stage.png"/>
+  image="Resources/UI/stage.png"/> -->
   <UI
 width ="80"
 height ="10"
