@@ -65,7 +65,8 @@ enum class IOType : char
 	NPC_SEND,
 	DOOR_OPEN,
 	PLAYER_MOVE,
-	MER_SKILL_END
+	MER_SKILL_END,
+	GAME_END
 };
 
 enum class ClientState : char

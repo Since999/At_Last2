@@ -14,7 +14,8 @@ struct BarricadePos {
 enum class EVENT_TYPE : char
 {
 	PLAYER_MOVE,
-	ZOMBIE_DEAD
+	ZOMBIE_DEAD,
+	GAME_END
 };
 
 struct Timer_Event
