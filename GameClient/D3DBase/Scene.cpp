@@ -597,7 +597,7 @@ bool CMainGameScene::ProcessInput(UCHAR* pKeysBuffer, HWND& hwnd)
 		network.key_down_state = true;
 		network.Send_request_packet(MsgType::CS_PLAYER_SPECIAL);
 	}
-	else if (network.g_client[network.my_id].special_skill == 0)
+	else if ((pKeysBuffer[VK_LSHIFT] & 0XF0) && (network.g_client[network.my_id].special_skill == 0))
 	{
 		auto framework = CGameFramework::GetInstance();
 		framework->AddGpuCommand([framework]() {
