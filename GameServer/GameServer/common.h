@@ -21,8 +21,8 @@ const int BASE_WORLD_HEIGHT = 120;
 const int END_WORLD_WIDTH = 240;
 const int END_WORLD_HEIGHT = 120;
 
-const float CAMERA_WIDTH = 32;
-const float CAMERA_HEIGHT = 31.3f;
+const float CAMERA_WIDTH = 30.0;
+const float CAMERA_HEIGHT = 18.0f;
 
 enum class MoveResult : char
 {

@@ -31,7 +31,9 @@ public:
 	void SetZ(float pos_z) { z = pos_z; };
 	float GetX() { return x; };
 	float GetZ() { return z; };
-
+	
+	float Distance(float s_x, float s_z, float e_x, float e_z);
+	MoveResult ZombieMove(float z_speed, Map& map);
 	MoveResult Move(float speed, Map& map);
 	bool IsCollied(int r, int c, Map& map);
 	Direction RootDir(float s_x, float s_z, float e_x, float e_z);

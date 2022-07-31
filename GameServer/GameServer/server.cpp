@@ -1818,6 +1818,7 @@ void Server::EngineerSpecialSkill(Client& cl)
 
 	if (check == false)
 	{
+		cout << "여기 ? \n";
 		Send_fail_packet(cl._id, MsgType::SC_ENGINEER_SPECIAL_BUILD_FAIL);
 		return;
 	}
@@ -2729,6 +2730,15 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			Send_fail_packet(cl._id, MsgType::SC_PLAYER_SPECIAL_NUM_ZERO);
 			break;
 		}
+
+		auto time = chrono::system_clock::now() - cl.player->special_time;
+		
+		if (chrono::duration_cast<chrono::milliseconds>(time).count() < 100)
+		{
+			break;
+		}
+
+		cl.player->special_time = chrono::system_clock::now();
 
 		if (cl._type == PlayerType::COMMANDER)
 		{
@@ -4001,6 +4011,8 @@ void Server::ZombiePlayerAttack(NPC& npc, MapType m_type)
 	if (npc._state != ZombieState::SPAWN)
 		return;
 
+	npc.astar_check = false;
+
 	// 각 클라이언트에게 좀비가 공격 모션 하라고 전달
 	for (auto& cl : g_clients)
 	{
@@ -4487,11 +4499,170 @@ void Server::SearchZombieAstar(int col, int row, Client& cl, NPC& npc)
 	cl.move_lock.unlock();
 
 	stack<AS_Node*> temp;
+
+	if (map.map[row][col] != (char)MazeWall::ROAD)
+	{
+		Direction dir = npc.zombie->RootDir((float)col, (float)row, npc.zombie->GetX(), npc.zombie->GetZ());
+
+		switch (dir)
+		{
+		case Direction::UP:
+		{
+			npc.zombie->SetZ(npc.zombie->GetZ() + 1.0f);
+			row += 1;
+
+			break;
+		}
+		case Direction::UP_RIGHT:
+		{
+			npc.zombie->SetX(npc.zombie->GetX() + 1.0f);
+			col += 1;
+			npc.zombie->SetZ(npc.zombie->GetZ() + 1.0f);
+			row += 1;
+			break;
+		}
+		case Direction::UP_LEFT:
+		{
+			npc.zombie->SetX(npc.zombie->GetX() - 1.0f);
+			col -= 1;
+			npc.zombie->SetZ(npc.zombie->GetZ() + 1.0f);
+			row += 1;
+			break;
+		}
+		case Direction::RIGHT:
+		{
+			npc.zombie->SetX(npc.zombie->GetX() + 1.0f);
+			col += 1;
+			break;
+		}
+		case Direction::LEFT:
+		{
+			npc.zombie->SetX(npc.zombie->GetX() - 1.0f);
+			col -= 1;
+			break;
+		}
+		case Direction::DOWN:
+		{
+			npc.zombie->SetZ(npc.zombie->GetZ() - 1.0f);
+			row -= 1;
+			break;
+		}
+		case Direction::DOWN_RIGHT:
+		{
+			npc.zombie->SetX(npc.zombie->GetX() + 1.0f);
+			col += 1;
+			npc.zombie->SetZ(npc.zombie->GetZ() - 1.0f);
+			row -= 1;
+			break;
+		}
+		case Direction::DOWN_LEFT:
+		{
+			npc.zombie->SetX(npc.zombie->GetX() - 1.0f);
+			col -= 1;
+			npc.zombie->SetZ(npc.zombie->GetZ() - 1.0f);
+			row -= 1;
+			break;
+		}
+		}
+	}
+
 	temp = npc.zombie->astar.AstartSearch(col, row, player_x, player_z);
 
 	npc.zombie->z_move_lock.lock();
 	npc.zombie->root = temp;
 	npc.zombie->z_move_lock.unlock();
+}
+
+void Server::ZombieAstar(MapType m_type, NPC& npc)
+{
+	//cout << "새로 astar를 돌릴 것이다 \n";
+	float root_path[3] = { 999999, 999999, 999999 };
+
+	// 각 클라이언트와의 거리 구하기
+	for (auto& cl : g_clients)
+	{
+		if (cl._state != ClientState::INGAME) continue;
+
+		if (cl.map_type != m_type) continue;
+
+		root_path[cl._id] = Distance(npc.zombie->GetX(), npc.zombie->GetZ(), cl.player->x, cl.player->z);
+	}
+
+	// npc의 의미상 정수 좌표(?) 구하기
+	int row = (int)npc.zombie->GetZ();
+	int col = (int)npc.zombie->GetX();
+
+	float row_result = npc.zombie->GetZ() - row;
+	float col_result = npc.zombie->GetX() - col;
+
+	if (row_result > 0.5f)
+		row += 1;
+	if (col_result > 0.5f)
+		col += 1;
+
+	// 거리가 가장 가까운 클라이언트를 목적지로 하는 Astar 구하기 
+	if (root_path[0] < root_path[1] && root_path[0] < root_path[2])
+	{
+		if (root_path[0] >= 1.0f)
+		{
+			SearchZombieAstar(col, row, g_clients[0], npc);
+			if (npc.zombie->root.size() == 0)
+			{
+				npc.astar_check = false;
+				npc.zombie->astar.New_Delete();
+			}
+			else
+				npc.astar_check = true;
+		}
+		else
+		{
+			npc.astar_check = false;
+			npc.zombie->astar.New_Delete();
+		}
+	}
+	else if (root_path[1] < root_path[0] && root_path[1] < root_path[2])
+	{
+		if (root_path[1] >= 1.0f)
+		{
+			SearchZombieAstar(col, row, g_clients[1], npc);
+			if (npc.zombie->root.size() == 0)
+			{
+				npc.astar_check = false;
+				npc.zombie->astar.New_Delete();
+			}
+			else
+				npc.astar_check = true;
+		}
+		else
+		{
+			npc.astar_check = false;
+			npc.zombie->astar.New_Delete();
+		}
+	}
+	else if (root_path[2] < root_path[1] && root_path[2] < root_path[0])
+	{
+		if (root_path[2] >= 1.0f)
+		{
+			SearchZombieAstar(col, row, g_clients[2], npc);
+			if (npc.zombie->root.size() == 0)
+			{
+				npc.astar_check = false;
+				npc.zombie->astar.New_Delete();
+			}
+			else
+				npc.astar_check = true;
+		}
+		else
+		{
+			npc.astar_check = false;
+			npc.zombie->astar.New_Delete();
+		}
+	}
+	else
+	{
+		npc._state = ZombieState::SLEEP;
+		return;
+	}
 }
 
 void Server::ZombieAstarMove(NPC& npc, MapType m_type)
@@ -4509,95 +4680,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 	// Astar 알고리즘을 돌리지 않았다면 npc의 Astar 알고리즘 돌려서 스택 집어 넣기
 	if (npc.astar_check == false)
 	{
-		//cout << "새로 astar를 돌릴 것이다 \n";
-		float root_path[3] = { 999999, 999999, 999999 };
-
-		// 각 클라이언트와의 거리 구하기
-		for (auto& cl : g_clients)
-		{
-			if (cl._state != ClientState::INGAME) continue;
-
-			if (cl.map_type != m_type) continue;
-
-			root_path[cl._id] = Distance(npc.zombie->GetX(), npc.zombie->GetZ(), cl.player->x, cl.player->z);
-		}
-
-		// npc의 의미상 정수 좌표(?) 구하기
-		int row = (int)npc.zombie->GetZ();
-		int col = (int)npc.zombie->GetX();
-
-		float row_result = npc.zombie->GetZ() - row;
-		float col_result = npc.zombie->GetX() - col;
-
-		if (row_result > 0.5f)
-			row += 1;
-		if (col_result > 0.5f)
-			col += 1;
-
-		// 거리가 가장 가까운 클라이언트를 목적지로 하는 Astar 구하기 
-		if (root_path[0] < root_path[1] && root_path[0] < root_path[2])
-		{
-			if (root_path[0] >= 1.0f)
-			{
-				SearchZombieAstar(col, row, g_clients[0], npc);
-				if (npc.zombie->root.size() == 0)
-				{
-					npc.astar_check = false;
-					npc.zombie->astar.New_Delete();
-				}
-				else
-					npc.astar_check = true;
-			}
-			else
-			{
-				npc.astar_check = false;
-				npc.zombie->astar.New_Delete();
-			}
-		}
-		else if (root_path[1] < root_path[0] && root_path[1] < root_path[2])
-		{
-			if (root_path[1] >= 1.0f)
-			{
-				SearchZombieAstar(col, row, g_clients[1], npc);
-				if (npc.zombie->root.size() == 0)
-				{
-					npc.astar_check = false;
-					npc.zombie->astar.New_Delete();
-				}
-				else
-					npc.astar_check = true;
-			}
-			else
-			{
-				npc.astar_check = false;
-				npc.zombie->astar.New_Delete();
-			}
-		}
-		else if (root_path[2] < root_path[1] && root_path[2] < root_path[0])
-		{
-			if (root_path[2] >= 1.0f)
-			{
-				SearchZombieAstar(col, row, g_clients[2], npc);
-				if (npc.zombie->root.size() == 0)
-				{
-					npc.astar_check = false;
-					npc.zombie->astar.New_Delete();
-				}
-				else
-					npc.astar_check = true;
-			}
-			else
-			{
-				npc.astar_check = false;
-			//	npc.zombie->astar.New_Delete();
-			}
-		}
-		else
-		{
-			cout << "맵 영역에 아무도 없으므로 일단 수면 \n";
-			npc._state = ZombieState::SLEEP;
-			return;
-		}
+		ZombieAstar(m_type, npc);
 	}
 
 	if (npc.zombie->root.size() == 1)
@@ -4630,13 +4713,15 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 		if (npc.zombie->root.empty() == false)
 		{
 			// 좀비가 Astar 대로 이동하는데 이동하는 지역에 따라 충돌을 했는지 실패했는지 성공했는지 파악
-			move_check = npc.zombie->Move(z_speed, map);
+			
+			//move_check = npc.zombie->Move(z_speed, map);
+			move_check = npc.zombie->ZombieMove(z_speed, map);
 
 			// 충돌하거나 실패했다면 다시 Astar 알고리즘을 돌려야함
 			if (move_check != MoveResult::MOVE)
 			{
 				npc.astar_check = false;
-			//	npc.zombie->astar.New_Delete();
+				npc.zombie->astar.New_Delete();
 			}
 		}
 		else
@@ -4800,6 +4885,7 @@ void Server::ZombieAstarMove(NPC& npc, MapType m_type)
 			npc.zombie->zombie_dir = dir;
 			Send_zombie_arrive_packet(g_clients[2]._id, npc._id, map_type, npc.zombie->zombie_dir);
 		}
+		
 	}
 
 	// 이동에 성공했으면, 주변에 플레이어와 접근하여 또는 발견하여 플레이어를 충분히 공격할 수 있는 거리가 되었는지 확인

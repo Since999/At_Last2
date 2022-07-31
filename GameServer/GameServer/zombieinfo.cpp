@@ -11,43 +11,44 @@ Zombie::~Zombie()
 
 Direction Zombie::RootDir(float s_x, float s_z, float e_x, float e_z)
 {
-	//float dir_x = x - (int)x;
-	//float dir_z = z - (int)z;
+	float dir_x = e_x - s_x;
+	float dir_z = e_z - s_z;
 
-	if (e_x < s_x && e_z < s_z)
-	{
-		return Direction::DOWN_LEFT;
-	}
-	else if (e_x < s_x && e_z == s_z)
-	{
-		return Direction::LEFT;
-	}
-	else if (e_x < s_x && e_z > s_z)
-	{
-		return Direction::UP_LEFT;
-	}
-	else if (e_x == s_x && e_z < s_z)
-	{
-		return Direction::DOWN;
-	}
-	else if (e_x == s_x && e_z == s_z)
-	{
-		cout << "여긴 어쨰야 하나 \n";
-		return Direction::NONE;
-	}
-	else if (e_x == s_x && e_z > s_z)
+	float radian = atan2f(dir_z, dir_x);
+	float degree = radian * (180 / 3.141592f);
+
+	if (degree < 0)
+		degree += 360.0f;
+
+	if (67.5f <= degree && degree < 112.5f)
 	{
 		return Direction::UP;
 	}
-	else if (e_x > s_x && e_z < s_z)
+	else if (112.5f <= degree && degree < 157.5f)
+	{
+		return Direction::UP_LEFT;
+	}
+	else if (157.5f <= degree && degree < 202.5f)
+	{
+		return Direction::LEFT;
+	}
+	else if (202.5f <= degree && degree < 247.5f)
+	{
+		return Direction::DOWN_LEFT;
+	}
+	else if (247.5f <= degree && degree < 292.5f)
+	{
+		return Direction::DOWN;
+	}
+	else if (292.5f <= degree && degree < 337.5f)
 	{
 		return Direction::DOWN_RIGHT;
 	}
-	else if (e_x > s_x && e_z == s_z)
+	else if (337.5f <= degree && degree < 360.0f || 0 <= degree && degree < 22.5f)
 	{
 		return Direction::RIGHT;
 	}
-	else if (e_x > s_x && e_z > s_z)
+	else if (22.5f <= degree && degree < 67.5f)
 	{
 		return Direction::UP_RIGHT;
 	}
@@ -64,11 +65,123 @@ bool Zombie::IsCollied(int r, int c, Map& map)
 	return false;
 }
 
+float Zombie::Distance(float s_x, float s_z, float e_x, float e_z)
+{
+	float distance = (float)sqrt(((e_x - s_x) * (e_x - s_x)) + ((e_z - s_z) * (e_z - s_z)));
+
+	return distance;
+}
+
+MoveResult Zombie::ZombieMove(float z_speed, Map& map)
+{
+	if (root.empty())
+	{
+		return MoveResult::FAIL;
+	}
+
+	AS_Node* node = root.top();
+
+	float distance = Distance(x, z, node->Get_X(), node->Get_Y());
+
+	float dir_x = node->Get_X() - x;
+	float dir_z = node->Get_Y() - z;
+
+	float radian = atan2f(dir_z, dir_x);
+	float degree = radian * (180 / 3.141592f);
+
+	if (degree < 0)
+		degree += 360.0f;
+
+	if (67.5f <= degree && degree < 112.5f)
+	{
+		zombie_dir = Direction::UP;
+	}
+	else if (112.5f <= degree && degree < 157.5f)
+	{
+		zombie_dir = Direction::UP_LEFT;
+	}
+	else if (157.5f <= degree && degree < 202.5f)
+	{
+		zombie_dir = Direction::LEFT;
+	}
+	else if (202.5f <= degree && degree < 247.5f)
+	{
+		zombie_dir = Direction::DOWN_LEFT;
+	}
+	else if (247.5f <= degree && degree < 292.5f)
+	{
+		zombie_dir = Direction::DOWN;
+	}
+	else if (292.5f <= degree && degree < 337.5f)
+	{
+		zombie_dir = Direction::DOWN_RIGHT;
+	}
+	else if (337.5f <= degree && degree < 360.0f || 0 <= degree && degree < 22.5f)
+	{
+		zombie_dir = Direction::RIGHT;
+	}
+	else if (22.5f <= degree && degree < 67.5f)
+	{
+		zombie_dir = Direction::UP_RIGHT;
+	}
+
+	if (distance > z_speed)
+	{
+		float fix_speed = z_speed;
+
+		float cos_angle = cos(degree * (3.141592f / 180.0f));
+		float sin_angle = sin(degree * (3.141592f / 180.0f));
+
+		float t_x = cos_angle * fix_speed + x;
+		float t_z = sin_angle * fix_speed + z;
+
+		x = t_x;
+		z = t_z;
+
+		return MoveResult::MOVE;
+	}
+	else
+	{
+		float fix_speed = distance;
+
+		float cos_angle = cos(degree * (3.141592f / 180.0f));
+		float sin_angle = sin(degree * (3.141592f / 180.0f));
+
+		float t_x = cos_angle * fix_speed + x;
+		float t_z = sin_angle * fix_speed + z;
+
+		root.pop();
+
+		node = root.top();
+
+		fix_speed = z_speed - distance;
+
+		dir_x = node->Get_X() - x;
+		dir_z = node->Get_Y() - z;
+
+		radian = atan2f(dir_z, dir_x);
+		degree = radian * (180 / 3.141592f);
+
+		if (degree < 0)
+			degree += 360.0f;
+
+		cos_angle = cos(degree * (3.141592f / 180.0f));
+		sin_angle = sin(degree * (3.141592f / 180.0f));
+
+		t_x = cos_angle * fix_speed + x;
+		t_z = sin_angle * fix_speed + z;
+
+		x = t_x;
+		z = t_z;
+
+		return MoveResult::MOVE;
+	}
+}
+
 MoveResult Zombie::Move(float z_speed, Map& map)
 {
 	if (root.empty())
 	{
-		cout << "이상한 위치 참조하여 길을 알려주지 않음 \n";
 		return MoveResult::FAIL;
 	}
 
@@ -100,15 +213,16 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 	}
 
 	// node에 아무것도 없다면? 움직일 수 없으므로 반환
-	if (node == nullptr) return MoveResult::FAIL;
+	if (node == nullptr)
+	{
+		return MoveResult::FAIL;
+	}
 
 	// node가 맵 밖을 가르킨다면..? 당연히 오류이므로 제거
 	if (node->Get_X() < 0 || node->Get_X() > 1100 || node->Get_Y() < 0 || node->Get_Y() > 420)
 	{
-		cout << node->Get_X() << " , " << node->Get_Y() << "라서 오류 터져 제거 \n";
 		while (!root.empty())
 			root.pop();
-		cout << "아마 제거? \n";
 		return MoveResult::FAIL;
 	}
 
@@ -140,7 +254,10 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 			collied = IsCollied(i, col, map);
 			if (collied)
 			{
-				z = root_z;
+				if (i == root_z)
+					z = root_z;
+				else
+					z = i - 1;
 				break;
 			}
 		}
@@ -151,6 +268,7 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		else
 		{
+			cout << "UP 충돌 \n";
 			return MoveResult::COLLIED;
 		}
 
@@ -317,6 +435,9 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		else
 		{
+			x -= z_speed * 0.7f;
+			z -= z_speed * 0.7f;
+			cout << "UP_RIGHT 충돌 \n";
 			return MoveResult::COLLIED;
 		}
 
@@ -489,6 +610,9 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		else
 		{
+			x += z_speed * 0.7f;
+			z -= z_speed * 0.7f;
+			cout << "UP_LEFT 충돌 \n";
 			return MoveResult::COLLIED;
 		}
 
@@ -523,6 +647,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		else
 		{
+			x += z_speed;
+			cout << "LEFT 충돌 \n";
 			return MoveResult::COLLIED;
 		}
 
@@ -558,6 +684,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		else
 		{
+			x -= z_speed;
+			cout << "RIGHT 충돌 \n";
 			return MoveResult::COLLIED;
 		}
 
@@ -592,6 +720,8 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		else
 		{
+			z += z_speed;
+			cout << "DOWN 충돌 \n";
 			return MoveResult::COLLIED;
 		}
 
@@ -756,6 +886,9 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		else
 		{
+			x += z_speed * 0.7f;
+			z += z_speed * 0.7f;
+			cout << "DOWN_LEFT 충돌 \n";
 			return MoveResult::COLLIED;
 		}
 
@@ -920,6 +1053,9 @@ MoveResult Zombie::Move(float z_speed, Map& map)
 		}
 		else
 		{
+			x -= z_speed * 0.7f;
+			z += z_speed * 0.7f;
+			cout << "DOWN_RIGHT 충돌 \n";
 			return MoveResult::COLLIED;
 		}
 
@@ -949,7 +1085,7 @@ NormalZombie::NormalZombie()
 	hp = 30;
 	damage = 5;
 	attRange = 2.5f;
-	speed = 4.5f;
+	speed = 5.0f;
 	infection = 1.0f;
 	_type = ZombieType::NORMAL;
 	attack_timer = chrono::milliseconds(2000);
@@ -966,7 +1102,7 @@ SoldierZombie::SoldierZombie()
 	hp = 40;
 	damage = 6;
 	attRange = 2.8f;
-	speed = 5.0f;
+	speed = 5.5f;
 	infection = 3.0f;
 	_type = ZombieType::SOLIDEIR;
 	attack_timer = chrono::milliseconds(2000);
@@ -983,7 +1119,7 @@ TankerZombie::TankerZombie()
 	hp = 50;
 	damage = 8;
 	attRange = 2.2f;
-	speed = 4.0f;
+	speed = 4.5f;
 	infection = 2.0f;
 	_type = ZombieType::TANKER;
 	attack_timer = chrono::milliseconds(2000);

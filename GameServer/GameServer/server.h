@@ -137,6 +137,7 @@ public:
 	static void DieZombie(Zombie* zombie) { delete zombie; zombie = nullptr; };
 	static float Distance(float s_x, float s_z, float e_x, float e_z);
 	static void SearchZombieAstar(int col, int row, Client& cl, NPC& npc);
+	static void ZombieAstar(MapType m_type, NPC& npc);
 	static void ZombieMove(int z_id);
 	static void ZombieAstarMove(NPC& npc, MapType m_type);
 	static void ZombieDead(NPC& npc, MapType m_type);

@@ -1,7 +1,7 @@
 #include "Zombie.h"
 #include "GameFramework.h"
 
-#define MAX_QUEUE_SIZE 3
+#define MAX_QUEUE_SIZE 5
 
 Zombie::Zombie()
 {
@@ -30,7 +30,7 @@ void Zombie::SetInfo(sc_zombie_move_packet* packet)
 	dir = packet->dir;
 	arrive = false;
 
-	if (abs(packet->x - x) > 10 || abs(packet->z - z) > 10)
+	if (abs(packet->x - x) > 5 || abs(packet->z - z) > 5)
 		return;
 
 	AddMove(packet->x, packet->z);
@@ -59,7 +59,7 @@ void Zombie::AddMove(float x, float z)
 void Zombie::Move()
 {
 	float time = CGameFramework::GetInstance()->GetTotalTime() - 0.5f;
-	if (move_list.size() < 2) return;
+	if (move_list.size() < 4) return;
 	/*while ((*move_queue.begin()).time < time) {
 		move_queue.pop_front();
 	}*/

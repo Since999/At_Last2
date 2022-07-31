@@ -672,7 +672,7 @@ bool Player::PlayerAttack(float x1, float z1, float z_x, float z_z)
 	
 	float a_result = abs((degree * z_x) + (-1.0f * z_z) - (degree * x) + z) / sqrt(degree * degree + 1);
 
-	if (-2.0f < a_result && a_result < 2.0f)	// 절대적인 거리가 1.0f안이면 충돌한것으로 판정하여 true를 반환, 그 외는 아니므로 false
+	if (-1.0f < a_result && a_result < 1.0f)	// 절대적인 거리가 1.0f안이면 충돌한것으로 판정하여 true를 반환, 그 외는 아니므로 false
 	{
 		return true;
 	}
@@ -694,6 +694,7 @@ Commander::Commander()
 	special_skill = 1;
 	kill_zombie = 0;
 	special_check = false;
+	special_time = chrono::system_clock::now();
 }
 
 Commander::~Commander()
@@ -710,12 +711,13 @@ Engineer::Engineer()
 	x = 65.0f, z = 55.0f;
 	//x = 203.0f, z = 244.0f;
 	//speed = 0.8f;
-	speed = 5.0f;
+	speed = 4.0f;
 	//bullet = 30;
 	special_skill = 3;
 	special_dir = DIR::HEIGHT;
 	kill_zombie = 0;
 	special_check = false;
+	special_time = chrono::system_clock::now();
 }
 
 Engineer::~Engineer()
@@ -732,11 +734,12 @@ Mercynary::Mercynary()
 	x = 67.0f, z = 55.0f;
 	//x = 204.0f, z = 244.0f;
 	//speed = 1.2f;
-	speed = 5.0f;
+	speed = 6.0f;
 	//bullet = 30;
 	special_skill = 3;
 	kill_zombie = 0;
 	special_check = false;
+	special_time = chrono::system_clock::now();
 }
 
 Mercynary::~Mercynary()

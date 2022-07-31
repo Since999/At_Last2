@@ -1180,7 +1180,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 		case MapType::FINAL_PATH:
 		{
 			if (r_zombie3[packet->id]._state != ZombieState::SPAWN) break;
-
+			
 			r_zombie3[packet->id]._animation = ZombieAnimationState::WALK;
 			SetZombieInfo(&r_zombie3[id], packet);
 

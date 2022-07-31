@@ -17,6 +17,7 @@ public:
 	Direction dir;
 	int kill_zombie;
 	atomic_bool special_check;
+	chrono::system_clock::time_point special_time;
 
 public:
 	Player();
