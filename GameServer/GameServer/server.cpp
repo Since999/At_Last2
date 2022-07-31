@@ -1006,7 +1006,7 @@ void Server::PlayerAttack(Client& cl, NPC& npc, MapType m_type, float p_x, float
 				if (other._state != ClientState::INGAME) continue;
 
 				Send_player_zombie_kill_num_packet(other._id, cl._id, cl.player->kill_zombie);
-				Send_zombie_dead_packet(cl._id, npc._id, m_type);
+				Send_zombie_dead_packet(other._id, npc._id, m_type);
 			}
 		}
 

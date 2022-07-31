@@ -594,7 +594,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_BARRICADE_SEND:
 	{
-		cout << "받음 \n";
 		sc_barricade_packet* packet = reinterpret_cast<sc_barricade_packet*>(ptr);
 
 		int i = 0;
@@ -646,7 +645,6 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_GAME_START:
 	{
-		cout << "게임 시작 \n";
 		game_start = true;
 		Send_request_packet(MsgType::CS_GAME_START);
 
@@ -971,19 +969,20 @@ void Network::ProcessPacket(unsigned char* ptr)
 	}
 	case (int)MsgType::SC_MERCENARY_SPECIAL:
 	{
-		cout << "용병 스킬 시작 \n";
 		g_client[my_id].special_skill -= 1;
 		break;
 	}
 	case (int)MsgType::SC_MERCENARY_SPECIAL_END:
 	{
-		cout << "용병 스킬 끝 \n";
 
 		break;
 	}
 	case (int)MsgType::SC_PLAYER_SPECIAL_NUM_ZERO:
 	{
-		cout << "스페셜 스킬 사용 횟수가 없어 사용하지 못했습니다. \n";
+		auto framework = CGameFramework::GetInstance();
+		framework->AddGpuCommand([framework]() {
+			framework->ui_system->AddUISetting("Resources/UI/skill_fail.xml");
+			});
 
 		break;
 	}
