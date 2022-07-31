@@ -1093,10 +1093,7 @@ void Network::ProcessPacket(unsigned char* ptr)
 	{
 		Network::PlayBGM(L"ending");
 
-		auto framework = CGameFramework::GetInstance();
-		framework->AddGpuCommand([framework]() {
-			framework->ui_system->AddUISetting("Resources/UI/ending.xml");
-			});
+		AddTimer(0, EVENT_TYPE::GAME_END, 2000);
 
 		break;
 	}
@@ -2098,6 +2095,18 @@ void Network::Work()
 
 			break;
 		}
+		case IOType::GAME_END:
+		{
+			auto framework = CGameFramework::GetInstance();
+			framework->AddGpuCommand([framework]() {
+				framework->ui_system->AddUISetting("Resources/UI/ending.xml");
+				});
+
+			delete exp_over;
+			exp_over = nullptr;
+
+			break;
+		}
 		}
 
 		//// 2. 플레이어 캐릭터 선택
@@ -2196,6 +2205,14 @@ void Network::Do_Timer()
 			{
 				Exp_Over* over = new Exp_Over;
 				over->_IOType = IOType::NPC_DEAD;
+				HANDLE t_iocp = _socket.ReturnHandle();
+				PostQueuedCompletionStatus(t_iocp, 1, te.p_id, &over->_wsa_over);
+				break;
+			}
+			case EVENT_TYPE::GAME_END:
+			{
+				Exp_Over* over = new Exp_Over;
+				over->_IOType = IOType::GAME_END;
 				HANDLE t_iocp = _socket.ReturnHandle();
 				PostQueuedCompletionStatus(t_iocp, 1, te.p_id, &over->_wsa_over);
 				break;
