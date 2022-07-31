@@ -59,5 +59,11 @@
     loop = "true"
     channel = "bgm"/>
 
+      <Sound
+    name = "ending"
+    sound = "Resources/Sound/ending.wav"
+    loop = "true"
+    channel = "bgm"/>
+
 
 </SoundSystem>
