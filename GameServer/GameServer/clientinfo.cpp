@@ -689,7 +689,7 @@ Commander::Commander()
 	x = 63.0f , z = 55.0f;
 	//x = 202.0f, z = 244.0f;
 	//speed = 1.0f;
-	speed = 5.0f;
+	speed = 4.0f;
 	//bullet = 30;
 	special_skill = 1;
 	kill_zombie = 0;
@@ -711,7 +711,7 @@ Engineer::Engineer()
 	x = 65.0f, z = 55.0f;
 	//x = 203.0f, z = 244.0f;
 	//speed = 0.8f;
-	speed = 4.0f;
+	speed = 3.5f;
 	//bullet = 30;
 	special_skill = 3;
 	special_dir = DIR::HEIGHT;
@@ -734,7 +734,7 @@ Mercynary::Mercynary()
 	x = 67.0f, z = 55.0f;
 	//x = 204.0f, z = 244.0f;
 	//speed = 1.2f;
-	speed = 6.0f;
+	speed = 4.5f;
 	//bullet = 30;
 	special_skill = 3;
 	kill_zombie = 0;

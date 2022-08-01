@@ -3000,17 +3000,17 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		if (cl._type == PlayerType::COMMANDER)
 		{
 			cl.player->x = 202.0f;
-			cl.player->z = 244.0f;
+			cl.player->z = 240.0f;
 		}
 		else if (cl._type == PlayerType::ENGINEER)
 		{
 			cl.player->x = 204.0f;
-			cl.player->z = 244.0f;
+			cl.player->z = 240.0f;
 		}
 		else if (cl._type == PlayerType::MERCENARY)
 		{
 			cl.player->x = 206.0f;
-			cl.player->z = 244.0f;
+			cl.player->z = 240.0f;
 		}
 
 		for (auto& a_cl : g_clients)
@@ -3031,17 +3031,17 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 
 		if (cl._type == PlayerType::COMMANDER)
 		{
-			cl.player->x = 513.0f;
+			cl.player->x = 512.0f;
 			cl.player->z = 338.0f;
 		}
 		else if (cl._type == PlayerType::ENGINEER)
 		{
-			cl.player->x = 513.0f;
+			cl.player->x = 512.0f;
 			cl.player->z = 340.0f;
 		}
 		else if (cl._type == PlayerType::MERCENARY)
 		{
-			cl.player->x = 513.0f;
+			cl.player->x = 512.0f;
 			cl.player->z = 342.0f;
 		}
 
@@ -3063,17 +3063,17 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 
 		if (cl._type == PlayerType::COMMANDER)
 		{
-			cl.player->x = 825.0f;
+			cl.player->x = 822.0f;
 			cl.player->z = 338.0f;
 		}
 		else if (cl._type == PlayerType::ENGINEER)
 		{
-			cl.player->x = 825.0f;
+			cl.player->x = 822.0f;
 			cl.player->z = 340.0f;
 		}
 		else if (cl._type == PlayerType::MERCENARY)
 		{
-			cl.player->x = 825.0f;
+			cl.player->x = 822.0f;
 			cl.player->z = 342.0f;
 		}
 
