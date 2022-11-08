@@ -101,9 +101,15 @@ void Network::Initialize()
 	if (retval != 0)
 		throw Exception("Start Fail");
 
+	std::ifstream file{ "ip.txt" };
+	string ip, sPort;
+	getline(file, ip);
+	getline(file, sPort);
+	short port = stoi(sPort);
+
 	_socket.Init();
 	_socket.CreatePort();
-	_socket.Connect(SERVER_IP, SERVER_PORT);
+	_socket.Connect(ip.c_str(), port);
 }
 
 void Network::AddTimer(int id, EVENT_TYPE type, int duration)
