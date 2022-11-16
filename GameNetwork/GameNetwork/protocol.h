@@ -22,7 +22,12 @@
 using namespace std;
 
 const short SERVER_PORT = 4000;
-const char* const SERVER_IP = "220.94.221.236";
+//const char* const SERVER_IP = "220.94.221.236";
+class IP_ADDRESS {
+public:
+	static string SERVER_IP;
+};
+
 //const char* const SERVER_IP = "127.0.0.1";	// 임시로 자기 IP 가르키고 있음
 
 const int MAX_PLAYER = 3;							// 플레이어 수

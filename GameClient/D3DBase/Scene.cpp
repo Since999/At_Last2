@@ -309,6 +309,49 @@ void CScene::RemoveObjects()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//CEnterIPScene
+
+CEnterIPScene::CEnterIPScene(ID3D12RootSignature* root_sig) : CScene(root_sig)
+{
+
+}
+
+CEnterIPScene::~CEnterIPScene()
+{
+
+}
+
+void CEnterIPScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	CScene::BuildObjects(pd3dDevice, pd3dCommandList);
+	CGameFramework::GetInstance()->ChangeUI(new UISystem(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), "Resources/UI/EnterIP.xml"));
+}
+
+bool CEnterIPScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+{
+	switch (nMessageID)
+	{
+		
+	case WM_KEYDOWN:
+		if (isdigit(wParam)) {
+			CGameFramework::GetInstance()->ui_system->GetIPUI()->InputNumber(wParam - '0');
+		}
+		switch (wParam)
+		{
+		case 'R':
+			CGameFramework::GetInstance()->ui_system->GetIPUI()->InputNumber(1);
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+	return(false);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //CLobbyScene
 
 CLobbyScene::CLobbyScene(ID3D12RootSignature* root_sig) : CScene(root_sig)
@@ -324,7 +367,7 @@ CLobbyScene::~CLobbyScene()
 void CLobbyScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CScene::BuildObjects(pd3dDevice, pd3dCommandList);
-	CGameFramework::GetInstance()->ChangeUI(new UISystem(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), "Resources/UI/lobby_UI.xml"));
+	CGameFramework::GetInstance()->ChangeUI(new UISystem(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), "Resources/UI/EnterIP.xml"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

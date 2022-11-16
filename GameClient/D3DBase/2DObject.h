@@ -137,3 +137,36 @@ public:
 
     virtual void Animate(float fTimeElapsed);
 };
+
+class CIPUI : public CGameObject {
+private:
+    const int digit = 4;
+private:
+    array<int, 4> address_value;
+    vector<CNumberUI*> num_ui;
+    string* value_ptr = NULL;
+    int cur_index = 0;
+    string cur_value;
+    int num_cnt = 0;
+public:
+    CIPUI(float width, float height, float x, float y, UISystem& ui, string* value_ptr = NULL);
+
+    virtual void Animate(float fTimeElapsed);
+
+    virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList) {}
+    virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL) {}
+    virtual void ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL) {}
+
+    void InputNumber(int num) {
+        if (num_cnt >= 3) {
+            cur_value.clear();
+            cur_index += 1;
+            num_cnt = 0;
+        }
+        if (cur_index >= 4) cur_index = 0;
+
+        cur_value.push_back(num + '0');
+        address_value[cur_index] = stoi( cur_value);
+        num_cnt++;
+    }
+};

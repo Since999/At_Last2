@@ -6,17 +6,18 @@
 #include "GameFramework.h"
 #include "Configuration.h"
 
-map<wstring, int*> CXMLReader::variable_map;
+map<wstring, void*> CXMLReader::variable_map;
 map<wstring, function<void()>> CXMLReader::function_map;
 
-const map<wstring, int*>& CXMLReader::GetVariableMap()
+const map<wstring, void*>& CXMLReader::GetVariableMap()
 {
     if (!variable_map.empty()) return variable_map;
     variable_map.emplace(L"skill", &(Network::g_client[Network::my_id].special_skill));
     variable_map.emplace(L"left bullet", &(Network::g_client[Network::my_id].left_bullet));
     variable_map.emplace(L"kill", &CGameFramework::GetInstance()->zombie_killed);
     variable_map.emplace(L"left zombies", &CGameFramework::GetInstance()->left_zombie);
-
+    variable_map.emplace(L"ip", &IP_ADDRESS::SERVER_IP);
+    
     return variable_map;
 }
 const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
@@ -99,7 +100,7 @@ bool CXMLReader::GetUISetting(const string& file_name, UISystem* ui)
     GetNumberUI(xml, ui);
     GetButtonUI(xml, ui);
     GetPopupUI(xml, ui);
-    
+    GetIPUI(xml, ui);
     return true;
 }
 
@@ -124,7 +125,7 @@ void CXMLReader::GetNumberUI(CMarkup& xml, UISystem* ui)
 #endif
             continue; 
         }
-        ui->AddNumberUI(width, height, x, y, digit, (*found).second);
+        ui->AddNumberUI(width, height, x, y, digit, (int*)(*found).second);
 
     }
 }
@@ -261,5 +262,30 @@ void CXMLReader::GetPopupUI(CMarkup& xml, UISystem* ui)
         float duration = _wtof(xml.GetAttrib(L"duration"));
         wstring image_file_name = std::wstring(xml.GetAttrib(L"image").operator LPCWSTR());
         ui->AddPopupUI(width, height, x, y, image_file_name, duration);
+    }
+}
+
+void CXMLReader::GetIPUI(CMarkup& xml, UISystem* ui)
+{
+    xml.ResetPos();
+    xml.FindElem(L"UISystem");
+    xml.IntoElem();
+    const auto& map = GetVariableMap();
+    while (xml.FindElem(L"IP")) {
+        float width = _wtof(xml.GetAttrib(L"width"));
+        float height = _wtof(xml.GetAttrib(L"height"));
+        float x = _wtof(xml.GetAttrib(L"x"));
+        float y = _wtof(xml.GetAttrib(L"y"));
+        wstring variable_name = std::wstring(xml.GetAttrib(L"variable").operator LPCWSTR());
+        auto& found = map.find(variable_name);
+        if (found == map.end()) {
+#ifdef _DEBUG
+            cout << "Error (GetNumberUI): no such variable in map." << endl;
+            wcout << "\tstring: " << variable_name << endl;
+#endif
+            continue;
+        }
+        ui->AddIPUI(width, height, x, y, (int*)(*found).second);
+
     }
 }

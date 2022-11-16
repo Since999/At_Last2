@@ -55,6 +55,8 @@ mutex Network::timer_lock;
 
 char Network::map[WORLD_HEIGHT][WORLD_WIDTH];
 
+string IP_ADDRESS::SERVER_IP;
+
 Network::Network()
 {
 	
@@ -100,16 +102,17 @@ void Network::Initialize()
 	int retval = WSAStartup(MAKEWORD(2, 2), &WSAData);
 	if (retval != 0)
 		throw Exception("Start Fail");
-
+	/*
 	std::ifstream file{ "ip.txt" };
 	string ip, sPort;
 	getline(file, ip);
 	getline(file, sPort);
 	short port = stoi(sPort);
-
+	*/
 	_socket.Init();
 	_socket.CreatePort();
-	_socket.Connect(ip.c_str(), port);
+	//_socket.Connect(ip.c_str(), port);
+	_socket.Connect(IP_ADDRESS::SERVER_IP.c_str(), SERVER_PORT);
 }
 
 void Network::AddTimer(int id, EVENT_TYPE type, int duration)

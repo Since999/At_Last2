@@ -260,6 +260,14 @@ void UISystem::AddPopupUI(float width, float height, float x, float y, const wst
 	AddObject(object);
 }
 
+void UISystem::AddIPUI(float width, float height, float x, float y, int* value_ptr)
+{
+	CIPUI* object = new CIPUI(width, height, x, y,  *this, (string*)value_ptr);
+	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
+	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(object);
+	ip_ui = object;
+}
+
 void UISystem::AddUISetting(const string& file_name)
 {
 	CXMLReader::GetUISetting(file_name, this);

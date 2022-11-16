@@ -26,6 +26,7 @@ Network network;
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
+	IP_ADDRESS::SERVER_IP = "220.094.221.236";
 #ifdef ENABLE_NETWORK
 	thread Timer_thread{ network.Do_Timer };
 	

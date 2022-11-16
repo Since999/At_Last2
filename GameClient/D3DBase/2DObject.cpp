@@ -2,6 +2,7 @@
 #include "Shader.h"
 #include "GameFramework.h"
 #include "2DShader.h"
+#include <sstream>
 
 CMesh* C2DObject::mesh = NULL;
 int C2DObject::root_par_index = (int)ROOT_PARAMATER_INDEX::GAMEOBJECT;
@@ -416,4 +417,46 @@ void CPopupUI::Animate(float fTimeElapsed)
 	if (transparent < 0.f) {
 		CGameFramework::GetInstance()->ui_system->RemoveObject(this);
 	}
+}
+
+CIPUI::CIPUI(float width, float height, float x, float y, UISystem& ui, string* value_ptr)
+	: CGameObject(0), value_ptr(value_ptr)
+{
+	if (value_ptr) {
+		std::stringstream ss{ *value_ptr };
+		std::string tmp;
+		int i = 0;
+		while (getline(ss, tmp, '.')) {
+			address_value[i] = (stoi(tmp));
+			i++;
+		}
+	}
+
+	float w = width / digit;
+
+	float left = x - width / 2 + w / 2;
+	float Cx;
+
+	for (int i = 0; i < digit; ++i) {
+		Cx = left + w * i;
+		num_ui.push_back(new CNumberUI(w, height, Cx, y, 3, ui, &address_value[i]));
+		CGameFramework::GetInstance()->GetCurruntScene()->AddObject(num_ui[i]);
+		//ui.AddObject(component[i]);
+	}
+}
+
+void CIPUI::Animate(float fTimeElapsed)
+{
+	
+	/*for (int value : address_value) {
+		int i = 0;
+		for (; value / pow(10, i) >= 1 && i < component.size(); ++i) {
+			int num = value / pow(10, i);
+			num = num % 10;
+			component[i]->SetValue(num);
+		}
+		for (; i < component.size(); ++i) {
+			component[i]->SetValue(0);
+		}
+	}*/
 }

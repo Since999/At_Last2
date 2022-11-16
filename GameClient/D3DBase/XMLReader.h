@@ -18,10 +18,11 @@ private:
 	static void GetNumberUI(CMarkup& xml, UISystem* ui);
 	static void GetButtonUI(CMarkup& xml, UISystem* ui);
 	static void GetPopupUI(CMarkup& xml, UISystem* ui);
+	static void GetIPUI(CMarkup& xml, UISystem* ui);
 
-	static const map<wstring, int*>&  GetVariableMap();
+	static const map<wstring, void*>&  GetVariableMap();
 	static const map<wstring, function<void()>>& GetFunctionMap();
-	static map<wstring, int*> variable_map;
+	static map<wstring, void*> variable_map;
 	static map<wstring, function<void()>> function_map;
 };
 

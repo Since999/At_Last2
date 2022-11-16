@@ -59,16 +59,19 @@ public:
 	void AddButtonUI(float width, float height, float x, float y, const wstring& image_file_name, function<void()> func, const wstring& name);
 	void AddPopupUI(float width, float height, float x, float y, const wstring& image_file_name, float time);
 	void AddUISetting(const string& file_name);
+	void AddIPUI(float width, float height, float x, float y, int* value_ptr = NULL);
 
 	void CheckMouseCollision(float x, float y);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 
 	void EnableButton(const wstring& name, bool is_enable);
+
+	CIPUI* GetIPUI() { return ip_ui; };
 private:
 	ID3D12RootSignature* root_signagture = NULL;
 	CCamera* camera = NULL;
-
+	CIPUI* ip_ui;
 	map<wstring, CGameObject*> variable_ui_map;
 };
 

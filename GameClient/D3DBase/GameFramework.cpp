@@ -517,7 +517,8 @@ void CGameFramework::BuildObjects()
 	m_pScene = scene;
 	scene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	*/
-	auto lobby = new CLobbyScene();
+	//auto lobby = new CLobbyScene();
+	auto lobby = new CEnterIPScene();
 	m_pScene = lobby;
 	lobby->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 	

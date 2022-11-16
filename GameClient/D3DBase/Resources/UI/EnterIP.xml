@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UISystem>
+  
+
+
+  <UI
+width ="2000"
+height ="1080"
+x = "980"
+y ="540"
+image="Resources/UI/lobby.jpg"/>
+
+  <UI
+width ="800"
+height ="200"
+x = "960"
+y ="660"
+image="Resources/UI/At_Last....png"/>
+
+
+  <UI
+width ="460"
+height ="100"
+x = "960"
+y ="240"
+image="Resources/UI/B_back.png"/>
+ 
+  <Button
+width ="440"
+height ="80"
+x = "960"
+y ="240"
+image="Resources/UI/Login.png"
+action="login"/>
+
+
+  <IP
+width ="1000"
+height ="200"
+x = "980"
+y ="540"
+digit ="12"
+variable ="ip"/>
+
+</UISystem>

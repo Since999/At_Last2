@@ -452,6 +452,7 @@
     <Xml Include="Resources\Model\PlayerModel.xml" />
     <Xml Include="Resources\Particle\sample.xml" />
     <Xml Include="Resources\Sound\Sound.xml" />
+    <Xml Include="Resources\UI\EnterIP.xml" />
     <Xml Include="Resources\UI\lobby_UI.xml" />
     <Xml Include="Resources\UI\lobby_UI_2.xml" />
     <Xml Include="Resources\UI\popup_test.xml" />

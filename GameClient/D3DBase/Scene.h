@@ -54,6 +54,15 @@ protected:
 	ID3D12RootSignature* m_pd3dGraphicsRootSignature = NULL;
 };
 
+class CEnterIPScene : public CScene {
+public:
+	CEnterIPScene(ID3D12RootSignature* root_sig = NULL);
+	~CEnterIPScene();
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual bool OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
+};
+
 class CLobbyScene : public CScene {
 public:
 	CLobbyScene(ID3D12RootSignature* root_sig = NULL);
