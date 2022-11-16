@@ -169,4 +169,14 @@ public:
         address_value[cur_index] = stoi( cur_value);
         num_cnt++;
     }
+
+    void SetIP() {
+        string address;
+        for (int i : address_value) {
+            address.append(to_string(i));
+            address.push_back('.');
+        }
+        address.pop_back();
+        IP_ADDRESS::SERVER_IP = address;
+    }
 };

@@ -27,10 +27,10 @@ Network network;
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
 	IP_ADDRESS::SERVER_IP = "220.094.221.236";
-#ifdef ENABLE_NETWORK
+//#ifdef ENABLE_NETWORK
 	thread Timer_thread{ network.Do_Timer };
 	
-	network.worker_threads.emplace_back(network.Work);
+	//network.worker_threads.emplace_back(network.Work);
 	/*while (1)
 	{
 		if (network.game_start)
@@ -38,7 +38,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	}*/
 	
 	//if (network.game_start)
-#endif
+//#endif
 	{
 		UNREFERENCED_PARAMETER(hPrevInstance);
 		UNREFERENCED_PARAMETER(lpCmdLine);

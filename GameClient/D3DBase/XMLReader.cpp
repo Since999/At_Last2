@@ -29,7 +29,11 @@ const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
     
     CSelectScene* sel_scene = dynamic_cast<CSelectScene*>(scene);
     function_map.emplace(L"login", [framework, sig]() {
-       // network.Login();
+        framework->ui_system->GetIPUI()->SetIP();
+        //thread Timer_thread{ network.Do_Timer };
+
+        network.worker_threads.emplace_back(network.Work);
+        //network.Login();
         framework->ChangeScene(new CSelectScene(sig));
     });
     function_map.emplace(L"game start", [framework, sig]() {
