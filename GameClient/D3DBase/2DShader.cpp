@@ -262,8 +262,14 @@ void UISystem::AddPopupUI(float width, float height, float x, float y, const wst
 
 void UISystem::AddIPUI(float width, float height, float x, float y, int* value_ptr)
 {
-	CIPUI* object = new CIPUI(width, height, x, y,  *this, (string*)value_ptr);
-	//object->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * ));
+	CTexture* texture = GetTexture(L"Resources/UI/dot.png");
+	CMaterial* material = new CMaterial();
+	material->SetTexture(texture);
+
+	/*CGameObject* object = new CUIObject(width, height, x, y, material);
+	AddObject(object);*/
+
+	CIPUI* object = new CIPUI(width, height, x, y,  *this, (string*)value_ptr, material);
 	CGameFramework::GetInstance()->GetCurruntScene()->AddObject(object);
 	ip_ui = object;
 }

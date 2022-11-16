@@ -338,8 +338,8 @@ bool CEnterIPScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPAR
 		}
 		switch (wParam)
 		{
-		case 'R':
-			CGameFramework::GetInstance()->ui_system->GetIPUI()->InputNumber(1);
+		case VK_TAB:
+			CGameFramework::GetInstance()->ui_system->GetIPUI()->NextDigit();
 			break;
 		default:
 			break;

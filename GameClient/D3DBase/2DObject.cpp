@@ -419,7 +419,7 @@ void CPopupUI::Animate(float fTimeElapsed)
 	}
 }
 
-CIPUI::CIPUI(float width, float height, float x, float y, UISystem& ui, string* value_ptr)
+CIPUI::CIPUI(float width, float height, float x, float y, UISystem& ui, string* value_ptr, CMaterial* dot_material)
 	: CGameObject(0), value_ptr(value_ptr)
 {
 	if (value_ptr) {
@@ -441,7 +441,13 @@ CIPUI::CIPUI(float width, float height, float x, float y, UISystem& ui, string* 
 		Cx = left + w * i;
 		num_ui.push_back(new CNumberUI(w, height, Cx, y, 3, ui, &address_value[i]));
 		CGameFramework::GetInstance()->GetCurruntScene()->AddObject(num_ui[i]);
-		//ui.AddObject(component[i]);
+	}
+
+	for (int i = 0; i < digit - 1; ++i) {
+		Cx = left + w * i;
+		CGameObject* dot = new CUIObject(w / 5, w / 5, Cx + w / 2, y - height / 2, dot_material);
+		//CGameObject* dot = new CUIObject(w/3, height, Cx, y, dot_material);
+		ui.AddObject(dot);
 	}
 }
 

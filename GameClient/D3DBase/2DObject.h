@@ -149,7 +149,7 @@ private:
     string cur_value;
     int num_cnt = 0;
 public:
-    CIPUI(float width, float height, float x, float y, UISystem& ui, string* value_ptr = NULL);
+    CIPUI(float width, float height, float x, float y, UISystem& ui, string* value_ptr = NULL, CMaterial* dot_material = NULL);
 
     virtual void Animate(float fTimeElapsed);
 
@@ -168,6 +168,10 @@ public:
         cur_value.push_back(num + '0');
         address_value[cur_index] = stoi( cur_value);
         num_cnt++;
+    }
+
+    void NextDigit() {
+        if (++cur_index >= 4) cur_index = 0;
     }
 
     void SetIP() {
