@@ -2840,7 +2840,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 		cl.send_start_packet = true;
 
 		bool game_start = true;
-
 		
 		for (auto& other : g_clients)
 		{
@@ -2850,14 +2849,20 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			//other.state_lock.lock();
 			if (ClientState::INGAME != other._state || other.send_start_packet == false)
 			{
-				game_start = false;
+				for (auto& d_cl : g_clients)
+				{
+					if (d_cl._state != ClientState::INGAME) continue;
+
+					d_cl._state = ClientState::DEAD;
+
+					Send_player_dead_packet(d_cl._id, cl._id);
+				}
 				//other.state_lock.unlock();
 				break;
 			}
 			//other.state_lock.unlock();
 		}
 		
-
 		if (game_start)
 		{
 			for (auto& client : g_clients)
@@ -4429,7 +4434,6 @@ void Server::Work()
 		}
 	}
 }
-
 
 void Server::Send_zombie_search_packet(int c_id, int s_id, int z_id, MapType m_type)
 {
