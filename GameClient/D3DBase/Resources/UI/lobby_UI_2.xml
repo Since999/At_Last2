@@ -64,10 +64,10 @@ y ="660"
 image="Resources/UI/pmc.png"/>
 
   <Button
-width ="440"
-height ="80"
+width ="600"
+height ="300"
 x = "960"
-y ="240"
+y ="100"
 image="Resources/UI/start.png"
 action="start button"/>
 
