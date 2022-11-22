@@ -2851,11 +2851,11 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 			{
 				for (auto& d_cl : g_clients)
 				{
-					if (d_cl._state != ClientState::INGAME) continue;
+					if (d_cl._state == ClientState::INGAME) continue;
 
 					d_cl._state = ClientState::DEAD;
 
-					Send_player_dead_packet(d_cl._id, cl._id);
+					Send_player_dead_packet(cl._id, d_cl._id);
 				}
 				//other.state_lock.unlock();
 				break;
