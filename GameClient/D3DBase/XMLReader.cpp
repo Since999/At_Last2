@@ -63,7 +63,9 @@ const map<wstring, function<void()>>& CXMLReader::GetFunctionMap()
         ui->EnableButton(L"select player 2", false);
         ui->EnableButton(L"select player 3", false);    
     });
-    
+    function_map.emplace(L"start button", []() {
+        network.Send_request_packet(MsgType::CS_GAME_START_REQUEST);
+    });
     return function_map;
 }
 
