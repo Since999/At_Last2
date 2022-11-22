@@ -3,6 +3,7 @@
 
 Client::Client()
 {
+	_state = ClientState::FREE;
 	_type = PlayerType::NONE;
 	move_time = chrono::system_clock::now();
 	t_x = 1;
