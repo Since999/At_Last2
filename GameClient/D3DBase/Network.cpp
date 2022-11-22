@@ -2127,11 +2127,11 @@ void Network::Do_Timer()
 				Send_request_packet(MsgType::CS_BARRICADE_REQUEST);
 				this_thread::sleep_for(10ms);
 			}
-			else if (barricade_req == true && game_start == false)
-			{
-				Send_request_packet(MsgType::CS_GAME_START_REQUEST);
-				this_thread::sleep_for(10ms);
-			}
+			//else if (barricade_req == true && game_start == false)
+			//{
+			//	Send_request_packet(MsgType::CS_GAME_START_REQUEST);
+			//	this_thread::sleep_for(10ms);
+			//}
 
 			//Send_request_packet(MsgType::CS_SERVER_REQUEST);
 
