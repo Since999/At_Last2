@@ -2081,6 +2081,14 @@ void Network::Work()
 			break;
 		case IOType::PLAYER_MOVE:
 		{
+			if (!game_start)
+			{
+				delete exp_over;
+				exp_over = nullptr;
+
+				break;
+			}
+
 			PlayerMove(c_id);
 
 			delete exp_over;
