@@ -63,6 +63,13 @@ x = "1650"
 y ="660"
 image="Resources/UI/pmc.png"/>
 
+  <Button
+width ="440"
+height ="80"
+x = "960"
+y ="240"
+image="Resources/UI/start.png"
+action="start button"/>
 
 <!-- <UI
 width ="800"
