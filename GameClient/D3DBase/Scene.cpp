@@ -441,42 +441,30 @@ void CMainGameScene::BuildObjects(ID3D12Device* device, ID3D12GraphicsCommandLis
 #ifndef ENABLE_NETWORK
 	network.g_client[network.my_id]._type = PlayerType::COMMANDER;
 #endif
-	model_index = (int)(network.g_client[network.my_id]._type);
-	m_pPlayer = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
-		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
-	model_index = (int)(network.g_client[network.other_client_id1]._type);
-	m_pPlayer2 = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
-		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
-	model_index = (int)(network.g_client[network.other_client_id2]._type);
-	m_pPlayer3 = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
-		CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
-
-
+	int i = 0;
 	float bottom = -580.0;
+	for (auto& client : network.g_client) {
+		model_index = (int)(client._type);
+		CMainGamePlayer* player = new CMainGamePlayer(device, list, GetGraphicsRootSignature(), NULL, 10,
+			CConfiguration::player_models[model_index].model, CConfiguration::player_models[model_index].texture.c_str());
+		
 #ifdef ENABLE_NETWORK
-	m_pPlayer->SetPosition({ (network.g_client[network.my_id].Get_Client_X() - 550.0f) * (-100.0f), 00.0f, (network.g_client[network.my_id].Get_Client_Z() - 210.0f) * (-100.0f) });
-
-	m_pPlayer->SetPosition({ 50500.0f, bottom, 14000.0f });
-	m_pPlayer2->SetPosition({ (network.g_client[network.other_client_id1].Get_Client_X() - 550.0f) * (-100.0f), 00.0f, (network.g_client[network.other_client_id1].Get_Client_Z() - 210.0f) * (-100.0f) });
-	m_pPlayer3->SetPosition({ (network.g_client[network.other_client_id2].Get_Client_X() - 550.0f) * (-100.0f), 00.0f, (network.g_client[network.other_client_id2].Get_Client_Z() - 210.0f) * (-100.0f) });
-
-	client_player = m_pPlayer;
+		player->SetPosition({ (client.Get_Client_X() - 550.0f) * (-100.0f),
+			00.0f, (client.Get_Client_Z() - 210.0f) * (-100.0f) });
 #else
-	m_pPlayer->SetPosition({ 50500.0f, bottom, 14000.0f });
-	m_pPlayer2->SetPosition({ 50500.0f, bottom, 14000.0f });
-	m_pPlayer3->SetPosition({ 50500.0f, bottom, 14000.0f });
-	client_player = m_pPlayer;
+		player->SetPosition({ 50500.0f, bottom, 14000.0f });
 #endif
-	((CMainGamePlayer*)m_pPlayer)->SetPlayerInfo(&network.g_client[network.my_id]);
-	((CMainGamePlayer*)m_pPlayer2)->SetPlayerInfo(&network.g_client[network.other_client_id1]);
-	((CMainGamePlayer*)m_pPlayer3)->SetPlayerInfo(&network.g_client[network.other_client_id2]);
+		player->SetPlayerInfo(&client);
+		players.push_back(player);
+	}
+	client_player = players[network.my_id];
 
 	client_player->ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 	framework->m_pCamera = client_player->GetCamera();
 
 	framework->m_pCamera->CreateShaderVariables(device, list);
 
-	sun_light = new CSunLight(m_pPlayer);
+	sun_light = new CSunLight(client_player);
 }
 
 CMainGameScene::~CMainGameScene()
@@ -489,9 +477,9 @@ void CMainGameScene::ReleaseObjects()
 	CScene::ReleaseObjects();
 	ReleaseShaderVariables();
 
-	if (m_pPlayer) delete m_pPlayer;
-	if (m_pPlayer2) delete m_pPlayer2;
-	if (m_pPlayer3) delete m_pPlayer3;
+	for (auto& player : players) {
+		if (player) delete player;
+	}
 }
 
 void CMainGameScene::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -502,25 +490,26 @@ void CMainGameScene::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12Graph
 void CMainGameScene::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CScene::UpdateShaderVariables(pd3dCommandList);
-	m_pPlayer2->UpdateShaderVariables(pd3dCommandList);
-	m_pPlayer3->UpdateShaderVariables(pd3dCommandList);
-	m_pPlayer->UpdateShaderVariables(pd3dCommandList);
+	for (auto& player : players) {
+		player->UpdateShaderVariables(pd3dCommandList);
+	}
 }
 
 void CMainGameScene::ReleaseShaderVariables()
 {
 	CScene::ReleaseShaderVariables();
-	m_pPlayer2->ReleaseShaderVariables();
-	m_pPlayer3->ReleaseShaderVariables();
-	m_pPlayer->ReleaseShaderVariables();
+	for (auto& player : players) {
+		player->ReleaseShaderVariables();
+	}
 }
 
 void CMainGameScene::AnimateObjects(float fTimeElapsed)
 {
 	CScene::AnimateObjects(fTimeElapsed);
-	m_pPlayer2->Update(fTimeElapsed);
-	m_pPlayer3->Update(fTimeElapsed);
-	m_pPlayer->Update(fTimeElapsed);
+
+	for (auto& player : players) {
+		player->Update(fTimeElapsed);
+	}
 
 	sun_light->Update(XMFLOAT3(), fTimeElapsed);
 }
@@ -533,10 +522,9 @@ void CMainGameScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 #ifdef _WITH_PLAYER_TOP
 	pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
-	m_pPlayer->Render(pd3dCommandList, pCamera);
-	m_pPlayer2->Render(pd3dCommandList, pCamera);
-	m_pPlayer3->Render(pd3dCommandList, pCamera);
-
+	for (auto& player : players) {
+		player->Render(pd3dCommandList, pCamera);
+	}
 }
 void CMainGameScene::ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -544,9 +532,9 @@ void CMainGameScene::ShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	//Render
 	CScene::ShadowMapRender(pd3dCommandList);
-	m_pPlayer->ShadowMapRender(pd3dCommandList);
-	m_pPlayer2->ShadowMapRender(pd3dCommandList);
-	m_pPlayer3->ShadowMapRender(pd3dCommandList);
+	for (auto& player : players) {
+		player->ShadowMapRender(pd3dCommandList);
+	}
 }
 
 bool CMainGameScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)

@@ -104,9 +104,8 @@ public:
 	virtual void StopEvent();
 
 private:
-	CPlayer* m_pPlayer = NULL;
-	CPlayer* m_pPlayer2 = NULL;
-	CPlayer* m_pPlayer3 = NULL;
+	vector<CPlayer*> players;
+	
 	CPlayer* client_player = NULL;
 	CSunLight* sun_light = NULL;
 };
