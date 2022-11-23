@@ -740,6 +740,9 @@ void Server::ChangeMapType(Client& cl)
 {
 	MapType change = MapType::NONE;
 
+	if (cl._state != ClientState::INGAME)
+		return;
+
 	if ((cl.map_type != MapType::FIRST_PATH) && ((One_Road_Pos.x <= cl.player->x && cl.player->x <= One_Road_Pos3.x) && (One_Road_Pos.z <= cl.player->z && cl.player->z <= One_Base_Pos.z - 1)))
 	{
 		cl.zombie_list.clear();
@@ -921,7 +924,7 @@ void Server::ChangeMapType(Client& cl)
 		{
 			if (s_cl._state != ClientState::INGAME) continue;
 
-			Send_zombie_number_packet(cl._id, remain_zombie_num);
+			Send_zombie_number_packet(s_cl._id, remain_zombie_num);
 		}
 
 		map_type = cl.map_type;
@@ -2583,11 +2586,6 @@ void Server::ProcessPacket(int client_id, unsigned char* p)
 					break;
 			}
 
-			//if (escape == false)
-			//{
-			//	Send_fail_packet(cl._id, MsgType::SC_PLAYER_SEARCH_FAIL);
-			//}
-
 			ChangeMapType(cl);
 
 			switch (map_type)
@@ -3339,25 +3337,15 @@ void Server::ChangeRoadZombieStateToSpawn(NPC& npc)
 	{
 		for (auto& cl : g_clients)
 		{
-			//cl.state_lock.lock();
 			if (cl._state != ClientState::INGAME)
 			{
-				//cl.state_lock.unlock();
 				continue;
 			}
-			//cl.state_lock.unlock();
 
-			//Send_zombie_spawn_packet(cl._id, npc._id, npc.zombie->GetX(), npc.zombie->GetZ(), npc.zombie->_type, npc.zombie->hp);
 			Send_zombie_spawn_packet(cl._id, npc._id, npc.zombie->GetX(), npc.zombie->GetZ(), npc.zombie->_type, npc.zombie->hp, npc.zombie->angle);
 
-			// 아직 viewlist를 만들지 않아서 해당 부분을 만들어야함
-			// viewlist안에 들어와 있는 경우에만 spawn 시작을 알려야함
-			// 아직 하지 않은 이유는 카메라크기에 대한 정의가 아직 안되어있으며, 어떻게 될지 모르기에 그냥 모두 스폰한걸 클라이언트에게 넘김
-			// viewlist 안에 없으면 클라이언트에 보낼 이유가 없음
-			
 			if (NCDis_check(cl._id, npc) == false)	// 거리 멀면 보낼 이유가 없으므로... continue
 				continue;
-
 
 			cl.list_lock.lock();
 			cl.zombie_list.insert(npc._id);
@@ -3369,7 +3357,6 @@ void Server::ChangeRoadZombieStateToSpawn(NPC& npc)
 		//this_thread::sleep_for(1ms);
 		AddTimer(npc._id, EVENT_TYPE::EVENT_NPC_MOVE, 667);
 	}
-
 }
 
 void Server::ChangeZombieStateToSpawn(int spawn_id)
@@ -3417,10 +3404,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 
 					Send_zombie_spawn_packet(cl._id, i, b_zombie1[i].zombie->GetX(), b_zombie1[i].zombie->GetZ(), b_zombie1[i].zombie->_type, b_zombie1[i].zombie->hp, b_zombie1[i].zombie->angle);
 
-					// 아직 viewlist를 만들지 않아서 해당 부분을 만들어야함
-					// viewlist안에 들어와 있는 경우에만 spawn 시작을 알려야함
-					// 아직 하지 않은 이유는 카메라크기에 대한 정의가 아직 안되어있으며, 어떻게 될지 모르기에 그냥 모두 스폰한걸 클라이언트에게 넘김
-					// viewlist 안에 없으면 클라이언트에 보낼 이유가 없음
 					if (NCDis_check(cl._id, b_zombie1[i]) == false)	// 거리 멀면 보낼 이유가 없으므로... continue
 						continue;
 
@@ -3483,11 +3466,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 
 					Send_zombie_spawn_packet(cl._id, i, b_zombie2[i].zombie->GetX(), b_zombie2[i].zombie->GetZ(), b_zombie2[i].zombie->_type, b_zombie2[i].zombie->hp, b_zombie2[i].zombie->angle);
 
-					// 아직 viewlist를 만들지 않아서 해당 부분을 만들어야함
-					// viewlist안에 들어와 있는 경우에만 spawn 시작을 알려야함
-					// 아직 하지 않은 이유는 카메라크기에 대한 정의가 아직 안되어있으며, 어떻게 될지 모르기에 그냥 모두 스폰한걸 클라이언트에게 넘김
-					// viewlist 안에 없으면 클라이언트에 보낼 이유가 없음
-
 					if (NCDis_check(cl._id, b_zombie2[i]) == false)	// 거리 멀면 보낼 이유가 없으므로... continue
 						continue;
 
@@ -3547,11 +3525,6 @@ void Server::ChangeZombieStateToSpawn(int spawn_id)
 					if (cl._state != ClientState::INGAME) continue;
 
 					Send_zombie_spawn_packet(cl._id, i, b_zombie3[i].zombie->GetX(), b_zombie3[i].zombie->GetZ(), b_zombie3[i].zombie->_type, b_zombie3[i].zombie->hp, b_zombie3[i].zombie->angle);
-
-					// 아직 viewlist를 만들지 않아서 해당 부분을 만들어야함
-					// viewlist안에 들어와 있는 경우에만 spawn 시작을 알려야함
-					// 아직 하지 않은 이유는 카메라크기에 대한 정의가 아직 안되어있으며, 어떻게 될지 모르기에 그냥 모두 스폰한걸 클라이언트에게 넘김
-					// viewlist 안에 없으면 클라이언트에 보낼 이유가 없음
 
 					if (NCDis_check(cl._id, b_zombie3[i]) == false)	// 거리 멀면 보낼 이유가 없으므로... continue
 						continue;
